@@ -22,11 +22,6 @@ public class InfoCommand extends SimpleBotSubcommand {
     }
 
     @Override
-    public String getHelpString() {
-        return "Hiển thị thông tin cơ bản của bot";
-    }
-
-    @Override
     public void runCommand(SlashCommandInteractionEvent event) {
         Guild guild = event.getGuild();
         if (guild == null)

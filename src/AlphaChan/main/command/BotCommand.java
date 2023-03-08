@@ -3,6 +3,7 @@ package AlphaChan.main.command;
 import AlphaChan.main.command.subcommands.BotCommands.GuildCommand;
 import AlphaChan.main.command.subcommands.BotCommands.HelpCommand;
 import AlphaChan.main.command.subcommands.BotCommands.InfoCommand;
+import AlphaChan.main.command.subcommands.BotCommands.PingCommand;
 import AlphaChan.main.util.SimpleBotCommand;
 
 public class BotCommand extends SimpleBotCommand {
@@ -11,6 +12,6 @@ public class BotCommand extends SimpleBotCommand {
         addSubcommands(new InfoCommand());
         addSubcommands(new GuildCommand());
         addSubcommands(new HelpCommand());
+        addSubcommands(new PingCommand());
     }
-
 }

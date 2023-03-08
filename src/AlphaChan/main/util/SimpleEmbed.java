@@ -9,7 +9,7 @@ import java.util.concurrent.TimeUnit;
 import javax.annotation.Nonnull;
 
 import AlphaChan.main.handler.TableHandler;
-import AlphaChan.main.user.DataCache;
+import AlphaChan.main.user.TimeObject;
 import net.dv8tion.jda.api.entities.Emoji;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
@@ -20,20 +20,26 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 
-public class SimpleEmbed extends DataCache {
+public class SimpleEmbed extends TimeObject {
 
     private List<RunnableButton> buttons = new ArrayList<RunnableButton>();
     private List<Integer> rows = new ArrayList<Integer>(Arrays.asList(0));
 
-    private final String SEPARATOR = ":";
-
     protected ButtonInteractionEvent interaction;
+    protected String requestor;
+
     protected final SlashCommandInteractionEvent event;
+
+    private static final String SEPARATOR = ":";
 
     public SimpleEmbed(SlashCommandInteractionEvent event, int aliveLimit) {
         super(aliveLimit, 0);
         this.event = event;
         TableHandler.add(this);
+    }
+
+    public void setRequestor(String userId) {
+        this.requestor = userId;
     }
 
     public void update() {
@@ -44,6 +50,15 @@ public class SimpleEmbed extends DataCache {
         interaction = event;
 
         String key = event.getComponentId();
+
+        if (requestor != null) {
+            if (!getTriggerMember().getId().equals(requestor)) {
+                sendMessage(
+                        "Bạn không có quuyền tương tác với bảng này\nSử dụng /mindustry searchschematic để tương tác với bảng",
+                        true);
+                return;
+            }
+        }
 
         for (RunnableButton b : buttons) {
             String id = b.getId();

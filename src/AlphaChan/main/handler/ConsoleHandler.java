@@ -5,6 +5,7 @@ import java.util.HashMap;
 
 import AlphaChan.main.console.HelpConsole;
 import AlphaChan.main.console.ReloadConfigConsole;
+import AlphaChan.main.console.ReloadSlashCommandConsole;
 import AlphaChan.main.console.ShowGuildConsole;
 import AlphaChan.main.console.ShowUserConsole;
 import AlphaChan.main.util.ConsoleCommand;
@@ -28,6 +29,7 @@ public class ConsoleHandler {
         addCommand(new ShowUserConsole());
         addCommand(new HelpConsole());
         addCommand(new ReloadConfigConsole());
+        addCommand(new ReloadSlashCommandConsole());
 
         UpdatableHandler.run("CONSOLE", 0, () -> run());
     }

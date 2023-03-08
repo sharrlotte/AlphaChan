@@ -1,5 +1,8 @@
 package AlphaChan.main.console;
 
+import java.util.ArrayList;
+import java.util.Comparator;
+
 import AlphaChan.main.handler.ConsoleHandler;
 import AlphaChan.main.util.ConsoleCommand;
 import AlphaChan.main.util.Log;
@@ -17,7 +20,23 @@ public class HelpConsole extends SimpleConsoleCommand {
 
         if (command.getArgumentCount() == 0) {
             StringBuilder content = new StringBuilder();
-            for (String c : ConsoleHandler.getCommands()) {
+            ArrayList<String> commands = new ArrayList<>();
+            commands.addAll(ConsoleHandler.getCommands());
+
+            commands.sort(new Comparator<String>() {
+                public int compare(String s1, String s2) {
+                    int length = s1.length() < s2.length() ? s1.length() : s2.length();
+                    for (int i = 0; i < length; i++) {
+                        if (s1.charAt(i) < s2.charAt(i))
+                            return -1;
+                        if (s1.charAt(i) < s2.charAt(i))
+                            return 1;
+                    }
+                    return 0;
+                }
+            });
+
+            for (String c : commands) {
                 content.append("\n\t- " + c);
             }
 

@@ -1,6 +1,6 @@
 package AlphaChan.main.user;
 
-public abstract class DataCache {
+public abstract class TimeObject {
 
     private final int ALIVE_LIMIT;
     private final int UPDATE_LIMIT;
@@ -8,7 +8,7 @@ public abstract class DataCache {
     private int time = 0;
     private int updateTime = 0;
 
-    public DataCache(final int aliveLimit, final int updateLimit) {
+    public TimeObject(final int aliveLimit, final int updateLimit) {
         this.UPDATE_LIMIT = updateLimit;
         this.ALIVE_LIMIT = aliveLimit;
         this.time = ALIVE_LIMIT;

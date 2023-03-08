@@ -70,6 +70,7 @@ public class PostSchemCommand extends SimpleBotSubcommand {
             String uuid = UUID.randomUUID().toString();
             new SchematicData(uuid, data).update();
             new SchematicInfo(uuid, member.getId(), tag).update();
+            
             MessageHandler.sendSchematicPreview(event);
             reply(event, "Đăng bản thiết kế thành công", 10);
         }

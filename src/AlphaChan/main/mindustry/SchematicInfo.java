@@ -14,8 +14,6 @@ import AlphaChan.BotConfig;
 import AlphaChan.BotConfig.Config;
 import AlphaChan.main.handler.DatabaseHandler;
 import AlphaChan.main.handler.DatabaseHandler.DATABASE;
-import AlphaChan.main.user.PenguinData;
-import AlphaChan.main.user.StarData;
 
 public class SchematicInfo {
 
@@ -35,10 +33,6 @@ public class SchematicInfo {
         this.tag = tag;
     }
 
-    @Override
-    protected void finalize() {
-        update();
-    }
 
     public void setId(String id) {
         this.id = id;
@@ -65,10 +59,11 @@ public class SchematicInfo {
     }
 
     public long getStar() {
-        if (this.star != -1)
-            return this.star;
+        if (star != -1)
+            return star;
         // Create collection if it's not exist
         if (!DatabaseHandler.collectionExists(DATABASE.STAR, this.id)) {
+            star = 0;
             return 0;
         }
         MongoCollection<StarData> collection = DatabaseHandler.getDatabase(DATABASE.STAR)
@@ -85,15 +80,16 @@ public class SchematicInfo {
             return false;
 
         collection.insertOne(new StarData(userId));
-        this.star += 1;
+        star += 1;
         return true;
     }
 
     public long getPenguin() {
-        if (this.penguin != -1)
-            return this.penguin;
+        if (penguin != -1)
+            return penguin;
         // Create collection if it's not exist
         if (!DatabaseHandler.collectionExists(DATABASE.PENGUIN, this.id)) {
+            penguin = 0;
             return 0;
         }
         MongoCollection<PenguinData> collection = DatabaseHandler.getDatabase(DATABASE.PENGUIN)
@@ -112,6 +108,7 @@ public class SchematicInfo {
         if (collection.find(filter).first() != null)
             return false;
 
+        penguin += 1;
         collection.insertOne(new PenguinData(userId));
         return true;
     }

@@ -59,7 +59,7 @@ public class Log {
 
         builder.append(e.getMessage());
         for (StackTraceElement ste : e.getStackTrace()) {
-            builder.append(ste.toString());
+            builder.append(ste.toString() + "\n");
         }
 
         print(color, logHeader, builder.toString());

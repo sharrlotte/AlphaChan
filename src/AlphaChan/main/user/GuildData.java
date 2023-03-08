@@ -26,7 +26,7 @@ import net.dv8tion.jda.api.entities.TextChannel;
 
 import static AlphaChan.AlphaChan.*;
 
-public class GuildData extends DataCache {
+public class GuildData extends TimeObject {
 
     public enum CHANNEL_TYPE {
         SCHEMATIC, MAP, SERVER_STATUS, BOT_LOG
@@ -59,11 +59,6 @@ public class GuildData extends DataCache {
         super(BotConfig.readInt(Config.GUILD_ALIVE_TIME, 10), BotConfig.readInt(Config.UPDATE_LIMIT, 10));
         this.guildId = guildId;
         _getGuild();
-    }
-
-    @Override
-    protected void finalize() {
-        update();
     }
 
     public void setShowLevel(String showLevel) {

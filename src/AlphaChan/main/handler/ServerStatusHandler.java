@@ -3,10 +3,7 @@ package AlphaChan.main.handler;
 import java.awt.Color;
 import java.util.Calendar;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 import javax.annotation.Nonnull;
 
@@ -29,7 +26,6 @@ public final class ServerStatusHandler {
 
     private static ServerStatusHandler instance = new ServerStatusHandler();
 
-    private static HashMap<String, Integer> survivalMap = new HashMap<>();
     private static HashMap<String, HashMap<String, Message>> serverStatus = new HashMap<>();
     private static HashMap<String, String> servers = new HashMap<>();
 
@@ -118,16 +114,7 @@ public final class ServerStatusHandler {
                     + "\nPhiên bản: " + result.version
                     + "\nPing: " + result.ping + "ms\n");
 
-            String mapName = Strings.stripColors(result.mapname);
-            if ((result.modeName != null && result.modeName.equals("Survival"))
-                    || (result.mode.name().equals("survival"))) {
-                if (!survivalMap.containsKey(mapName))
-                    survivalMap.put(mapName, result.wave);
-                else {
-                    if (survivalMap.get(mapName) < result.wave)
-                        survivalMap.put(mapName, result.wave);
-                }
-            }
+
 
         } else {
             field.append("Máy chủ không tồn tại hoặc ngoại tuyến\n");
@@ -135,27 +122,6 @@ public final class ServerStatusHandler {
         }
         builder.addField("Thông tin: ", field.toString(), true);
         builder.setFooter("Lần cập nhật cuối: " + Calendar.getInstance().getTime());
-        return builder;
-    }
-
-    public static int getWave(String mapName) {
-        if (survivalMap.containsKey(mapName))
-            return survivalMap.get(mapName);
-        return 0;
-    }
-
-    public static EmbedBuilder survivalMapLeaderboard() {
-        EmbedBuilder builder = new EmbedBuilder();
-        builder.setTitle("**Danh sách bản đồ:**");
-        StringBuilder field = new StringBuilder();
-        Map<String, Integer> mapSortedByKey = survivalMap.entrySet().stream()
-                .sorted((e1, e2) -> e1.getKey().compareTo(e2.getKey()))
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e1, LinkedHashMap::new));
-
-        for (String m : mapSortedByKey.keySet()) {
-            field.append(m + ": " + survivalMap.get(m).toString() + "\n");
-        }
-        builder.addField("Kỷ lục đợt cao nhất của các bản đồ sinh tồn: ", field.toString(), false);
         return builder;
     }
 }

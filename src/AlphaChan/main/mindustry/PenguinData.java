@@ -1,4 +1,4 @@
-package AlphaChan.main.user;
+package AlphaChan.main.mindustry;
 
 public class PenguinData {
 

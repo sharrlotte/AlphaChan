@@ -52,7 +52,7 @@ public class SchematicTable extends SimpleTable {
 
         String schematicDataCollectionName = BotConfig.readString(Config.SCHEMATIC_DATA_COLLECTION, null);
 
-        this.collection = DatabaseHandler.getCollection(DATABASE.MINDUSTRY, schematicDataCollectionName,
+        collection = DatabaseHandler.getCollection(DATABASE.MINDUSTRY, schematicDataCollectionName,
                 SchematicData.class);
 
         addButtonPrimary("<", () -> this.previousPage());
@@ -62,18 +62,13 @@ public class SchematicTable extends SimpleTable {
         addButtonPrimary("data", Emoji.fromMarkdown("📁"), () -> this.sendCode());
         addButtonPrimary("star", Emoji.fromMarkdown("⭐"), () -> this.addStar());
         addButtonPrimary("penguin", Emoji.fromMarkdown("🐧"), () -> this.addPenguin());
+        addRow();
         addButtonPrimary("delete", Emoji.fromMarkdown("🚮"), () -> this.deleteSchematic());
-
     }
 
     @Override
     public int getMaxPage() {
         return this.schematicInfoList.size();
-    }
-
-    @Override
-    public void sendTable() {
-        updateTable();
     }
 
     @Override
@@ -106,15 +101,24 @@ public class SchematicTable extends SimpleTable {
     }
 
     private void deleteSchematic() {
-        if (UserHandler.isAdmin(getTriggerMember())) {
+        if (!UserHandler.isAdmin(getTriggerMember())) {
+            sendMessage("Bạn không có quyền xóa bản thiết kế", true);
+            return;
+        }
+
+        try {
             schematicInfoList.remove(currentInfo);
-            currentCode.delete();
             currentData.delete();
             currentInfo.delete();
+
+            if (currentCode != null)
+                currentCode.delete();
+
             updateTable();
             sendMessage("Đã xóa bản thiết kế", 10);
-        } else {
-            sendMessage("Bạn không có quyền xóa bản thiết kế", true);
+
+        } catch (Exception e) {
+            Log.error(e);
         }
     }
 

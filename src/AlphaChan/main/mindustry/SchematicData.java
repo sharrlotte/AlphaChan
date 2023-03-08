@@ -25,11 +25,6 @@ public class SchematicData {
         this.data = data;
     }
 
-    @Override
-    protected void finalize() {
-        update();
-    }
-
     public void setId(String id) {
         this.id = id;
     }

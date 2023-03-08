@@ -35,9 +35,9 @@ public class HelpCommand extends SimpleBotSubcommand {
         String subcommand = subcommandOption.getAsString();
         if (CommandHandler.getCommandHashMap().containsKey(command))
             reply(event, "/" + command + " " + subcommand + "\n"
-                    + CommandHandler.getCommandHashMap().get(command).getHelpString(subcommand), 30);
+                    + CommandHandler.getCommandHashMap().get(command).getHelpString(subcommand), 60);
         else
-            reply(event, "Lệnh " + command + " " + subcommand + " không tồn tại", 30);
+            reply(event, "Lệnh " + command + " " + subcommand + " không tồn tại", 10);
     }
 
     @Override

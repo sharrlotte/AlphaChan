@@ -74,8 +74,9 @@ public class SimpleTable extends SimpleEmbed {
         updateTable();
     }
 
-    public void sendTable() {
+    public SimpleTable sendTable() {
         updateTable();
+        return this;
     }
 
     public void updateTable() {
@@ -89,8 +90,9 @@ public class SimpleTable extends SimpleEmbed {
             event.getHook().editOriginal("```Đã hết dữ liệu```").queue();
             return;
         }
-        Collection<ActionRow> row = getButton();
         WebhookMessageUpdateAction<Message> action = event.getHook().editOriginalEmbeds(message);
+
+        Collection<ActionRow> row = getButton();
         if (row.size() > 0)
             action.setActionRows(row);
         action.queue();

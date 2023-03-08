@@ -72,7 +72,7 @@ public class SearchSchematicCommand extends SimpleBotSubcommand {
                     .sort(new Document().append("star", -1));
         } else {
             schematicInfo = collection.find(Filters.and(Filters.all("tag", tags), filter), SchematicInfo.class)
-                    .limit(SEARCH_LIMIT).sort(new Document().append("star", -1));
+                    .limit(SEARCH_LIMIT);
         }
 
         if (schematicInfo.first() == null) {
@@ -81,7 +81,7 @@ public class SearchSchematicCommand extends SimpleBotSubcommand {
             else
                 reply(event, "Không có dữ liệu về bản thiết kế với nhãn: " + tagOption.getAsString().toLowerCase(), 30);
         } else {
-            new SchematicTable(event, schematicInfo).sendTable();
+            new SchematicTable(event, schematicInfo).sendTable().setRequestor(event.getMember().getId());
         }
     }
 

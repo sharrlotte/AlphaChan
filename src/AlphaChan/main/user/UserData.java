@@ -23,7 +23,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import static AlphaChan.AlphaChan.*;
 
-public class UserData extends DataCache {
+public class UserData extends TimeObject {
 
     @Nonnull
     public String userId;
@@ -48,11 +48,6 @@ public class UserData extends DataCache {
         super(BotConfig.readInt(Config.USER_ALIVE_TIME, 10), BotConfig.readInt(Config.UPDATE_LIMIT, 10));
         this.userId = userId;
         this.guildId = guildId;
-    }
-
-    @Override
-    protected void finalize() {
-        update();
     }
 
     public UserData modify(@Nonnull String guildId, @Nonnull String userId, String name, Integer point, Integer level,
