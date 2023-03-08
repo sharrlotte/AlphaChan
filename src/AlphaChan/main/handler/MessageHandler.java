@@ -289,7 +289,7 @@ public final class MessageHandler extends ListenerAdapter {
             channel.sendFile(mapFile).addFile(f).setEmbeds(builder.build()).queue();
 
         } catch (Exception e) {
-            e.printStackTrace();
+            Log.error(e);
         }
     }
 
@@ -333,7 +333,7 @@ public final class MessageHandler extends ListenerAdapter {
         try {
             sendSchematicPreview(ContentHandler.parseSchematicURL(attachment.getUrl()), member, event.getChannel());
         } catch (Exception e) {
-            e.printStackTrace();
+            Log.error(e);
         }
     }
 

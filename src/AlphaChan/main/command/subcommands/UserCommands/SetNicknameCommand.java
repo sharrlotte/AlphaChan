@@ -11,6 +11,7 @@ import static AlphaChan.AlphaChan.*;
 
 import AlphaChan.main.handler.UserHandler;
 import AlphaChan.main.user.UserData;
+import AlphaChan.main.util.Log;
 import AlphaChan.main.util.SimpleBotSubcommand;
 
 public class SetNicknameCommand extends SimpleBotSubcommand {
@@ -72,7 +73,7 @@ public class SetNicknameCommand extends SimpleBotSubcommand {
 
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            Log.error(e);
         }
     }
 

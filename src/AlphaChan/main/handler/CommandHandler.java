@@ -81,8 +81,8 @@ public class CommandHandler extends ListenerAdapter {
         try {
             event.deferReply().queue();
             handleCommand(event);
-        } catch (Throwable e) {
-            e.printStackTrace();
+        } catch (Exception e) {
+            Log.error(e);
         }
     }
 
@@ -124,7 +124,7 @@ public class CommandHandler extends ListenerAdapter {
             } else
                 reply(event, "Lệnh sai rồi kìa baka", 10);
         } catch (Exception e) {
-            e.printStackTrace();
+            Log.error(e);
         }
 
     }

@@ -37,11 +37,11 @@ public class SimpleEmbed extends DataCache {
     }
 
     public void update() {
-        
+
     }
 
     public void onCommand(@Nonnull ButtonInteractionEvent event) {
-        this.interaction = event;
+        interaction = event;
 
         String key = event.getComponentId();
 
@@ -55,12 +55,12 @@ public class SimpleEmbed extends DataCache {
     }
 
     public void finalize() {
-        this.delete();
+        delete();
     }
 
     public void delete() {
-        this.event.getHook().deleteOriginal().queue();
-        this.killTimer();
+        event.getHook().deleteOriginal().queue();
+        killTimer();
     }
 
     public @Nonnull Guild getEventGuild() {
@@ -82,7 +82,7 @@ public class SimpleEmbed extends DataCache {
     }
 
     public String getId() {
-        return this.event.getId();
+        return event.getId();
     }
 
     public @Nonnull Guild getTriggerGuild() {
@@ -110,7 +110,7 @@ public class SimpleEmbed extends DataCache {
     }
 
     public String getButtonName() {
-        if (this.interaction == null)
+        if (interaction == null)
             return null;
         return interaction.getComponentId();
     }
@@ -214,29 +214,29 @@ public class SimpleEmbed extends DataCache {
     }
 
     public void clearButton() {
-        this.rows = new ArrayList<Integer>(Arrays.asList(0));
-        this.buttons.clear();
+        rows = new ArrayList<Integer>(Arrays.asList(0));
+        buttons.clear();
     }
 
     public void reply(String content) {
-        this.event.getHook().editOriginal("```" + content + "```").queue();
+        event.getHook().editOriginal("```" + content + "```").queue();
     }
 
     public void reply(String content, int deleteAfter) {
-        this.event.getHook().editOriginal("```" + content + "```").queue();
+        event.getHook().editOriginal("```" + content + "```").queue();
     }
 
     public void sendMessage(String content, int deleteAfter) {
-        if (this.interaction == null)
+        if (interaction == null)
             return;
-        this.interaction.getHook().sendMessage("```" + content + "```")
+        interaction.getHook().sendMessage("```" + content + "```")
                 .queue(m -> m.delete().queueAfter(deleteAfter, TimeUnit.SECONDS));
     }
 
     public void sendMessage(String content, boolean ephemeral) {
-        if (this.interaction == null)
+        if (interaction == null)
             return;
-        this.interaction.getHook().sendMessage("```" + content + "```").setEphemeral(ephemeral).queue();
+        interaction.getHook().sendMessage("```" + content + "```").setEphemeral(ephemeral).queue();
     }
 
     private class RunnableButton {
@@ -249,16 +249,15 @@ public class SimpleEmbed extends DataCache {
         }
 
         public Runnable getRunnable() {
-            return this.runable;
+            return runable;
         }
 
         public Button getButton() {
-            return this.button;
+            return button;
         }
 
         public String getId() {
-            return this.getButton().getId();
+            return getButton().getId();
         }
     }
-
 }

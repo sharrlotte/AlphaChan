@@ -75,19 +75,15 @@ public class SchematicInfo {
                 .getCollection(this.id, StarData.class);
 
         return collection.countDocuments();
-
     }
 
     public boolean addStar(@Nonnull String userId) {
-        if (!DatabaseHandler.collectionExists(DATABASE.STAR, this.id)) {
-            DatabaseHandler.createCollection(DATABASE.STAR, this.id);
-        }
-        MongoCollection<StarData> collection = DatabaseHandler.getDatabase(DATABASE.STAR)
-                .getCollection(this.id, StarData.class);
+        MongoCollection<StarData> collection = DatabaseHandler.getCollection(DATABASE.STAR, this.id, StarData.class);
 
-        Document filter = new Document().append("_id", this.id);
+        Document filter = new Document().append("userId", userId);
         if (collection.find(filter).first() != null)
             return false;
+
         collection.insertOne(new StarData(userId));
         this.star += 1;
         return true;
@@ -108,15 +104,14 @@ public class SchematicInfo {
     }
 
     public boolean addPenguin(@Nonnull String userId) {
-        if (!DatabaseHandler.collectionExists(DATABASE.PENGUIN, this.id)) {
-            DatabaseHandler.createCollection(DATABASE.PENGUIN, this.id);
-        }
-        MongoCollection<PenguinData> collection = DatabaseHandler.getDatabase(DATABASE.PENGUIN)
-                .getCollection(this.id, PenguinData.class);
 
-        Document filter = new Document().append("_id", this.id);
+        MongoCollection<PenguinData> collection = DatabaseHandler.getCollection(DATABASE.PENGUIN, this.id,
+                PenguinData.class);
+
+        Document filter = new Document().append("userId", userId);
         if (collection.find(filter).first() != null)
             return false;
+
         collection.insertOne(new PenguinData(userId));
         return true;
     }

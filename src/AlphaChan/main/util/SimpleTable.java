@@ -4,14 +4,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import javax.annotation.Nonnull;
-
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageEmbed;
-import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.requests.restaction.WebhookMessageUpdateAction;
@@ -27,49 +22,7 @@ public class SimpleTable extends SimpleEmbed {
     }
 
     public void finalize() {
-        this.delete();
-    }
-
-    public @Nonnull Guild getEventGuild() {
-        Guild guild = event.getGuild();
-        if (guild == null)
-            throw new IllegalStateException("GUILD IS NOT EXISTS");
-        return guild;
-    }
-
-    public @Nonnull Member getEventMember() {
-        Member member = event.getMember();
-        if (member == null)
-            throw new IllegalStateException("MEMBER IS NOT EXISTS");
-        return member;
-    }
-
-    public TextChannel getEventTextChannel() {
-        return event.getTextChannel();
-    }
-
-    public @Nonnull Guild getTriggerGuild() {
-        Guild guild = interaction.getGuild();
-        if (guild == null)
-            throw new IllegalStateException("GUILD IS NOT EXISTS");
-        return guild;
-    }
-
-    public @Nonnull Member getTriggerMember() {
-        Member member = interaction.getMember();
-        if (member == null)
-            throw new IllegalStateException("MEMBER IS NOT EXISTS");
-        return member;
-    }
-
-    public @Nonnull TextChannel getTriggerTextChannel() {
-        return interaction.getTextChannel();
-    }
-
-    public String getButtonName() {
-        if (this.interaction == null)
-            return null;
-        return interaction.getComponentId();
+        delete();
     }
 
     public boolean addPage(EmbedBuilder value) {
@@ -79,7 +32,7 @@ public class SimpleTable extends SimpleEmbed {
     }
 
     public MessageEmbed getCurrentPage() {
-        EmbedBuilder value = this.table.get(pageNumber);
+        EmbedBuilder value = table.get(pageNumber);
         return addPageFooter(value).build();
     }
 
@@ -95,30 +48,30 @@ public class SimpleTable extends SimpleEmbed {
     }
 
     public int getMaxPage() {
-        return this.table.size();
+        return table.size();
     }
 
     public void nextPage() {
-        this.pageNumber += 1;
-        this.pageNumber %= getMaxPage();
-        this.updateTable();
+        pageNumber += 1;
+        pageNumber %= getMaxPage();
+        updateTable();
     }
 
     public void previousPage() {
-        this.pageNumber -= 1;
-        if (this.pageNumber <= -1)
-            this.pageNumber = getMaxPage() - 1;
-        this.updateTable();
+        pageNumber -= 1;
+        if (pageNumber <= -1)
+            pageNumber = getMaxPage() - 1;
+        updateTable();
     }
 
     public void firstPage() {
-        this.pageNumber = 0;
-        this.updateTable();
+        pageNumber = 0;
+        updateTable();
     }
 
     public void lastPage() {
-        this.pageNumber = getMaxPage() - 1;
-        this.updateTable();
+        pageNumber = getMaxPage() - 1;
+        updateTable();
     }
 
     public void sendTable() {
@@ -126,7 +79,7 @@ public class SimpleTable extends SimpleEmbed {
     }
 
     public void updateTable() {
-        this.resetTimer();
+        resetTimer();
         if (getMaxPage() <= 0) {
             event.getHook().editOriginal("```Không có dữ liệu```").queue();
             return;
@@ -137,7 +90,7 @@ public class SimpleTable extends SimpleEmbed {
             return;
         }
         Collection<ActionRow> row = getButton();
-        WebhookMessageUpdateAction<Message> action = this.event.getHook().editOriginalEmbeds(message);
+        WebhookMessageUpdateAction<Message> action = event.getHook().editOriginalEmbeds(message);
         if (row.size() > 0)
             action.setActionRows(row);
         action.queue();

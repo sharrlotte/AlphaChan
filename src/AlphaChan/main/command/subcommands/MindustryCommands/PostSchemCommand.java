@@ -20,6 +20,7 @@ import AlphaChan.main.handler.NetworkHandler;
 import AlphaChan.main.mindustry.SchematicTag;
 import AlphaChan.main.mindustry.SchematicData;
 import AlphaChan.main.mindustry.SchematicInfo;
+import AlphaChan.main.util.Log;
 import AlphaChan.main.util.SimpleBotSubcommand;
 
 public class PostSchemCommand extends SimpleBotSubcommand {
@@ -107,7 +108,7 @@ public class PostSchemCommand extends SimpleBotSubcommand {
                 event.replyChoices(options).queue();
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            Log.error(e);
         }
     }
 }

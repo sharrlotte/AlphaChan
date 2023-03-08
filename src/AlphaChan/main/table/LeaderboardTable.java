@@ -15,6 +15,7 @@ import AlphaChan.main.handler.DatabaseHandler;
 import AlphaChan.main.handler.UserHandler;
 import AlphaChan.main.handler.DatabaseHandler.DATABASE;
 import AlphaChan.main.user.UserData;
+import AlphaChan.main.util.Log;
 import AlphaChan.main.util.SimpleTable;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
@@ -172,8 +173,9 @@ public class LeaderboardTable extends SimpleTable {
             }
             data += "\nMáy chủ:           " + user._getGuild().getName();
             return data;
+
         } catch (Exception e) {
-            e.printStackTrace();
+            Log.error(e);
             return "Người dùng đã rời khỏi máy chủ";
         }
     }

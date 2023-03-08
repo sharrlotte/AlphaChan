@@ -54,7 +54,7 @@ public class AlphaChan {
             Log.system("Bot online");
 
         } catch (Exception e) {
-            e.printStackTrace();
+            Log.error(e);
         }
     }
 }

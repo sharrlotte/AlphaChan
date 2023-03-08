@@ -21,6 +21,7 @@ import AlphaChan.main.handler.UserHandler;
 import AlphaChan.main.handler.DatabaseHandler.DATABASE;
 import AlphaChan.main.mindustry.SchematicData;
 import AlphaChan.main.mindustry.SchematicInfo;
+import AlphaChan.main.util.Log;
 import AlphaChan.main.util.SimpleTable;
 import mindustry.game.Schematic;
 
@@ -59,8 +60,8 @@ public class SchematicTable extends SimpleTable {
         addButtonPrimary(">", () -> this.nextPage());
         addRow();
         addButtonPrimary("data", Emoji.fromMarkdown("📁"), () -> this.sendCode());
-        addButtonPrimary("star", Emoji.fromMarkdown("⭐"), () -> this.star());
-        addButtonPrimary("penguin", Emoji.fromMarkdown("🐧"), () -> this.penguin());
+        addButtonPrimary("star", Emoji.fromMarkdown("⭐"), () -> this.addStar());
+        addButtonPrimary("penguin", Emoji.fromMarkdown("🐧"), () -> this.addPenguin());
         addButtonPrimary("delete", Emoji.fromMarkdown("🚮"), () -> this.deleteSchematic());
 
     }
@@ -77,25 +78,31 @@ public class SchematicTable extends SimpleTable {
 
     @Override
     public void delete() {
-        this.event.getHook().deleteOriginal().queue();
-        if (this.currentCode != null)
-            this.currentCode.delete().queue();
+        event.getHook().deleteOriginal().queue();
         this.killTimer();
+
+        if (currentCode != null)
+            currentCode.delete().queue();
     }
 
-    private void star() {
+    private void addStar() {
+        if (currentInfo == null)
+            return;
 
-        if (this.currentInfo != null) {
-            this.currentInfo.addStar(getTriggerMember().getId());
+        if (currentInfo.addStar(getTriggerMember().getId()))
             updateTable();
-        }
+        else
+            sendMessage("Bạn đã like bản thiết kế này", showPageNumber);
     }
 
-    private void penguin() {
-        if (this.currentInfo != null) {
-            this.currentInfo.addPenguin(getTriggerMember().getId());
+    private void addPenguin() {
+        if (currentInfo == null)
+            return;
+
+        if (currentInfo.addPenguin(getTriggerMember().getId()))
             updateTable();
-        }
+        else
+            sendMessage("Bạn đã dislike bản thiết kế này", showPageNumber);
     }
 
     private void deleteSchematic() {
@@ -104,6 +111,7 @@ public class SchematicTable extends SimpleTable {
             currentCode.delete();
             currentData.delete();
             currentInfo.delete();
+            updateTable();
             sendMessage("Đã xóa bản thiết kế", 10);
         } else {
             sendMessage("Bạn không có quyền xóa bản thiết kế", true);
@@ -111,51 +119,55 @@ public class SchematicTable extends SimpleTable {
     }
 
     private void sendCode() {
-        if (this.currentData == null)
+        if (currentData == null)
             return;
-        String data = this.currentData.data;
+
+        String data = currentData.data;
         if (data == null)
             return;
-        if (this.currentCode == null) {
+
+        if (currentCode == null)
             sendCodeData(data);
-        } else {
-            this.currentCode.delete().queue();
+        else {
+            currentCode.delete().complete();
             sendCodeData(data);
         }
     }
 
     public void sendCodeData(@Nonnull String data) {
-        if (this.currentData.data.length() < 1000)
-            this.event.getHook().sendMessage("```" + data + "```").queue(m -> this.currentCode = m);
-        else {
-            try {
-                File schematicFile = MessageHandler.getSchematicFile(ContentHandler.parseSchematic(data));
-                this.event.getHook().sendFile(schematicFile).queue(m -> this.currentCode = m);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+        if (currentData.data.length() < 1000) {
+            event.getHook().sendMessage("```" + data + "```").queue(m -> this.currentCode = m);
+            return;
+        }
+
+        try {
+            File schematicFile = MessageHandler.getSchematicFile(ContentHandler.parseSchematic(data));
+            event.getHook().sendFile(schematicFile).queue(message -> this.currentCode = message);
+
+        } catch (IOException e) {
+            Log.error(e);
         }
     }
 
     @Override
     public void updateTable() {
         try {
-            if (this.currentCode != null)
-                this.currentCode.delete().queue();
+            if (currentCode != null)
+                currentCode.delete().queue();
 
-            this.currentInfo = schematicInfoList.get(this.pageNumber);
-            this.currentData = collection.find(Filters.eq("_id", currentInfo.id)).limit(1).first();
-            if (this.currentData == null) {
-                this.event.getHook().editOriginal("Không có dữ liệu về bản thiết kế với id:" + currentInfo.id).queue();
+            currentInfo = schematicInfoList.get(pageNumber);
+            currentData = collection.find(Filters.eq("_id", currentInfo.id)).limit(1).first();
+            if (currentData == null) {
+                event.getHook().editOriginal("Không có dữ liệu về bản thiết kế với id:" + currentInfo.id).queue();
                 return;
             }
 
-            Schematic schem = ContentHandler.parseSchematic(this.currentData.getData());
+            Schematic schem = ContentHandler.parseSchematic(currentData.getData());
             File previewFile = MessageHandler.getSchematicPreviewFile(schem);
             EmbedBuilder builder = MessageHandler.getSchematicEmbedBuilder(schem, previewFile, event.getMember());
             StringBuilder field = new StringBuilder();
             builder = addPageFooter(builder);
-            String authorId = this.currentInfo.authorId;
+            String authorId = currentInfo.authorId;
             if (authorId != null) {
                 User user = jda.getUserById(authorId);
                 if (user != null)
@@ -163,15 +175,15 @@ public class SchematicTable extends SimpleTable {
             }
 
             field.append("- Nhãn: ");
-            for (int i = 0; i < this.currentInfo.tag.size() - 1; i++)
-                field.append(this.currentInfo.tag.get(i).toLowerCase() + ", ");
-            field.append(this.currentInfo.tag.get(this.currentInfo.tag.size() - 1).toLowerCase() + "\n");
-            field.append("- Sao: " + this.currentInfo.getStar() + "\n");
-            field.append("- Cánh cụt: " + this.currentInfo.getPenguin() + "\n");
+            for (int i = 0; i < currentInfo.tag.size() - 1; i++)
+                field.append(currentInfo.tag.get(i).toLowerCase() + ", ");
+            field.append(currentInfo.tag.get(currentInfo.tag.size() - 1).toLowerCase() + "\n");
+            field.append("- Sao: " + currentInfo.getStar() + "\n");
+            field.append("- Cánh cụt: " + currentInfo.getPenguin() + "\n");
 
             builder.addField("*Thông tin*", field.toString(), false);
 
-            WebhookMessageUpdateAction<Message> action = this.event.getHook().editOriginal(previewFile);
+            WebhookMessageUpdateAction<Message> action = event.getHook().editOriginal(previewFile);
 
             if (getTriggerMessage() != null)
                 action.retainFiles(getTriggerMessage().getAttachments());
@@ -179,8 +191,7 @@ public class SchematicTable extends SimpleTable {
             action.setEmbeds(builder.build()).setActionRows(getButton()).queue();
 
         } catch (Exception e) {
-            this.event.getHook().editOriginal("Lỗi").queue();
-            e.printStackTrace();
+            Log.error(e);
         }
     }
 }
