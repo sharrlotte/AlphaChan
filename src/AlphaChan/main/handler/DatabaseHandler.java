@@ -52,7 +52,7 @@ public final class DatabaseHandler {
     private static ConcurrentHashMap<String, MongoDatabase> database = new ConcurrentHashMap<String, MongoDatabase>();
 
     private DatabaseHandler() {
-        Log.info("SYSTEM", "Database handler up");
+        Log.system("Database handler up");
     }
 
     public static DatabaseHandler getInstance() {
@@ -120,7 +120,7 @@ public final class DatabaseHandler {
                 while (count > maxLogCount - 1000) {
                     collection.deleteOne(new Document());
                     count--;
-                    Log.info("SYSTEM", "Delete log: " + count);
+                    Log.system("Delete log: " + count);
                 }
             }
             // Insert log message

@@ -36,6 +36,10 @@ public class SimpleEmbed extends DataCache {
         TableHandler.add(this);
     }
 
+    public void update() {
+        
+    }
+
     public void onCommand(@Nonnull ButtonInteractionEvent event) {
         this.interaction = event;
 

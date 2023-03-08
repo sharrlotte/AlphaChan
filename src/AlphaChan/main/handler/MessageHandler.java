@@ -50,7 +50,7 @@ public final class MessageHandler extends ListenerAdapter {
     private MessageHandler() {
 
         jda.addEventListener(this);
-        Log.info("SYSTEM", "Message handler up");
+        Log.system("Message handler up");
     }
 
     public static MessageHandler getInstance() {
@@ -101,14 +101,14 @@ public final class MessageHandler extends ListenerAdapter {
 
         if (UserHandler.isYui(member) && message.getContentDisplay().equals("/reset command")) {
             replyMessage(message, "Working", 30);
-            Log.info("SYSTEM", "Resetting command");
+            Log.system("Resetting command");
             UpdatableHandler.updateCommand();
             message.delete().queue();
         }
 
         // Schematic preview
         if ((isSchematicText(message) && attachments.isEmpty()) || isSchematicFile(attachments)) {
-            Log.info("SYSTEM", getMessageSender(message) + ": sent a schematic ");
+            Log.system(getMessageSender(message) + ": sent a schematic ");
             sendSchematicPreview(message);
         }
 
@@ -194,7 +194,7 @@ public final class MessageHandler extends ListenerAdapter {
 
         List<TextChannel> botLogChannel = guildData._getChannels(CHANNEL_TYPE.BOT_LOG.name());
         if (botLogChannel == null) {
-            Log.info("SYSTEM", "Bot log channel for guild <" + guild.getName() + "> does not exists");
+            Log.system("Bot log channel for guild <" + guild.getName() + "> does not exists");
         } else
             botLogChannel.forEach(c -> c.sendMessage("```" + content + "```").queue());
     }

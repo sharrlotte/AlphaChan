@@ -21,7 +21,7 @@ public final class TableHandler extends ListenerAdapter {
 
     private TableHandler() {
         jda.addEventListener(this);
-        Log.info("SYSTEM", "Table handler up");
+        Log.system("Table handler up");
     }
 
     public static TableHandler getInstance() {

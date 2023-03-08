@@ -33,7 +33,7 @@ public final class UserHandler {
     private static ConcurrentHashMap<String, UserData> userCache = new ConcurrentHashMap<>();
 
     private UserHandler() {
-        Log.info("SYSTEM", "User handler up");
+        Log.system("User handler up");
     }
 
     public static UserHandler getInstance() {

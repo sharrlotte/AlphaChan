@@ -1,8 +1,6 @@
 package AlphaChan.main.user;
 
-import AlphaChan.main.util.Log;
-
-public class DataCache {
+public abstract class DataCache {
 
     private final int ALIVE_LIMIT;
     private final int UPDATE_LIMIT;
@@ -43,7 +41,5 @@ public class DataCache {
         return false;
     }
 
-    public void update() {
-        Log.error("Update unhandled");
-    }
+    public abstract void update();
 }

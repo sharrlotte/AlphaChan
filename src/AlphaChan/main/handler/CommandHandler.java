@@ -41,7 +41,7 @@ public class CommandHandler extends ListenerAdapter {
         addCommand(new YuiCommand());
 
         jda.addEventListener(this);
-        Log.info("SYSTEM", "Command handler up");
+        Log.system("Command handler up");
     }
 
     public static CommandHandler getInstance() {

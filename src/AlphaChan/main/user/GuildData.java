@@ -127,7 +127,7 @@ public class GuildData extends DataCache {
             if (member != null)
                 if (bot.canInteract(member)) {
 
-                    Log.info("SYSTEM", "Changing name " + member.getEffectiveName());
+                    Log.system("Changing name " + member.getEffectiveName());
                     UserData data = UserHandler.getUserNoCache(member);
                     if (data != null) {
                         data.setName(member.getUser().getName());

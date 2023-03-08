@@ -27,7 +27,7 @@ public class AlphaChan {
 
         try {
 
-            Log.info("SYSTEM", "Bot start");
+            Log.system("Bot start");
 
             String TOKEN = System.getenv("TOKEN");
 
@@ -51,7 +51,7 @@ public class AlphaChan {
             UpdatableHandler.getInstance();
             ConsoleHandler.getInstance();
 
-            Log.info("SYSTEM", "Bot online");
+            Log.system("Bot online");
 
         } catch (Exception e) {
             e.printStackTrace();

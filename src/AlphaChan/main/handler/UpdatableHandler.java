@@ -18,7 +18,7 @@ public final class UpdatableHandler {
     private UpdatableHandler() {
         run("UPDATE", 0, BotConfig.readInt(Config.UPDATE_PERIOD, 10), () -> update());
 
-        Log.info("SYSTEM", "Updatable handler up");
+        Log.system("Updatable handler up");
     }
 
     public static UpdatableHandler getInstance() {
@@ -47,11 +47,11 @@ public final class UpdatableHandler {
 
         CommandHandler.getCommands().forEach(c -> {
             jda.upsertCommand(c.command).complete();
-            Log.info("SYSTEM", "Added command " + c.getName());
+            Log.system("Added command " + c.getName());
         });
         ContextMenuHandler.getCommands().forEach(c -> {
             jda.upsertCommand(c.command).complete();
-            Log.info("SYSTEM", "Added command " + c.getName());
+            Log.system("Added command " + c.getName());
         });
     }
 

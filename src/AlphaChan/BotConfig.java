@@ -14,7 +14,7 @@ public final class BotConfig {
 
     private static final String configPath = "config.properties";
 
-    private static Properties prop;
+    private static Properties prop = new Properties();
 
     public static enum Config {
         YUI_ID,
@@ -34,6 +34,10 @@ public final class BotConfig {
         ;
     }
 
+    public static Properties getProperties() {
+        return prop;
+    }
+
     public static void load() {
 
         try {
@@ -42,9 +46,16 @@ public final class BotConfig {
                 file.createNewFile();
 
             InputStream input = new FileInputStream(file);
-            Properties prop = new Properties();
+            prop = new Properties();
+
             prop.load(input);
+            if (!prop.containsKey("Default")) {
+                makeDefault();
+            }
+
             input.close();
+
+            Log.system("Config loaded");
 
         } catch (IOException io) {
             Log.error(io);
@@ -61,11 +72,12 @@ public final class BotConfig {
         }
     }
 
-    public static void reset() {
+    public static void makeDefault() {
         try (OutputStream output = new FileOutputStream(configPath)) {
 
             prop = new Properties();
 
+            setProperty("Default", 1);
             setProperty(Config.YUI_ID, "719322804549320725");
 
             setProperty(Config.UPDATE_PERIOD, 60 * 1000);
@@ -80,9 +92,15 @@ public final class BotConfig {
 
             prop.store(output, "DEFAULT");
 
+            Log.system("Config loaded");
+
         } catch (IOException io) {
             Log.error(io);
         }
+    }
+
+    private static void setProperty(String key, Object value) {
+        prop.setProperty(key, String.valueOf(value));
     }
 
     private static void setProperty(Config key, Object value) {
@@ -112,4 +130,5 @@ public final class BotConfig {
     public static float readFloat(Config key, float def) {
         return Float.parseFloat(prop.getProperty(key.name(), String.valueOf(def)));
     }
+
 }

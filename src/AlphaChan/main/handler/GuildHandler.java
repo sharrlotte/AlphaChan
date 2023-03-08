@@ -27,7 +27,7 @@ public class GuildHandler {
 
     private GuildHandler() {
 
-        Log.info("SYSTEM", "Guild handler up");
+        Log.system("Guild handler up");
     }
 
     public static GuildHandler getInstance() {
@@ -92,7 +92,7 @@ public class GuildHandler {
             return addGuild(guildId);
         }
 
-        MongoCollection<GuildData> collection = DatabaseHandler. getDatabase(DATABASE.GUILD)
+        MongoCollection<GuildData> collection = DatabaseHandler.getDatabase(DATABASE.GUILD)
                 .getCollection(guildCollectionName, GuildData.class);
 
         // Get guild from database

@@ -35,7 +35,7 @@ public final class ContextMenuHandler extends ListenerAdapter {
         addCommand(new DeleteMessageContextMenu());
 
         jda.addEventListener(this);
-        Log.info("SYSTEM", "Context menu handler up");
+        Log.system("Context menu handler up");
 
     }
 

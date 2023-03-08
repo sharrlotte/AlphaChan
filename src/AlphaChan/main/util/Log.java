@@ -77,6 +77,10 @@ public class Log {
         print(TextColor.YELLOW, "WARNING", content);
     }
 
+    public static void system(String content) {
+        print(TextColor.BLUE, "SYSTEM", content);
+    }
+
     public static void info(String logHeader, String content) {
         print(TextColor.GREEN, logHeader, content);
     }
