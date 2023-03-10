@@ -15,6 +15,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberRemoveEvent;
 import net.dv8tion.jda.api.events.guild.member.update.GuildMemberUpdateNicknameEvent;
+import net.dv8tion.jda.api.events.interaction.command.MessageContextInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 
 import javax.annotation.Nonnull;
@@ -22,10 +23,10 @@ import javax.imageio.*;
 
 import org.bson.Document;
 
+import AlphaChan.main.data.user.GuildData;
+import AlphaChan.main.data.user.UserData;
+import AlphaChan.main.data.user.GuildData.CHANNEL_TYPE;
 import AlphaChan.main.handler.DatabaseHandler.LOG_TYPE;
-import AlphaChan.main.user.GuildData;
-import AlphaChan.main.user.UserData;
-import AlphaChan.main.user.GuildData.CHANNEL_TYPE;
 import AlphaChan.main.util.Log;
 
 import java.awt.image.*;
@@ -60,20 +61,13 @@ public final class MessageHandler extends ListenerAdapter {
     }
 
     private static String getMessageSender(Guild guild, Category category, Channel channel, Member member) {
-        StringBuffer sender = new StringBuffer();
-        if (guild != null)
-            sender.append("[" + guild.getName() + "] ");
+        String guildName = guild == null ? "" : guild.getName();
+        String categoryName = category == null ? "" : category.getName();
+        String channelName = channel == null ? "" : channel.getName();
+        String memberName = member == null ? "" : member.getEffectiveName();
 
-        if (channel != null)
-            if (category != null)
-                sender.append("<" + category.getName() + ": " + channel.getName() + "> ");
-            else
-                sender.append("<" + "Unknown: " + channel.getName() + "> ");
+        return "[" + guildName + "] " + "<" + categoryName + ":" + channelName + "> " + memberName;
 
-        if (member != null)
-            sender.append(member.getEffectiveName());
-
-        return sender.toString();
     }
 
     public static String getMessageSender(Message message) {
@@ -98,13 +92,6 @@ public final class MessageHandler extends ListenerAdapter {
         // Log all message that has been sent
         List<Attachment> attachments = message.getAttachments();
         Member member = message.getMember();
-
-        if (UserHandler.isYui(member) && message.getContentDisplay().equals("/reset command")) {
-            replyMessage(message, "Working", 30);
-            Log.system("Resetting command");
-            UpdatableHandler.updateCommand();
-            message.delete().queue();
-        }
 
         // Schematic preview
         if ((isSchematicText(message) && attachments.isEmpty()) || isSchematicFile(attachments)) {
@@ -194,7 +181,7 @@ public final class MessageHandler extends ListenerAdapter {
 
         List<TextChannel> botLogChannel = guildData._getChannels(CHANNEL_TYPE.BOT_LOG.name());
         if (botLogChannel == null) {
-            Log.system("Bot log channel for guild <" + guild.getName() + "> does not exists");
+            Log.error("Bot log channel for guild <" + guild.getName() + "> does not exists");
         } else
             botLogChannel.forEach(c -> c.sendMessage("```" + content + "```").queue());
     }
@@ -457,5 +444,20 @@ public final class MessageHandler extends ListenerAdapter {
 
     public static void replyMessage(Message message, String content) {
         message.reply("```" + content + "```").queue();
+    }
+
+    public static void replyEmbed(SlashCommandInteractionEvent event, EmbedBuilder builder, int deleteAfter) {
+        event.getHook().sendMessageEmbeds(builder.build())
+                .queue(_message -> _message.delete().queueAfter(deleteAfter, TimeUnit.SECONDS));
+    }
+
+    public static void replyEmbed(MessageContextInteractionEvent event, EmbedBuilder builder, int deleteAfter) {
+        event.getHook().sendMessageEmbeds(builder.build())
+                .queue(_message -> _message.delete().queueAfter(deleteAfter, TimeUnit.SECONDS));
+    }
+
+    public static void replyMessage(MessageContextInteractionEvent event, String content, int deleteAfter) {
+        event.getHook().sendMessage("```" + content + "```")
+                .queue(_message -> _message.delete().queueAfter(deleteAfter, TimeUnit.SECONDS));
     }
 }

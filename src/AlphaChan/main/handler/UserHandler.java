@@ -16,23 +16,25 @@ import com.mongodb.client.MongoCollection;
 
 import AlphaChan.BotConfig;
 import AlphaChan.BotConfig.Config;
+import AlphaChan.main.data.user.GuildData;
+import AlphaChan.main.data.user.UserData;
 import AlphaChan.main.handler.DatabaseHandler.DATABASE;
 import AlphaChan.main.handler.DatabaseHandler.LOG_TYPE;
-import AlphaChan.main.user.GuildData;
-import AlphaChan.main.user.UserData;
 import AlphaChan.main.util.Log;
 
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.Role;
 
-public final class UserHandler {
+public final class UserHandler implements Updatable {
 
     private static UserHandler instance = new UserHandler();
     // Hash map to store user cache
     private static ConcurrentHashMap<String, UserData> userCache = new ConcurrentHashMap<>();
 
     private UserHandler() {
+        UpdatableHandler.addListener(this);
+
         Log.system("User handler up");
     }
 
@@ -46,11 +48,11 @@ public final class UserHandler {
         return userCache.values();
     }
 
-    public static void update() {
+    public void update() {
         updateCache();
     }
 
-    public static void updateCache() {
+    public void updateCache() {
         Iterator<UserData> iterator = userCache.values().iterator();
         while (iterator.hasNext()) {
             UserData user = iterator.next();

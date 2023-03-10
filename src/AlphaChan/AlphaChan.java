@@ -1,8 +1,8 @@
 package AlphaChan;
 
+import AlphaChan.main.event.EventHandler;
+import AlphaChan.main.event.EventType;
 import AlphaChan.main.handler.CommandHandler;
-import AlphaChan.main.handler.ConsoleHandler;
-import AlphaChan.main.handler.ContextMenuHandler;
 import AlphaChan.main.handler.DatabaseHandler;
 import AlphaChan.main.handler.GuildHandler;
 import AlphaChan.main.handler.MessageHandler;
@@ -23,9 +23,9 @@ public class AlphaChan {
 
     public static JDA jda;
 
-    public static void main(String[] args) {
-
+    public AlphaChan() {
         try {
+            BotConfig.load();
 
             Log.system("Bot start");
 
@@ -37,8 +37,6 @@ public class AlphaChan {
                     .setMemberCachePolicy(MemberCachePolicy.ALL).build();
             jda.awaitReady();
 
-            BotConfig.load();
-
             GuildHandler.getInstance();
             UserHandler.getInstance();
             CommandHandler.getInstance();
@@ -47,14 +45,31 @@ public class AlphaChan {
             ServerStatusHandler.getInstance();
             MessageHandler.getInstance();
             TableHandler.getInstance();
-            ContextMenuHandler.getInstance();
             UpdatableHandler.getInstance();
-            ConsoleHandler.getInstance();
+
+            Runtime.getRuntime().addShutdownHook(new ShutdownHook());
+
+            EventHandler.connect(EventType.BotShutdown, (event) -> {
+                BotConfig.save();
+            });
+
+            EventHandler.invoke(EventType.BotShutdown);
 
             Log.system("Bot online");
 
         } catch (Exception e) {
             Log.error(e);
         }
+    }
+
+    private class ShutdownHook extends Thread {
+
+        public void run() {
+            EventHandler.invoke(EventType.BotShutdown);
+        }
+    }
+
+    public static void main(String[] args) {
+        new AlphaChan();
     }
 }

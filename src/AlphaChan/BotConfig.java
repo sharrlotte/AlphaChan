@@ -35,7 +35,13 @@ public final class BotConfig {
     }
 
     public static Properties getProperties() {
+        if (prop == null || prop.isEmpty())
+            makeDefault();
         return prop;
+    }
+
+    public static void clearProperties() {
+        prop.clear();
     }
 
     public static void load() {
@@ -62,7 +68,7 @@ public final class BotConfig {
         }
     }
 
-    public static void store() {
+    public static void save() {
         try (OutputStream output = new FileOutputStream(configPath)) {
 
             prop.store(output, null);
@@ -72,7 +78,7 @@ public final class BotConfig {
         }
     }
 
-    public static void makeDefault() {
+    private static void makeDefault() {
         try (OutputStream output = new FileOutputStream(configPath)) {
 
             prop = new Properties();
@@ -99,36 +105,40 @@ public final class BotConfig {
         }
     }
 
-    private static void setProperty(String key, Object value) {
-        prop.setProperty(key, String.valueOf(value));
+    public static boolean hasProperty(String key) {
+        return getProperties().containsKey(key);
     }
 
-    private static void setProperty(Config key, Object value) {
-        prop.setProperty(key.name(), String.valueOf(value));
+    public static void setProperty(String key, Object value) {
+        getProperties().setProperty(key, String.valueOf(value));
+    }
+
+    public static void setProperty(Config key, Object value) {
+        getProperties().setProperty(key.name(), String.valueOf(value));
     }
 
     public static String readString(String key, String def) {
-        return prop.getProperty(key, def);
+        return getProperties().getProperty(key, def);
     }
 
     public static String readString(Config key, String def) {
-        return prop.getProperty(key.name(), def);
+        return getProperties().getProperty(key.name(), def);
     }
 
     public static int readInt(String key, int def) {
-        return Integer.parseInt(prop.getProperty(key, String.valueOf(def)));
+        return Integer.parseInt(getProperties().getProperty(key, String.valueOf(def)));
     }
 
     public static int readInt(Config key, int def) {
-        return Integer.parseInt(prop.getProperty(key.name(), String.valueOf(def)));
+        return Integer.parseInt(getProperties().getProperty(key.name(), String.valueOf(def)));
     }
 
     public static float readFloat(String key, float def) {
-        return Float.parseFloat(prop.getProperty(key, String.valueOf(def)));
+        return Float.parseFloat(getProperties().getProperty(key, String.valueOf(def)));
     }
 
     public static float readFloat(Config key, float def) {
-        return Float.parseFloat(prop.getProperty(key.name(), String.valueOf(def)));
+        return Float.parseFloat(getProperties().getProperty(key.name(), String.valueOf(def)));
     }
 
 }

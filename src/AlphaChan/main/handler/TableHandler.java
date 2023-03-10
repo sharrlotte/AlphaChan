@@ -5,8 +5,8 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import javax.annotation.Nonnull;
 
-import AlphaChan.main.util.SimpleEmbed;
-import AlphaChan.main.util.SimpleTable;
+import AlphaChan.main.command.SimpleEmbed;
+import AlphaChan.main.command.SimpleTable;
 import AlphaChan.main.util.Log;
 
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
@@ -14,13 +14,15 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
 import static AlphaChan.AlphaChan.*;
 
-public final class TableHandler extends ListenerAdapter {
+public final class TableHandler extends ListenerAdapter implements Updatable {
 
     private static TableHandler instance = new TableHandler();
     private static ConcurrentHashMap<String, SimpleEmbed> tableCache = new ConcurrentHashMap<String, SimpleEmbed>();
 
     private TableHandler() {
         jda.addEventListener(this);
+        UpdatableHandler.addListener(this);
+
         Log.system("Table handler up");
     }
 
@@ -52,7 +54,7 @@ public final class TableHandler extends ListenerAdapter {
         }
     }
 
-    public static void update() {
+    public void update() {
         Iterator<SimpleEmbed> iterator = tableCache.values().iterator();
         while (iterator.hasNext()) {
             SimpleEmbed table = iterator.next();

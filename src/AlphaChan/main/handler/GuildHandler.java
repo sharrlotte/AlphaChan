@@ -14,18 +14,19 @@ import com.mongodb.client.MongoCollection;
 
 import AlphaChan.BotConfig;
 import AlphaChan.BotConfig.Config;
+import AlphaChan.main.data.user.GuildData;
 import AlphaChan.main.handler.DatabaseHandler.DATABASE;
-import AlphaChan.main.user.GuildData;
 import AlphaChan.main.util.Log;
 
 import net.dv8tion.jda.api.entities.Guild;
 
-public class GuildHandler {
+public class GuildHandler implements Updatable {
 
     private static GuildHandler instance = new GuildHandler();
     private static HashMap<String, GuildData> guildCache = new HashMap<>();
 
     private GuildHandler() {
+        UpdatableHandler.addListener(this);
 
         Log.system("Guild handler up");
     }
@@ -40,11 +41,11 @@ public class GuildHandler {
         return guildCache.values();
     }
 
-    public static void update() {
+    public void update() {
         updateGuildCache();
     }
 
-    public static void updateGuildCache() {
+    public void updateGuildCache() {
         Iterator<GuildData> iterator = guildCache.values().iterator();
         while (iterator.hasNext()) {
             GuildData guild = iterator.next();

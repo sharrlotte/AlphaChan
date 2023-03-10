@@ -1,5 +1,7 @@
 package AlphaChan.main.handler;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -14,6 +16,7 @@ import static AlphaChan.AlphaChan.*;
 public final class UpdatableHandler {
 
     private static UpdatableHandler instance = new UpdatableHandler();
+    private static List<Updatable> listeners = new ArrayList<>();
 
     private UpdatableHandler() {
         run("UPDATE", 0, BotConfig.readInt(Config.UPDATE_PERIOD, 10), () -> update());
@@ -27,32 +30,23 @@ public final class UpdatableHandler {
         return instance;
     }
 
-    public static void update() {
+    public static void addListener(Updatable listener) {
+        listeners.add(listener);
+    }
 
-        UserHandler.update();
-        GuildHandler.update();
-        TableHandler.update();
-        ServerStatusHandler.update();
+    private static void update() {
+
+        // ServerStatusHandler.update();
+
+        for (Updatable listener : listeners)
+            listener.update();
+
         updateStatus();
     }
 
     public static void updateStatus() {
         jda.getPresence().setActivity(Activity.playing("with " + GuildHandler.getActiveGuildCount() + " servers | "
                 + UserHandler.getActiveUserCount() + " users"));
-    }
-
-    public static void updateCommand() {
-        jda.getGuilds().forEach(guild -> guild.updateCommands().complete());
-        jda.updateCommands().complete();
-
-        CommandHandler.getCommands().forEach(c -> {
-            jda.upsertCommand(c.command).complete();
-            Log.system("Added command " + c.getName());
-        });
-        ContextMenuHandler.getCommands().forEach(c -> {
-            jda.upsertCommand(c.command).complete();
-            Log.system("Added command " + c.getName());
-        });
     }
 
     public static void run(String name, long delay, long period, Runnable r) {
