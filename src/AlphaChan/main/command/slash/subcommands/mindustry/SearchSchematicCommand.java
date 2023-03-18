@@ -36,7 +36,8 @@ public class SearchSchematicCommand extends SimpleBotSubcommand {
     public SearchSchematicCommand() {
         super("searchschematic", "Tìm bản thiết kế dựa theo nhãn", true, false);
         this.addOption(OptionType.STRING, "tag", "Nhãn để lọc bản thiết kế", false, true)//
-                .addOption(OptionType.USER, "user", "Tác giả của bản thiết kế");
+                .addOption(OptionType.USER, "user", "Tác giả của bản thiết kế")//
+                .addOption(OptionType.BOOLEAN, "own", "Ngăn chăn người khác tương tác với bảng");
 
     }
 
@@ -50,6 +51,7 @@ public class SearchSchematicCommand extends SimpleBotSubcommand {
 
         Document filter = new Document();
         OptionMapping tagOption = event.getOption("tag");
+        OptionMapping ownOption = event.getOption("own");
         String[] tags = {};
         if (tagOption != null) {
             tags = tagOption.getAsString().toUpperCase().split(SEPARATOR);
@@ -81,7 +83,17 @@ public class SearchSchematicCommand extends SimpleBotSubcommand {
             else
                 reply(event, "Không có dữ liệu về bản thiết kế với nhãn: " + tagOption.getAsString().toLowerCase(), 30);
         } else {
-            new SchematicTable(event, schematicInfo).sendTable().setRequestor(event.getMember().getId());
+
+            boolean own = false;
+            if (ownOption == null)
+                own = false;
+            else
+                own = ownOption.getAsBoolean();
+
+            SchematicTable table = new SchematicTable(event, schematicInfo);
+            table.sendTable();
+            if (own == true)
+                table.setRequestor(event.getMember().getId());
         }
     }
 

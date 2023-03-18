@@ -37,11 +37,14 @@ public final class UpdatableHandler {
     private static void update() {
 
         // ServerStatusHandler.update();
+        try {
+            for (Updatable listener : listeners)
+                listener.update();
 
-        for (Updatable listener : listeners)
-            listener.update();
-
-        updateStatus();
+            updateStatus();
+        } catch (Exception e) {
+            Log.error(e);
+        }
     }
 
     public static void updateStatus() {

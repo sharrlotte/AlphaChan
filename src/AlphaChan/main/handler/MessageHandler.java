@@ -61,10 +61,10 @@ public final class MessageHandler extends ListenerAdapter {
     }
 
     private static String getMessageSender(Guild guild, Category category, Channel channel, Member member) {
-        String guildName = guild == null ? "" : guild.getName();
-        String categoryName = category == null ? "" : category.getName();
-        String channelName = channel == null ? "" : channel.getName();
-        String memberName = member == null ? "" : member.getEffectiveName();
+        String guildName = guild == null ? "Unknown" : guild.getName();
+        String categoryName = category == null ? "Unknown" : category.getName();
+        String channelName = channel == null ? "Unknown" : channel.getName();
+        String memberName = member == null ? "Unknown" : member.getEffectiveName();
 
         return "[" + guildName + "] " + "<" + categoryName + ":" + channelName + "> " + memberName;
 
@@ -85,7 +85,6 @@ public final class MessageHandler extends ListenerAdapter {
             return;
         // Process the message
         handleMessage(message);
-
     }
 
     public static void handleMessage(Message message) {

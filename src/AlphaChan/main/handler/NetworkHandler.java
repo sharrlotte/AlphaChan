@@ -14,6 +14,7 @@ public class NetworkHandler {
     private static NetworkHandler instance = new NetworkHandler();
 
     private NetworkHandler() {
+        
     }
 
     public static NetworkHandler getInstance() {

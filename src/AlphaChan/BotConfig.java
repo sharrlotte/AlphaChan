@@ -12,7 +12,8 @@ import AlphaChan.main.util.Log;
 
 public final class BotConfig {
 
-    private static final String configPath = "config.properties";
+    private static final String CONFIG_PATH = "config.properties";
+    private static final String DEFAULT = "DEFAULT";
 
     private static Properties prop = new Properties();
 
@@ -37,6 +38,7 @@ public final class BotConfig {
     public static Properties getProperties() {
         if (prop == null || prop.isEmpty())
             makeDefault();
+
         return prop;
     }
 
@@ -47,7 +49,7 @@ public final class BotConfig {
     public static void load() {
 
         try {
-            File file = new File(configPath);
+            File file = new File(CONFIG_PATH);
             if (!file.exists())
                 file.createNewFile();
 
@@ -55,13 +57,13 @@ public final class BotConfig {
             prop = new Properties();
 
             prop.load(input);
-            if (!prop.containsKey("Default")) {
+            if (!prop.containsKey(DEFAULT)) {
+                input.close();
                 makeDefault();
+
+            } else {
+                Log.system("Config loaded");
             }
-
-            input.close();
-
-            Log.system("Config loaded");
 
         } catch (IOException io) {
             Log.error(io);
@@ -69,7 +71,7 @@ public final class BotConfig {
     }
 
     public static void save() {
-        try (OutputStream output = new FileOutputStream(configPath)) {
+        try (OutputStream output = new FileOutputStream(DEFAULT)) {
 
             prop.store(output, null);
 
@@ -79,7 +81,7 @@ public final class BotConfig {
     }
 
     private static void makeDefault() {
-        try (OutputStream output = new FileOutputStream(configPath)) {
+        try (OutputStream output = new FileOutputStream(CONFIG_PATH)) {
 
             prop = new Properties();
 
@@ -110,11 +112,11 @@ public final class BotConfig {
     }
 
     public static void setProperty(String key, Object value) {
-        getProperties().setProperty(key, String.valueOf(value));
+        prop.put(key, String.valueOf(value));
     }
 
     public static void setProperty(Config key, Object value) {
-        getProperties().setProperty(key.name(), String.valueOf(value));
+        setProperty(key.name(), String.valueOf(value));
     }
 
     public static String readString(String key, String def) {

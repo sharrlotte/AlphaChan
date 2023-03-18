@@ -30,9 +30,9 @@ public final class ServerStatusHandler {
     private static HashMap<String, String> servers = new HashMap<>();
 
     private ServerStatusHandler() {
-        Net net = new Net(new ArcNetProvider());
+        // Net net = new Net(new ArcNetProvider());
 
-        net.discoverServers(this::addServerIP, this::endDiscover);
+        // net.discoverServers(this::addServerIP, this::endDiscover);
     }
 
     public static ServerStatusHandler getInstance() {
@@ -113,8 +113,6 @@ public final class ServerStatusHandler {
                     + (result.description.length() == 0 ? "" : "\nMô tả: " + Strings.stripColors(result.description))
                     + "\nPhiên bản: " + result.version
                     + "\nPing: " + result.ping + "ms\n");
-
-
 
         } else {
             field.append("Máy chủ không tồn tại hoặc ngoại tuyến\n");

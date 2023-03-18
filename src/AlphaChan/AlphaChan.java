@@ -1,8 +1,7 @@
 package AlphaChan;
 
-import AlphaChan.main.event.EventHandler;
-import AlphaChan.main.event.EventType;
 import AlphaChan.main.handler.CommandHandler;
+import AlphaChan.main.handler.ContentHandler;
 import AlphaChan.main.handler.DatabaseHandler;
 import AlphaChan.main.handler.GuildHandler;
 import AlphaChan.main.handler.MessageHandler;
@@ -27,7 +26,7 @@ public class AlphaChan {
         try {
             BotConfig.load();
 
-            Log.system("Bot start");
+            Log.system("Connecting to discord");
 
             String TOKEN = System.getenv("TOKEN");
 
@@ -37,6 +36,7 @@ public class AlphaChan {
                     .setMemberCachePolicy(MemberCachePolicy.ALL).build();
             jda.awaitReady();
 
+            ContentHandler.getInstance();
             GuildHandler.getInstance();
             UserHandler.getInstance();
             CommandHandler.getInstance();
@@ -49,12 +49,6 @@ public class AlphaChan {
 
             Runtime.getRuntime().addShutdownHook(new ShutdownHook());
 
-            EventHandler.connect(EventType.BotShutdown, (event) -> {
-                BotConfig.save();
-            });
-
-            EventHandler.invoke(EventType.BotShutdown);
-
             Log.system("Bot online");
 
         } catch (Exception e) {
@@ -65,7 +59,6 @@ public class AlphaChan {
     private class ShutdownHook extends Thread {
 
         public void run() {
-            EventHandler.invoke(EventType.BotShutdown);
         }
     }
 

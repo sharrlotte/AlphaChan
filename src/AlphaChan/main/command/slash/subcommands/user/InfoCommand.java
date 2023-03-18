@@ -16,6 +16,7 @@ import AlphaChan.main.data.user.UserData;
 import AlphaChan.main.handler.UserHandler;
 
 import java.util.List;
+import java.awt.Color;
 
 public class InfoCommand extends SimpleBotSubcommand {
     public InfoCommand() {
@@ -62,11 +63,13 @@ public class InfoCommand extends SimpleBotSubcommand {
     private EmbedBuilder getDisplayedUserInformation(@Nonnull Member member) {
         EmbedBuilder builder = new EmbedBuilder();
         builder.setAuthor(member.getEffectiveName(), null, member.getEffectiveAvatarUrl());
+        builder.setImage(member.getEffectiveAvatarUrl());
         // Display role
         List<Role> roles = member.getRoles();
         String roleString = "";
         for (Role role : roles)
-            roleString += role.getName() + ", ";
+            roleString += role.getAsMention() + ", ";
+
         if (!roleString.isEmpty())
             roleString = roleString.substring(0, roleString.length() - 2);
         // Display point
@@ -81,6 +84,8 @@ public class InfoCommand extends SimpleBotSubcommand {
                 false);
         builder.addField("Điểm", "Tổng điểm cống hiến: " + user.money + //
                 "\nTổng điểm pvp: " + user.pvpPoint, false);
+
+        builder.setColor(Color.BLUE);
 
         return builder;
     }

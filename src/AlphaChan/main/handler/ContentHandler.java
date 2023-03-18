@@ -44,7 +44,7 @@ public class ContentHandler {
     private static ObjectMap<String, BufferedImage> regions = new ObjectMap<>();
 
     private static ContentHandler instance = new ContentHandler();
-    private final String assets = "libs/Mindustry/core/";
+    private String assets = "Mindustry/core/";
 
     public static ContentHandler getInstance() {
         return instance;
@@ -53,6 +53,10 @@ public class ContentHandler {
     private ContentHandler() {
 
         try {
+
+            File file = new File(assets);
+            if (!file.exists())
+                assets = "build/libs/Mindustry/core/";
 
             new Fi("cache").deleteDirectory();
             new File("cache/").mkdir();

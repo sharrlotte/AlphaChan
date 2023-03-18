@@ -6,7 +6,7 @@ tasks.withType(JavaCompile) {
     options.encoding = 'UTF-8'
 }
 
-project.ext.mainClassName = "OverflowGateBot.OverflowGateBot"
+project.ext.mainClassName = "AlphaChan.AlphaChan"
 sourceCompatibility = targetCompatibility = 16
 version = '1.0'
 
@@ -26,7 +26,7 @@ allprojects{
 }
 
 ext{
-    mindustryVersion = 'v137'
+    mindustryVersion = 'v142'
 }
 
 task dist(type: Jar){
@@ -34,7 +34,7 @@ task dist(type: Jar){
     from files(sourceSets.main.output.resourcesDir)
     from {configurations.runtimeClasspath.collect{ it.isDirectory() || !it.name.endsWithAny(".zip", ".jar") ? it : zipTree(it) }}
 
-    archiveFileName = "OverflowGateBot.jar"
+    archiveFileName = "AlphaChan.jar"
 
     manifest{
         attributes 'Main-Class': project.mainClassName
@@ -45,10 +45,13 @@ task dist(type: Jar){
 
 
 dependencies{
-    implementation("net.dv8tion:JDA:5.0.0-alpha.10")
-    implementation "org.jsoup:jsoup:1.7.2"
+    implementation 'org.mongodb:mongodb-driver-sync:4.3.4'
+    implementation ("net.dv8tion:JDA:5.0.0-alpha.10")
     implementation "com.github.Anuken.Mindustry:core:$mindustryVersion"
-    implementation "com.github.Anuken.Arc:arc-core:dfcb21ce56"
+    implementation "com.github.Anuken.Arc:arc-core:9de902f"
     implementation "org.slf4j:slf4j-nop:1.7.31"
-    implementation 'com.googlecode.json-simple:json-simple:1.1.1'
+    implementation 'com.google.code.gson:gson:2.10.1'
+    implementation "com.sedmelluq:lavaplayer:1.3.76"
+
 }
+

@@ -64,6 +64,7 @@ public final class DatabaseHandler {
     public static MongoDatabase getDatabase(DATABASE name) {
         if (database.containsKey(name.name()))
             return database.get(name.name());
+            
         MongoDatabase db = mongoClient.getDatabase(name.name()).withCodecRegistry(pojoCodecRegistry);
         database.put(name.name(), db);
         return db;
@@ -106,28 +107,26 @@ public final class DatabaseHandler {
     }
 
     public static void log(LOG_TYPE log, Document content) {
-        UpdatableHandler.run("LOG " + log.name(), 0, () -> {
-            // Create collection if it doesn't exist
-            MongoDatabase logDatabase = getDatabase(DATABASE.LOG);
-            if (!collectionExists(logDatabase, log.name()))
-                logDatabase.createCollection(log.name());
+        // Create collection if it doesn't exist
+        MongoDatabase logDatabase = getDatabase(DATABASE.LOG);
+        if (!collectionExists(logDatabase, log.name()))
+            logDatabase.createCollection(log.name());
 
-            MongoCollection<Document> collection = logDatabase.getCollection(log.name(), Document.class);
-            long count = collection.estimatedDocumentCount();
-            int maxLogCount = BotConfig.readInt(Config.MAX_LOG_COUNT, 10000);
+        MongoCollection<Document> collection = logDatabase.getCollection(log.name(), Document.class);
+        long count = collection.estimatedDocumentCount();
+        int maxLogCount = BotConfig.readInt(Config.MAX_LOG_COUNT, 10000);
 
-            if (count > maxLogCount) {
-                while (count > maxLogCount - 1000) {
-                    collection.deleteOne(new Document());
-                    count--;
-                    Log.system("Delete log: " + count);
-                }
+        if (count > maxLogCount) {
+            while (count > maxLogCount - 1000) {
+                collection.deleteOne(new Document());
+                count--;
+                Log.system("Delete log: " + count);
             }
-            // Insert log message
-            collection.insertOne(
-                    content.append(BotConfig.readString(Config.TIME_INSERT, "_timeInsert"),
-                            new BsonDateTime(System.currentTimeMillis())));
+        }
+        // Insert log message
+        collection.insertOne(
+                content.append(BotConfig.readString(Config.TIME_INSERT, "_timeInsert"),
+                        new BsonDateTime(System.currentTimeMillis())));
 
-        });
     }
 }

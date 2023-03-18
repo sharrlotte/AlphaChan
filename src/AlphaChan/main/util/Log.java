@@ -51,15 +51,15 @@ public class Log {
             System.out.println();
         }
 
-        System.out.println(color.get() + "<" + logHeader + "> " + content);
+        System.out.println(color.get() + "<" + logHeader + "> " + content + TextColor.MAGENTA.get());
     }
 
     public static void print(TextColor color, String logHeader, Exception e) {
         StringBuilder builder = new StringBuilder();
 
-        builder.append(e.getMessage());
+        builder.append(e.getMessage() + "\n");
         for (StackTraceElement ste : e.getStackTrace()) {
-            builder.append(ste.toString() + "\n");
+            builder.append("\t" + ste.toString() + "\n");
         }
 
         print(color, logHeader, builder.toString());
