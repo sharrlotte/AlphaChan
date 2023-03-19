@@ -16,6 +16,7 @@ public class StringUtils {
                 + (seconds < 10 ? "0" + seconds : seconds) + " giây";
     }
 
+    
     public static String toProgressBar(double percent) {
         String str = "";
         for (int i = 0; i < 12; i++)

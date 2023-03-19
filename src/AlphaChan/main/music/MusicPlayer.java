@@ -84,9 +84,7 @@ public class MusicPlayer extends AudioEventAdapter implements AudioSendHandler {
             result = true;
         }
 
-        if (table != null)
-            table.updateTable();
-
+        updateTable();
         return result;
     }
 
@@ -106,15 +104,30 @@ public class MusicPlayer extends AudioEventAdapter implements AudioSendHandler {
             result = true;
         }
 
+        updateTable();
+        return result;
+    }
+
+    private void updateTable() {
+
         if (table != null)
             table.updateTable();
 
-        return result;
     }
 
     public void clear() {
         queue.clear();
         audioPlayer.stopTrack();
+        updateTable();
+    }
+
+    public void addVolume(int amount) {
+
+        int volume = audioPlayer.getVolume();
+        volume += amount;
+        volume = Math.max(0, Math.min(100, volume));
+
+        audioPlayer.setVolume(volume);
     }
 
     public EmbedBuilder getEmbedBuilder() {
@@ -133,15 +146,17 @@ public class MusicPlayer extends AudioEventAdapter implements AudioSendHandler {
 
                 if (matcher.find()) {
 
-                    String url = "http://img.youtube.com/vi/" + matcher.group(1) + "/0.jpg";
-                    builder.setThumbnail(url);
+                    String url = "http://img.youtube.com/vi/" + matcher.group(1) + "/maxresdefault.jpg";
+                    builder.setImage(url);
                 }
 
                 builder.addField("Now playing",
                         "Tác giả: " + playing.getInfo().author + //
                                 "\nVideo: [" + playing.getInfo().title + "](" + playing.getInfo().uri + ")" + //
                                 "\nThời lượng: " + StringUtils.toTime(playing.getDuration()) + //
-                                "\nNgười yêu cầu: " + playing.getUserData(RequestMetadata.class).getRequester(),
+                                "\nNgười yêu cầu: " + playing.getUserData(RequestMetadata.class).getRequester() +
+                                "\nÂm lượng: [" + StringUtils.toProgressBar(audioPlayer.getVolume() / 100d) + "] "
+                                + audioPlayer.getVolume(),
 
                         false);
             }
@@ -152,19 +167,20 @@ public class MusicPlayer extends AudioEventAdapter implements AudioSendHandler {
         StringBuffer songList = new StringBuffer();
         Iterator<QueuedTrack> it = queue.iterator();
         QueuedTrack current;
-        int count = 1;
+        int count = 0;
+        boolean overload = false;
 
         while (it.hasNext()) {
             current = it.next();
-            // Max field string length is 1024
-            if (songList.length() + current.getTrack().getInfo().title.length() > 900)
-                break;
-
-            songList.append("\t" + count + ":    " + current.getTrack().getInfo().title + "\n");
             count++;
+            // Max field string length is 1024
+            if (songList.length() + current.getTrack().getInfo().title.length() < 900) {
+                songList.append("\t" + count + ": " + current.getTrack().getInfo().title + "\n");
+            } else
+                overload = true;
         }
 
-        builder.addField("Play list", songList.toString().replace("||", ""), false);
+        builder.addField("Play list", songList.toString().replace("||", "") + (overload ? "..." + count : ""), false);
 
         return builder;
     }
@@ -192,10 +208,7 @@ public class MusicPlayer extends AudioEventAdapter implements AudioSendHandler {
 
     @Override
     public void onTrackStart(AudioPlayer player, AudioTrack track) {
-        if (table == null)
-            return;
-
-        table.updateTable();
+        updateTable();
     }
 
     @Override
