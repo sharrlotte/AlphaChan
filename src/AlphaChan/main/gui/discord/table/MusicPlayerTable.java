@@ -1,5 +1,6 @@
 package AlphaChan.main.gui.discord.table;
 
+import AlphaChan.BotConfig;
 import AlphaChan.main.command.SimplePageTable;
 import AlphaChan.main.handler.MessageHandler;
 import AlphaChan.main.music.MusicPlayer;
@@ -20,13 +21,10 @@ public class MusicPlayerTable extends SimplePageTable {
             player.play();
             updateTable();
         }));
-
-        addButton(primary("next", Emoji.fromMarkdown("⏭️"), () -> {
+        addButton(primary("next", Emoji.fromMarkdown(BotConfig.NEXT_TRACK_EMOJI), () -> {
             if (!player.playNext())
                 MessageHandler.sendMessage(getEventTextChannel(), "Danh sách phát trống", 10);
-
         }));
-
         addButton(deny("X", () -> this.delete()));
 
         player.setTable(this);
@@ -37,12 +35,14 @@ public class MusicPlayerTable extends SimplePageTable {
 
         resetTimer();
 
-        setButton(primary("play", Emoji.fromMarkdown(player.getTrackStatus()), () -> player.play()));
+        setButton(primary("play", Emoji.fromMarkdown(player.getTrackStatus()), () -> {
+            player.play();
+            updateTable();
+        }));
 
         WebhookMessageUpdateAction<Message> action = event.getHook()
                 .editOriginalEmbeds(player.getEmbedBuilder().build()).setActionRows(getButton());
 
         action.queue();
     }
-
 }

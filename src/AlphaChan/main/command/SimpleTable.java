@@ -79,6 +79,9 @@ public class SimpleTable extends TimeObject {
 
     public void delete() {
         event.getHook().deleteOriginal().queue();
+        if (interaction != null)
+            interaction.getHook().deleteOriginal().queue();
+
     }
 
     public @Nonnull Guild getEventGuild() {

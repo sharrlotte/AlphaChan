@@ -60,11 +60,11 @@ public class SchematicTable extends SimplePageTable {
         addButton(deny("X", () -> this.delete()));
         addButton(primary(">", () -> this.nextPage()));
         addRow();
-        addButton(primary("data", Emoji.fromMarkdown("📁"), () -> this.sendCode()));
-        addButton(primary("star", Emoji.fromMarkdown("⭐"), () -> this.addStar()));
-        addButton(primary("penguin", Emoji.fromMarkdown("🐧"), () -> this.addPenguin()));
+        addButton(primary("data", Emoji.fromMarkdown(BotConfig.FILE_EMOJI), () -> this.sendCode()));
+        addButton(primary("star", Emoji.fromMarkdown(BotConfig.STAR_EMOJI), () -> this.addStar()));
+        addButton(primary("penguin", Emoji.fromMarkdown(BotConfig.PENGUIN_EMOJI), () -> this.addPenguin()));
         addRow();
-        addButton(primary("delete", Emoji.fromMarkdown("🚮"), () -> this.deleteSchematic()));
+        addButton(primary("delete", Emoji.fromMarkdown(BotConfig.PUT_LITTER_EMOJI), () -> this.deleteSchematic()));
 
     }
 

@@ -42,6 +42,10 @@ public final class BotConfig {
     public static final String STOP_EMOJI = "⏹";
     public static final String NEXT_TRACK_EMOJI = "⏯️";
     public static final String FORWARD_EMOJI = "⏩";
+    public static final String FILE_EMOJI = "📁";
+    public static final String STAR_EMOJI = "⭐";
+    public static final String PENGUIN_EMOJI = "⏩";
+    public static final String PUT_LITTER_EMOJI = "🚮";
 
     public static Properties getProperties() {
         if (prop == null || prop.isEmpty())

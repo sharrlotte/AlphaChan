@@ -56,6 +56,7 @@ public class MusicPlayer extends AudioEventAdapter implements AudioSendHandler {
 
     public boolean playNext() {
         boolean result = false;
+        audioPlayer.stopTrack();
 
         if (!queue.isEmpty()) {
             play(queue.removeFirst());
@@ -163,7 +164,7 @@ public class MusicPlayer extends AudioEventAdapter implements AudioSendHandler {
             count++;
         }
 
-        builder.addField("Play list", songList.toString(), false);
+        builder.addField("Play list", songList.toString().replace("||", ""), false);
 
         return builder;
     }
