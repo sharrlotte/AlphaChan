@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import AlphaChan.main.command.SimpleBotSubcommand;
-import AlphaChan.main.command.SimpleTable;
+import AlphaChan.main.command.SimplePageTable;
 import AlphaChan.main.data.user.GuildData;
 import AlphaChan.main.handler.GuildHandler;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -40,7 +40,7 @@ public class GuildCommand extends SimpleBotSubcommand {
             List<Guild> guilds = jda.getGuilds();
             EmbedBuilder builder = new EmbedBuilder();
             StringBuilder field = new StringBuilder();
-            SimpleTable table = new SimpleTable(event, 2);
+            SimplePageTable table = new SimplePageTable(event, 2);
 
             for (int i = 0; i < guilds.size(); i++) {
                 Guild guild = guilds.get(i);
@@ -59,11 +59,11 @@ public class GuildCommand extends SimpleBotSubcommand {
                 }
             }
             table.addPage(builder);
-            table.addButtonPrimary("<<<", () -> table.firstPage())//
-                    .addButtonPrimary("<", () -> table.previousPage())//
-                    .addButtonDeny("X", () -> table.delete())//
-                    .addButtonPrimary(">", () -> table.nextPage())//
-                    .addButtonPrimary(">>>", () -> table.lastPage());
+            table.addButton(table.primary("<<<", () -> table.firstPage()));
+            table.addButton(table.primary("<", () -> table.previousPage()));
+            table.addButton(table.deny("X", () -> table.delete()));
+            table.addButton(table.primary(">", () -> table.nextPage()));
+            table.addButton(table.primary(">>>", () -> table.lastPage()));
 
             table.sendTable();
 

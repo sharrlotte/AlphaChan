@@ -32,6 +32,8 @@ public final class BotConfig {
         SCHEMATIC_DATA_COLLECTION,
         MAX_LOG_COUNT, // Max log that database can store for each type
         TIME_INSERT, // Time field name in database
+
+        MAX_TRACK_LENGTH, // Max length for a youtube video track that can be played in second
         ;
     }
 
@@ -96,6 +98,7 @@ public final class BotConfig {
             setProperty(Config.SCHEMATIC_DATA_COLLECTION, "SCHEMATIC_DATA");
             setProperty(Config.MAX_LOG_COUNT, 8000);
             setProperty(Config.TIME_INSERT, "_timeInserted");
+            setProperty(Config.MAX_TRACK_LENGTH, "60");
 
             prop.store(output, "DEFAULT");
 

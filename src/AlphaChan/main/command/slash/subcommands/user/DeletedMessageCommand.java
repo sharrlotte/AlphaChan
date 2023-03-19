@@ -9,7 +9,7 @@ import com.mongodb.client.MongoCursor;
 import AlphaChan.BotConfig;
 import AlphaChan.BotConfig.Config;
 import AlphaChan.main.command.SimpleBotSubcommand;
-import AlphaChan.main.command.SimpleTable;
+import AlphaChan.main.command.SimplePageTable;
 import AlphaChan.main.handler.DatabaseHandler;
 import AlphaChan.main.handler.DatabaseHandler.DATABASE;
 import AlphaChan.main.handler.DatabaseHandler.LOG_TYPE;
@@ -69,12 +69,12 @@ public class DeletedMessageCommand extends SimpleBotSubcommand {
         Document messageData;
         EmbedBuilder builder = new EmbedBuilder();
         StringBuilder field = new StringBuilder();
-        SimpleTable table = new SimpleTable(event, 2);
-        table.addButtonPrimary("<<<", () -> table.firstPage())//
-                .addButtonPrimary("<", () -> table.previousPage())//
-                .addButtonDeny("X", () -> table.delete())//
-                .addButtonPrimary(">", () -> table.nextPage())//
-                .addButtonPrimary(">>>", () -> table.lastPage());
+        SimplePageTable table = new SimplePageTable(event, 2);
+        table.addButton(table.primary("<<<", () -> table.firstPage()));
+        table.addButton(table.primary("<", () -> table.previousPage()));
+        table.addButton(table.deny("X", () -> table.delete()));
+        table.addButton(table.primary(">", () -> table.nextPage()));
+        table.addButton(table.primary(">>>", () -> table.lastPage()));
 
         MongoCursor<Document> cursor = data.iterator();
         int i = 0;

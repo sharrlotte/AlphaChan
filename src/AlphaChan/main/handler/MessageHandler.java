@@ -350,7 +350,7 @@ public final class MessageHandler extends ListenerAdapter {
 
             message.reply(schemFile).addFile(previewFile).setEmbeds(builder.build()).queue();
         } catch (Exception e) {
-            replyMessage(message.getChannel(), "Lỗi: " + e.getMessage(), 30);
+            sendMessage(message.getChannel(), "Lỗi: " + e.getMessage(), 30);
         }
     }
 
@@ -362,7 +362,7 @@ public final class MessageHandler extends ListenerAdapter {
 
             channel.sendFile(schemFile).addFile(previewFile).setEmbeds(builder.build()).queue();
         } catch (Exception e) {
-            replyMessage(channel, "Lỗi: " + e.getMessage(), 30);
+            sendMessage(channel, "Lỗi: " + e.getMessage(), 30);
         }
     }
 
@@ -428,10 +428,10 @@ public final class MessageHandler extends ListenerAdapter {
 
     // Message send commands
     public static void replyMessage(SlashCommandInteractionEvent event, String content, int deleteAfter) {
-        replyMessage(event.getChannel(), content, deleteAfter);
+        sendMessage(event.getChannel(), content, deleteAfter);
     }
 
-    public static void replyMessage(MessageChannel channel, String content, int deleteAfter) {
+    public static void sendMessage(MessageChannel channel, String content, int deleteAfter) {
         if (channel != null)
             channel.sendMessage("```" + content + "```")
                     .queue(m -> m.delete().queueAfter(deleteAfter, TimeUnit.SECONDS));
@@ -445,17 +445,17 @@ public final class MessageHandler extends ListenerAdapter {
         message.reply("```" + content + "```").queue();
     }
 
-    public static void replyEmbed(SlashCommandInteractionEvent event, EmbedBuilder builder, int deleteAfter) {
+    public static void sendEmbed(SlashCommandInteractionEvent event, EmbedBuilder builder, int deleteAfter) {
         event.getHook().sendMessageEmbeds(builder.build())
                 .queue(_message -> _message.delete().queueAfter(deleteAfter, TimeUnit.SECONDS));
     }
 
-    public static void replyEmbed(MessageContextInteractionEvent event, EmbedBuilder builder, int deleteAfter) {
+    public static void sendEmbed(MessageContextInteractionEvent event, EmbedBuilder builder, int deleteAfter) {
         event.getHook().sendMessageEmbeds(builder.build())
                 .queue(_message -> _message.delete().queueAfter(deleteAfter, TimeUnit.SECONDS));
     }
 
-    public static void replyMessage(MessageContextInteractionEvent event, String content, int deleteAfter) {
+    public static void sendMessage(MessageContextInteractionEvent event, String content, int deleteAfter) {
         event.getHook().sendMessage("```" + content + "```")
                 .queue(_message -> _message.delete().queueAfter(deleteAfter, TimeUnit.SECONDS));
     }

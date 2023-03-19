@@ -14,7 +14,7 @@ import com.mongodb.client.model.Filters;
 
 import AlphaChan.BotConfig;
 import AlphaChan.BotConfig.Config;
-import AlphaChan.main.command.SimpleTable;
+import AlphaChan.main.command.SimplePageTable;
 import AlphaChan.main.data.mindustry.SchematicData;
 import AlphaChan.main.data.mindustry.SchematicInfo;
 import AlphaChan.main.handler.ContentHandler;
@@ -35,7 +35,7 @@ import net.dv8tion.jda.api.requests.restaction.WebhookMessageUpdateAction;
 
 import static AlphaChan.AlphaChan.*;
 
-public class SchematicTable extends SimpleTable {
+public class SchematicTable extends SimplePageTable {
 
     private List<SchematicInfo> schematicInfoList = new ArrayList<SchematicInfo>();
     private MongoCollection<SchematicData> collection;
@@ -56,15 +56,15 @@ public class SchematicTable extends SimpleTable {
         collection = DatabaseHandler.getCollection(DATABASE.MINDUSTRY, schematicDataCollectionName,
                 SchematicData.class);
 
-        addButtonPrimary("<", () -> this.previousPage());
-        addButtonDeny("X", () -> this.delete());
-        addButtonPrimary(">", () -> this.nextPage());
+        addButton(primary("<", () -> this.previousPage()));
+        addButton(deny("X", () -> this.delete()));
+        addButton(primary(">", () -> this.nextPage()));
         addRow();
-        addButtonPrimary("data", Emoji.fromMarkdown("📁"), () -> this.sendCode());
-        addButtonPrimary("star", Emoji.fromMarkdown("⭐"), () -> this.addStar());
-        addButtonPrimary("penguin", Emoji.fromMarkdown("🐧"), () -> this.addPenguin());
+        addButton(primary("data", Emoji.fromMarkdown("📁"), () -> this.sendCode()));
+        addButton(primary("star", Emoji.fromMarkdown("⭐"), () -> this.addStar()));
+        addButton(primary("penguin", Emoji.fromMarkdown("🐧"), () -> this.addPenguin()));
         addRow();
-        addButtonPrimary("delete", Emoji.fromMarkdown("🚮"), () -> this.deleteSchematic());
+        addButton(primary("delete", Emoji.fromMarkdown("🚮"), () -> this.deleteSchematic()));
 
     }
 

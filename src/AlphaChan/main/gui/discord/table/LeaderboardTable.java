@@ -9,7 +9,7 @@ import javax.annotation.Nonnull;
 import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
 
-import AlphaChan.main.command.SimpleTable;
+import AlphaChan.main.command.SimplePageTable;
 import AlphaChan.main.command.slash.subcommands.user.LeaderboardCommand.LEADERBOARD;
 import AlphaChan.main.command.slash.subcommands.user.LeaderboardCommand.ORDER;
 import AlphaChan.main.data.user.UserData;
@@ -25,7 +25,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 
 import static AlphaChan.AlphaChan.*;
 
-public class LeaderboardTable extends SimpleTable {
+public class LeaderboardTable extends SimplePageTable {
 
     private final LEADERBOARD leaderboard;
     private final ORDER order;
@@ -38,11 +38,11 @@ public class LeaderboardTable extends SimpleTable {
         this.leaderboard = leaderboard;
         this.order = order;
 
-        addButtonPrimary("<<<", () -> this.firstPage());
-        addButtonPrimary("<", () -> this.previousPage());
-        addButtonDeny("X", () -> this.delete());
-        addButtonPrimary(">", () -> this.nextPage());
-        addButtonPrimary(">>>", () -> this.lastPage());
+        addButton(primary("<<<", () -> this.firstPage()));
+        addButton(primary("<", () -> this.previousPage()));
+        addButton(deny("X", () -> this.delete()));
+        addButton(primary(">", () -> this.nextPage()));
+        addButton(primary(">>>", () -> this.lastPage()));
     }
 
     @Override

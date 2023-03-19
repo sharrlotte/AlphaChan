@@ -31,8 +31,9 @@ public class AlphaChan {
             String TOKEN = System.getenv("TOKEN");
 
             jda = JDABuilder.createDefault(TOKEN, GatewayIntent.GUILD_MESSAGES, GatewayIntent.GUILD_EMOJIS,
-                    GatewayIntent.GUILD_MEMBERS, GatewayIntent.GUILD_PRESENCES, GatewayIntent.GUILD_MESSAGE_REACTIONS)
-                    .disableCache(CacheFlag.VOICE_STATE)
+                    GatewayIntent.GUILD_MEMBERS, GatewayIntent.GUILD_PRESENCES, GatewayIntent.GUILD_MESSAGE_REACTIONS,
+                    GatewayIntent.GUILD_VOICE_STATES)
+                    .enableCache(CacheFlag.VOICE_STATE)
                     .setMemberCachePolicy(MemberCachePolicy.ALL).build();
             jda.awaitReady();
 
@@ -60,6 +61,10 @@ public class AlphaChan {
 
         public void run() {
         }
+    }
+
+    public static void shutdown() {
+        
     }
 
     public static void main(String[] args) {

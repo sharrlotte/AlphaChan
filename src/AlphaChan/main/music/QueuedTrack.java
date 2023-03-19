@@ -4,7 +4,7 @@ import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
 
 import AlphaChan.main.util.StringUtils;
-import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.entities.Member;
 
 /**
  *
@@ -13,7 +13,7 @@ import net.dv8tion.jda.api.entities.User;
 public class QueuedTrack {
     private final AudioTrack track;
 
-    public QueuedTrack(AudioTrack track, User owner) {
+    public QueuedTrack(AudioTrack track, Member owner) {
         this(track, new RequestMetadata(owner));
     }
 

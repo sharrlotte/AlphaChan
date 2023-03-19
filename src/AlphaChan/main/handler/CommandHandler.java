@@ -14,12 +14,14 @@ import AlphaChan.main.command.console.SetConfigConsole;
 import AlphaChan.main.command.console.ShowConfigConsole;
 import AlphaChan.main.command.console.ShowGuildConsole;
 import AlphaChan.main.command.console.ShowUserConsole;
+import AlphaChan.main.command.console.ShutdownConsole;
 import AlphaChan.main.command.context.DeleteMessageContextMenu;
 import AlphaChan.main.command.context.PostMapContextMenu;
 import AlphaChan.main.command.context.PostSchemContextMenu;
 import AlphaChan.main.command.slash.AdminCommand;
 import AlphaChan.main.command.slash.BotCommand;
 import AlphaChan.main.command.slash.MindustryCommand;
+import AlphaChan.main.command.slash.MusicCommand;
 import AlphaChan.main.command.slash.UserCommand;
 import AlphaChan.main.command.slash.YuiCommand;
 
@@ -91,6 +93,7 @@ public class CommandHandler {
             addCommand(new MindustryCommand());
             addCommand(new UserCommand());
             addCommand(new YuiCommand());
+            addCommand(new MusicCommand());
 
             jda.addEventListener(this);
             Log.system("Slash command handler up");
@@ -196,6 +199,7 @@ public class CommandHandler {
             addCommand(new ReloadSlashCommandConsole());
             addCommand(new SetConfigConsole());
             addCommand(new SaveConfigConsole());
+            addCommand(new ShutdownConsole());
 
             UpdatableHandler.run("CONSOLE", 0, () -> run());
             Log.system("Console command handler up");
@@ -304,7 +308,7 @@ public class CommandHandler {
                 return;
 
             if (!botMember.hasPermission(Permission.ADMINISTRATOR)) {
-                MessageHandler.replyMessage(event, "Vui lòng cho bot vai trò người quản lí để sử dụng bot", 30);
+                MessageHandler.sendMessage(event, "Vui lòng cho bot vai trò người quản lí để sử dụng bot", 30);
                 return;
             }
 

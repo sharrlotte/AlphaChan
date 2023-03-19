@@ -1,6 +1,6 @@
 package AlphaChan.main.music;
 
-import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.entities.Member;
 
 public class RequestMetadata {
 
@@ -8,9 +8,9 @@ public class RequestMetadata {
 
     public final UserInfo user;
 
-    public RequestMetadata(User user) {
+    public RequestMetadata(Member user) {
         this.user = user == null ? null
-                : new UserInfo(user.getIdLong(), user.getName(), user.getDiscriminator(),
+                : new UserInfo(user.getIdLong(), user.getEffectiveName(),
                         user.getEffectiveAvatarUrl());
     }
 
@@ -29,12 +29,11 @@ public class RequestMetadata {
 
     public class UserInfo {
         public final long id;
-        public final String username, discrim, avatar;
+        public final String username, avatar;
 
-        private UserInfo(long id, String username, String discrim, String avatar) {
+        private UserInfo(long id, String username, String avatar) {
             this.id = id;
             this.username = username;
-            this.discrim = discrim;
             this.avatar = avatar;
         }
     }
