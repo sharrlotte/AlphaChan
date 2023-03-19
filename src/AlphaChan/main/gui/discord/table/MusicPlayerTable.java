@@ -22,7 +22,7 @@ public class MusicPlayerTable extends SimplePageTable {
         }));
 
         addButton(primary("next", Emoji.fromMarkdown("⏭️"), () -> {
-            if (player.playNext())
+            if (!player.playNext())
                 MessageHandler.sendMessage(getEventTextChannel(), "Danh sách phát trống", 10);
 
         }));

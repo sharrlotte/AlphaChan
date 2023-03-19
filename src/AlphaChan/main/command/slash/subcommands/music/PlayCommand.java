@@ -110,7 +110,7 @@ public class PlayCommand extends SimpleBotSubcommand {
 
             }
             MessageHandler.sendMessage(event.getChannel(), "Tải thành công: " +
-                    string.toString() + (count == 0 ? "" : " và " + count + " bài hát khác"), 10);
+                    string.toString() + (count == 0 ? "" : "và " + count + " bài hát khác"), 10);
         }
 
         @Override

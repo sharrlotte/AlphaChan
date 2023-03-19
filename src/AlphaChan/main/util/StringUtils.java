@@ -26,16 +26,6 @@ public class StringUtils {
         return str;
     }
 
-    public static String getVolumeIcon(int volume) {
-        if (volume == 0)
-            return "\uD83D\uDD07"; // 🔇
-        if (volume < 30)
-            return "\uD83D\uDD08"; // 🔈
-        if (volume < 70)
-            return "\uD83D\uDD09"; // 🔉
-        return "\uD83D\uDD0A"; // 🔊
-    }
-
     public static String filter(String input) {
         return input.replace("\u202E", "")
                 .replace("@everyone", "@\u0435veryone") // cyrillic letter e

@@ -13,6 +13,7 @@ import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackEndReason;
 import com.sedmelluq.discord.lavaplayer.track.playback.AudioFrame;
 
+import AlphaChan.BotConfig;
 import AlphaChan.main.gui.discord.table.MusicPlayerTable;
 import AlphaChan.main.util.Log;
 import AlphaChan.main.util.StringUtils;
@@ -25,12 +26,6 @@ import net.dv8tion.jda.api.entities.Member;
 import java.awt.Color;
 
 public class MusicPlayer extends AudioEventAdapter implements AudioSendHandler {
-
-    public final static float MAX_TRACK_LENGTH = 60f; // Max 60 minutes video
-
-    public final static String PLAY_EMOJI = "\u25B6"; // ▶
-    public final static String PAUSE_EMOJI = "\u23F8"; // ⏸
-    public final static String STOP_EMOJI = "\u23F9"; // ⏹
 
     private AudioPlayer audioPlayer;
     private AudioFrame lastFrame;
@@ -182,7 +177,7 @@ public class MusicPlayer extends AudioEventAdapter implements AudioSendHandler {
     }
 
     public String getTrackStatus() {
-        return audioPlayer.isPaused() ? PAUSE_EMOJI : PLAY_EMOJI;
+        return audioPlayer.isPaused() ? BotConfig.PAUSE_EMOJI : BotConfig.PLAY_EMOJI;
 
     }
 

@@ -37,6 +37,12 @@ public final class BotConfig {
         ;
     }
 
+    public static final String PLAY_EMOJI = "▶️";
+    public static final String PAUSE_EMOJI = "⏸";
+    public static final String STOP_EMOJI = "⏹";
+    public static final String NEXT_TRACK_EMOJI = "⏯️";
+    public static final String FORWARD_EMOJI = "⏩";
+
     public static Properties getProperties() {
         if (prop == null || prop.isEmpty())
             makeDefault();
