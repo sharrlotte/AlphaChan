@@ -14,8 +14,8 @@ import AlphaChan.main.handler.CommandHandler.SlashCommandHandler;
 public class HelpCommand extends SimpleBotSubcommand {
     public HelpCommand() {
         super("help", "Hiển thị thông tin các lệnh");
-        this.addOption(OptionType.STRING, "command", "Tên lệnh", true, true).//
-                addOption(OptionType.STRING, "subcommand", "Tên lệnh", true, true);
+        addOption(OptionType.STRING, "command", "Tên lệnh", true, true);
+        addOption(OptionType.STRING, "subcommand", "Tên lệnh", true, true);
     }
 
     @Override

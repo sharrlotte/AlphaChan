@@ -17,8 +17,8 @@ import AlphaChan.main.util.Log;
 public class SetNicknameCommand extends SimpleBotSubcommand {
     public SetNicknameCommand() {
         super("setnickname", "Thay đổi tên của người dùng", true, false);
-        this.addOption(OptionType.STRING, "nickname", "Biệt danh muốn đặt", true).//
-                addOption(OptionType.USER, "user", "Tên người muốn đổi(Admin only");
+        addOption(OptionType.STRING, "nickname", "Biệt danh muốn đặt", true);
+        addOption(OptionType.USER, "user", "Tên người muốn đổi(Admin only");
     }
 
     @Override

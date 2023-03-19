@@ -91,7 +91,6 @@ public final class BotConfig {
             setProperty(Config.UPDATE_PERIOD, 60 * 1000);
             setProperty(Config.GUILD_ALIVE_TIME, 20);
             setProperty(Config.USER_ALIVE_TIME, 10);
-            setProperty(Config.UPDATE_LIMIT, 10);
             setProperty(Config.GUILD_COLLECTION, "GUILD_DATA");
             setProperty(Config.SCHEMATIC_INFO_COLLECTION, "SCHEMATIC_INFO");
             setProperty(Config.SCHEMATIC_DATA_COLLECTION, "SCHEMATIC_DATA");

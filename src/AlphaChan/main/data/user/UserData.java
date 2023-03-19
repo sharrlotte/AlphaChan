@@ -39,13 +39,13 @@ public class UserData extends TimeObject {
 
     // For codec
     public UserData() {
-        super(BotConfig.readInt(Config.USER_ALIVE_TIME, 10), BotConfig.readInt(Config.UPDATE_LIMIT, 10));
+        super(BotConfig.readInt(Config.USER_ALIVE_TIME, 10));
         userId = new String();
         guildId = new String();
     }
 
     public UserData(@Nonnull String guildId, @Nonnull String userId) {
-        super(BotConfig.readInt(Config.USER_ALIVE_TIME, 10), BotConfig.readInt(Config.UPDATE_LIMIT, 10));
+        super(BotConfig.readInt(Config.USER_ALIVE_TIME, 10));
         this.userId = userId;
         this.guildId = guildId;
     }
@@ -200,13 +200,11 @@ public class UserData extends TimeObject {
         }
         point += p;
 
-        updateTimer(1);
         return levelUp;
     }
 
     public int _addMoney(int m) {
         this.money += m;
-        updateTimer(1);
         return m;
     }
 

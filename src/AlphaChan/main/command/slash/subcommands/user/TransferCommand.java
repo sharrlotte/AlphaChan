@@ -21,9 +21,9 @@ public class TransferCommand extends SimpleBotSubcommand {
 
     public TransferCommand() {
         super("transfer", "Chuyển chỉ số cho người khác", true, false);
-        this.addOption(OptionType.STRING, "type", "Loại chỉ số muốn chuyển", true, true).//
-                addOption(OptionType.USER, "user", "Người muốn chuyển", true).//
-                addOption(OptionType.INTEGER, "point", "Số điểm muốn chuyển", true);
+        addOption(OptionType.STRING, "type", "Loại chỉ số muốn chuyển", true, true);
+        addOption(OptionType.USER, "user", "Người muốn chuyển", true);
+        addOption(OptionType.INTEGER, "point", "Số điểm muốn chuyển", true);
     }
 
     @Override

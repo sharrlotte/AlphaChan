@@ -15,12 +15,22 @@ import java.util.List;
 import java.util.UUID;
 import java.util.function.Predicate;
 
+import org.bson.Document;
+import org.bson.conversions.Bson;
+
+import com.mongodb.client.FindIterable;
+import com.mongodb.client.MongoCollection;
+
+import AlphaChan.BotConfig;
+import AlphaChan.BotConfig.Config;
 import AlphaChan.main.command.SimpleBotSubcommand;
 import AlphaChan.main.data.mindustry.SchematicData;
 import AlphaChan.main.data.mindustry.SchematicInfo;
 import AlphaChan.main.data.mindustry.SchematicTag;
+import AlphaChan.main.handler.DatabaseHandler;
 import AlphaChan.main.handler.MessageHandler;
 import AlphaChan.main.handler.NetworkHandler;
+import AlphaChan.main.handler.DatabaseHandler.DATABASE;
 import AlphaChan.main.util.Log;
 
 public class PostSchemCommand extends SimpleBotSubcommand {
@@ -31,8 +41,9 @@ public class PostSchemCommand extends SimpleBotSubcommand {
 
     public PostSchemCommand() {
         super("postschem", "Chuyển tập tin bản thiết kế thành hình ảnh", false, true);
-        this.addOption(OptionType.ATTACHMENT, "schematicfile", "file to review", true)//
-                .addOption(OptionType.STRING, "tag", "Gắn thẻ cho bản thiết kế", true, true);
+        addOption(OptionType.ATTACHMENT, "schematicfile", "file to review", true);
+        addOption(OptionType.STRING, "tag", "Gắn thẻ cho bản thiết kế", true, true);
+        addOption(OptionType.BOOLEAN, "preview", "Gửi hình ảnh của bản thiết kế");
     }
 
     @Override
@@ -54,9 +65,6 @@ public class PostSchemCommand extends SimpleBotSubcommand {
         if (member == null)
             throw new IllegalStateException("NO OPTIONS");
 
-        Attachment a = fileOption.getAsAttachment();
-        String data = NetworkHandler.downloadContent(a.getUrl());
-
         List<String> temp = Arrays.asList(tagOption.getAsString().toUpperCase().split(SEPARATOR));
         LinkedList<String> tag = new LinkedList<String>(temp);
         Predicate<String> contain = t -> (!tags.contains(t));
@@ -67,11 +75,35 @@ public class PostSchemCommand extends SimpleBotSubcommand {
             reply(event, "Bản thiết kế không hợp lệ, thiếu nhãn", 30);
 
         } else {
+
+            OptionMapping previewOption = event.getOption("preview");
+            Attachment a = fileOption.getAsAttachment();
+            String data = NetworkHandler.downloadContent(a.getUrl());
+            String schematicDataCollectionName = BotConfig.readString(Config.SCHEMATIC_DATA_COLLECTION, null);
+
+            if (schematicDataCollectionName == null) {
+                Log.error("Bot config: SCHEMATIC_DATA_COLLECTION not exist");
+                return;
+            }
+
+            MongoCollection<SchematicData> collection = DatabaseHandler.getCollection(DATABASE.MINDUSTRY,
+                    schematicDataCollectionName, SchematicData.class);
+
+            Bson filter = new Document().append("data", data);
+            FindIterable<SchematicData> result = collection.find(filter);
+
+            if (result.first() != null) {
+                reply(event, "Bản thiết kế đã tồn tại", 10);
+                return;
+            }
+
             String uuid = UUID.randomUUID().toString();
             new SchematicData(uuid, data).update();
             new SchematicInfo(uuid, member.getId(), tag).update();
-            
-            MessageHandler.sendSchematicPreview(event);
+
+            if (previewOption != null && previewOption.getAsBoolean() == true)
+                MessageHandler.sendSchematicPreview(event);
+
             reply(event, "Đăng bản thiết kế thành công", 10);
         }
     }

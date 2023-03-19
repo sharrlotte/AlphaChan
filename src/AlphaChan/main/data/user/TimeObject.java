@@ -1,21 +1,28 @@
 package AlphaChan.main.data.user;
 
+import AlphaChan.main.event.Signal;
+
 public abstract class TimeObject {
 
-    private final int ALIVE_LIMIT;
-    private final int UPDATE_LIMIT;
+    private final int ALIVE_TIME;
 
     private int time = 0;
-    private int updateTime = 0;
 
-    public TimeObject(final int aliveLimit, final int updateLimit) {
-        this.UPDATE_LIMIT = updateLimit;
-        this.ALIVE_LIMIT = aliveLimit;
-        this.time = ALIVE_LIMIT;
+    protected Signal<Integer> onTimeOut = new Signal<>();
+
+    public TimeObject(final int aliveTime) {
+        this.ALIVE_TIME = aliveTime;
+        this.time = ALIVE_TIME;
     }
 
     public boolean isAlive() {
-        return time > 0;
+
+        if (time > 0) {
+            return true;
+        }
+
+        onTimeOut.emit(0);
+        return false;
     }
 
     public boolean isAlive(int n) {
@@ -24,21 +31,15 @@ public abstract class TimeObject {
     }
 
     public void resetTimer() {
-        time = ALIVE_LIMIT;
+        time = ALIVE_TIME;
     }
 
     public void killTimer() {
         this.time = 0;
     }
 
-    public boolean updateTimer(int n) {
-        updateTime += n;
-        if (updateTime >= UPDATE_LIMIT) {
-            updateTime = 0;
-            update();
-            return true;
-        }
-        return false;
+    public int getTime() {
+        return time;
     }
 
     public abstract void update();

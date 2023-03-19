@@ -30,8 +30,10 @@ public class DeleteMessageContextMenu extends SimpleBotContextMenu {
                 Member trigger = event.getMember();
                 if (trigger == null)
                     continue;
+
                 if (name.equals(trigger.getEffectiveName())) {
                     event.getTarget().delete().queue();
+                    reply(event, "Xóa thành công", 10);
                     return;
                 }
                 reply(event, "Không thể xóa tin nhắn của bot mà người khác đã yêu cầu", 10);

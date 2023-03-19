@@ -59,7 +59,6 @@ public final class TableHandler extends ListenerAdapter implements Updatable {
         while (iterator.hasNext()) {
             SimpleEmbed table = iterator.next();
             if (!table.isAlive(1)) {
-                table.delete();
                 iterator.remove();
             }
         }

@@ -52,6 +52,9 @@ public final class DatabaseHandler {
     private static ConcurrentHashMap<String, MongoDatabase> database = new ConcurrentHashMap<String, MongoDatabase>();
 
     private DatabaseHandler() {
+
+        // Generate index
+
         Log.system("Database handler up");
     }
 
@@ -64,7 +67,7 @@ public final class DatabaseHandler {
     public static MongoDatabase getDatabase(DATABASE name) {
         if (database.containsKey(name.name()))
             return database.get(name.name());
-            
+
         MongoDatabase db = mongoClient.getDatabase(name.name()).withCodecRegistry(pojoCodecRegistry);
         database.put(name.name(), db);
         return db;

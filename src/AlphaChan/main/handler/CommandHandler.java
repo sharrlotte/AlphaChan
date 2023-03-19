@@ -160,7 +160,7 @@ public class CommandHandler {
                     // Call subcommand
                     slashCommands.get(command).onCommand(event);
                     // Print to terminal
-                    Log.print("LOG", MessageHandler.getMessageSender(event) + ": used " + event.getName() + " "
+                    Log.info("INTERACTION", MessageHandler.getMessageSender(event) + ": used " + event.getName() + " "
                             + event.getSubcommandName() + " " + event.getOptions().toString());
                     // Send to discord log channel
                     if (!command.equals("yui")) {
@@ -310,7 +310,8 @@ public class CommandHandler {
 
             if (contextCommands.containsKey(command)) {
                 contextCommands.get(command).onCommand(event);
-                Log.print("LOG", MessageHandler.getMessageSender(event.getTarget()) + ": used " + event.getName());
+                Log.info("INTERACTION",
+                        MessageHandler.getMessageSender(event.getTarget()) + ": used " + event.getName());
             }
 
         }

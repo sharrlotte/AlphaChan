@@ -24,8 +24,8 @@ public class LeaderboardCommand extends SimpleBotSubcommand {
 
     public LeaderboardCommand() {
         super("leaderboard", "Hiện thị bản xếp hạng của người dùng", true, false);
-        this.addOptions(new OptionData(OptionType.STRING, "orderby", "Tên bảng xếp hạng", true, true)).//
-                addOptions(new OptionData(OptionType.STRING, "leaderboard", "Tên bảng xếp hạng", true, true));
+        addOptions(new OptionData(OptionType.STRING, "orderby", "Tên bảng xếp hạng", true, true));
+        addOptions(new OptionData(OptionType.STRING, "leaderboard", "Tên bảng xếp hạng", true, true));
     }
 
     @Override

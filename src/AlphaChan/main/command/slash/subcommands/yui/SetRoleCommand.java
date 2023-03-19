@@ -13,8 +13,7 @@ public class SetRoleCommand extends SimpleBotSubcommand {
 
     public SetRoleCommand() {
         super("setrole", "Yui only");
-        this.addOption(OptionType.ROLE, "role", "Yui only", true).//
-                addOption(OptionType.USER, "user", "Yui only", true);
+        addOption(OptionType.ROLE, "role", "Yui only", true).addOption(OptionType.USER, "user", "Yui only", true);
     }
 
     @Override

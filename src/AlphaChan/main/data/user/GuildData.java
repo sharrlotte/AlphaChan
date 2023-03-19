@@ -52,11 +52,11 @@ public class GuildData extends TimeObject {
 
     // For codec
     public GuildData() {
-        super(BotConfig.readInt(Config.GUILD_ALIVE_TIME, 10), BotConfig.readInt(Config.UPDATE_LIMIT, 10));
+        super(BotConfig.readInt(Config.GUILD_ALIVE_TIME, 10));
     }
 
     public GuildData(@Nonnull String guildId) {
-        super(BotConfig.readInt(Config.GUILD_ALIVE_TIME, 10), BotConfig.readInt(Config.UPDATE_LIMIT, 10));
+        super(BotConfig.readInt(Config.GUILD_ALIVE_TIME, 10));
         this.guildId = guildId;
         _getGuild();
     }

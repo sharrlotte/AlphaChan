@@ -25,6 +25,8 @@ import mindustry.world.blocks.legacy.*;
 
 import javax.imageio.*;
 
+import AlphaChan.main.util.Log;
+
 import java.awt.*;
 import java.awt.geom.*;
 import java.awt.image.*;
@@ -78,7 +80,7 @@ public class ContentHandler {
 
             TextureAtlasData data = new TextureAtlasData(
                     new Fi(assets + "assets/sprites/sprites.aatls"),
-                    new Fi(assets + "sprites"), false);
+                    new Fi(assets + "assets/sprites"), false);
             Core.atlas = new TextureAtlas();
 
             new Fi(assets + "assets-raw/sprites_out").walk(f -> {
@@ -158,7 +160,7 @@ public class ContentHandler {
                     }
                 }
             } catch (Exception e) {
-                throw new RuntimeException(e);
+                Log.error(e);
             }
 
             world = new World() {
@@ -181,7 +183,7 @@ public class ContentHandler {
         });
     }
 
-    private static BufferedImage tint(BufferedImage image, Color color) {
+    private BufferedImage tint(BufferedImage image, Color color) {
         BufferedImage copy = new BufferedImage(image.getWidth(), image.getHeight(), image.getType());
         Color tmp = new Color();
         for (int x = 0; x < copy.getWidth(); x++) {
@@ -263,6 +265,7 @@ public class ContentHandler {
         });
 
         requests.each(req -> req.block.drawPlanConfigTop(req, requests));
+
         return image;
     }
 

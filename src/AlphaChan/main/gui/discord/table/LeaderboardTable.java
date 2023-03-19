@@ -72,8 +72,12 @@ public class LeaderboardTable extends SimpleTable {
                     String guildId = guild.getId();
                     MongoCollection<UserData> collection = DatabaseHandler.getCollection(DATABASE.USER, guildId,
                             UserData.class);
-                    FindIterable<UserData> data = collection.find();
-                    data.forEach(d -> users.add(d));
+                    try {
+                        FindIterable<UserData> data = collection.find();
+                        data.forEach(d -> users.add(d));
+                    } catch (Exception e) {
+
+                    }
                 });
                 break;
 
@@ -85,8 +89,12 @@ public class LeaderboardTable extends SimpleTable {
                 MongoCollection<UserData> collection = DatabaseHandler.getCollection(DATABASE.USER, guildId,
                         UserData.class);
 
-                FindIterable<UserData> data = collection.find();
-                data.forEach(d -> users.add(d));
+                try {
+                    FindIterable<UserData> data = collection.find();
+                    data.forEach(d -> users.add(d));
+                } catch (Exception e) {
+
+                }
                 break;
 
             case ONLINE:

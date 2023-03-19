@@ -27,8 +27,8 @@ public class DeletedMessageCommand extends SimpleBotSubcommand {
 
     public DeletedMessageCommand() {
         super("deletedmessage", "Hiển thị tin nhắn đã xóa gần đây nhất", true, false);
-        this.addOption(OptionType.INTEGER, "amount", "Số lượng tin nhắn", true).//
-                addOption(OptionType.USER, "user", "Người xóa tin nhắn");
+        addOption(OptionType.INTEGER, "amount", "Số lượng tin nhắn", true);
+        addOption(OptionType.USER, "user", "Người xóa tin nhắn");
     }
 
     @Override

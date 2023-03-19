@@ -63,7 +63,7 @@ public class InfoCommand extends SimpleBotSubcommand {
     private EmbedBuilder getDisplayedUserInformation(@Nonnull Member member) {
         EmbedBuilder builder = new EmbedBuilder();
         builder.setAuthor(member.getEffectiveName(), null, member.getEffectiveAvatarUrl());
-        builder.setImage(member.getEffectiveAvatarUrl());
+        builder.setThumbnail(member.getEffectiveAvatarUrl());
         // Display role
         List<Role> roles = member.getRoles();
         String roleString = "";

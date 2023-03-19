@@ -18,6 +18,7 @@ import AlphaChan.main.data.mindustry.SchematicTag;
 import AlphaChan.main.gui.discord.table.SchematicTable;
 import AlphaChan.main.handler.DatabaseHandler;
 import AlphaChan.main.handler.DatabaseHandler.DATABASE;
+
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.events.interaction.command.CommandAutoCompleteInteractionEvent;
@@ -26,18 +27,19 @@ import net.dv8tion.jda.api.interactions.commands.Command;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 
+import static com.mongodb.client.model.Sorts.descending;
+
 public class SearchSchematicCommand extends SimpleBotSubcommand {
 
     private final String SEPARATOR = ",";
-    private final Integer SEARCH_LIMIT = 100;
 
     private static List<String> tags = SchematicTag.getTags();
 
     public SearchSchematicCommand() {
         super("searchschematic", "Tìm bản thiết kế dựa theo nhãn", true, false);
-        this.addOption(OptionType.STRING, "tag", "Nhãn để lọc bản thiết kế", false, true)//
-                .addOption(OptionType.USER, "user", "Tác giả của bản thiết kế")//
-                .addOption(OptionType.BOOLEAN, "own", "Ngăn chăn người khác tương tác với bảng");
+        addOption(OptionType.STRING, "tag", "Nhãn để lọc bản thiết kế", false, true);
+        addOption(OptionType.USER, "user", "Tác giả của bản thiết kế");
+        addOption(OptionType.BOOLEAN, "own", "Ngăn chăn người khác tương tác với bảng");
 
     }
 
@@ -70,11 +72,11 @@ public class SearchSchematicCommand extends SimpleBotSubcommand {
 
         FindIterable<SchematicInfo> schematicInfo;
         if (tags.length <= 0) {
-            schematicInfo = collection.find(filter, SchematicInfo.class).limit(SEARCH_LIMIT)
-                    .sort(new Document().append("star", -1));
+            schematicInfo = collection.find(filter, SchematicInfo.class)
+                    .sort(descending("star"));
         } else {
             schematicInfo = collection.find(Filters.and(Filters.all("tag", tags), filter), SchematicInfo.class)
-                    .limit(SEARCH_LIMIT);
+                    .sort(descending("star"));
         }
 
         if (schematicInfo.first() == null) {
@@ -82,6 +84,7 @@ public class SearchSchematicCommand extends SimpleBotSubcommand {
                 reply(event, "Không có dữ liệu về bản thiết kế", 30);
             else
                 reply(event, "Không có dữ liệu về bản thiết kế với nhãn: " + tagOption.getAsString().toLowerCase(), 30);
+
         } else {
 
             boolean own = false;

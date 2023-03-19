@@ -23,6 +23,7 @@ import AlphaChan.main.handler.MessageHandler;
 import AlphaChan.main.handler.UserHandler;
 import AlphaChan.main.handler.DatabaseHandler.DATABASE;
 import AlphaChan.main.util.Log;
+import AlphaChan.main.util.StringUtils;
 import mindustry.game.Schematic;
 
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -43,7 +44,7 @@ public class SchematicTable extends SimpleTable {
     private Message currentCode;
 
     public SchematicTable(@Nonnull SlashCommandInteractionEvent event, FindIterable<SchematicInfo> schematicInfo) {
-        super(event, 10);
+        super(event, 30);
 
         MongoCursor<SchematicInfo> cursor = schematicInfo.cursor();
         while (cursor.hasNext()) {
@@ -74,11 +75,16 @@ public class SchematicTable extends SimpleTable {
 
     @Override
     public void delete() {
-        event.getHook().deleteOriginal().queue();
-        this.killTimer();
+        try {
+            event.getHook().deleteOriginal().queue();
 
-        if (currentCode != null)
-            currentCode.delete().queue();
+            this.killTimer();
+
+            if (currentCode != null)
+                currentCode.delete().queue();
+        } catch (Exception e) {
+            Log.error(e);
+        }
     }
 
     private void addStar() {
@@ -115,8 +121,14 @@ public class SchematicTable extends SimpleTable {
             if (currentCode != null)
                 currentCode.delete();
 
-            updateTable();
             sendMessage("Đã xóa bản thiết kế", 10);
+
+            if (schematicInfoList.size() == 0) {
+                delete();
+                return;
+            }
+
+            updateTable();
 
         } catch (Exception e) {
             Log.error(e);
@@ -124,18 +136,23 @@ public class SchematicTable extends SimpleTable {
     }
 
     private void sendCode() {
-        if (currentData == null)
-            return;
+        try {
+            if (currentData == null)
+                return;
 
-        String data = currentData.data;
-        if (data == null)
-            return;
+            String data = currentData.data;
+            if (data == null)
+                return;
 
-        if (currentCode == null)
-            sendCodeData(data);
-        else {
-            currentCode.delete().complete();
-            sendCodeData(data);
+            if (currentCode == null)
+                sendCodeData(data);
+            else {
+                currentCode.delete().complete();
+                sendCodeData(data);
+            }
+
+        } catch (Exception e) {
+            Log.error(e);
         }
     }
 
@@ -160,6 +177,8 @@ public class SchematicTable extends SimpleTable {
             if (currentCode != null)
                 currentCode.delete().queue();
 
+            pageNumber %= getMaxPage();
+
             currentInfo = schematicInfoList.get(pageNumber);
             currentData = collection.find(Filters.eq("_id", currentInfo.id)).limit(1).first();
             if (currentData == null) {
@@ -181,8 +200,11 @@ public class SchematicTable extends SimpleTable {
 
             field.append("- Nhãn: ");
             for (int i = 0; i < currentInfo.tag.size() - 1; i++)
-                field.append(currentInfo.tag.get(i).toLowerCase() + ", ");
-            field.append(currentInfo.tag.get(currentInfo.tag.size() - 1).toLowerCase() + "\n");
+                field.append(StringUtils.capitalize(currentInfo.tag.get(i).replace("_", " ").toLowerCase() + ", "));
+
+            field.append(StringUtils.capitalize(currentInfo.tag.get(
+                    currentInfo.tag.size() - 1).replace("_", " ").toLowerCase() + "\n"));
+
             field.append("- Sao: " + currentInfo.getStar() + "\n");
             field.append("- Cánh cụt: " + currentInfo.getPenguin() + "\n");
 

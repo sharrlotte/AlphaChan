@@ -16,8 +16,8 @@ import AlphaChan.main.handler.GuildHandler;
 public class SetLevelRoleCommand extends SimpleBotSubcommand {
     public SetLevelRoleCommand() {
         super("setlevelrole", "Cài đặt các vai trò của máy chủ");
-        this.addOption(OptionType.ROLE, "role", "Vai trò muốn gán", true).//
-                addOption(OptionType.INTEGER, "level", "Cấp độ cần thiết để nhận vai trò", true);
+        addOption(OptionType.ROLE, "role", "Vai trò muốn gán", true);
+        addOption(OptionType.INTEGER, "level", "Cấp độ cần thiết để nhận vai trò", true);
     }
 
     @Override

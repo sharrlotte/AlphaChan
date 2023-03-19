@@ -10,6 +10,7 @@ import javax.annotation.Nonnull;
 
 import AlphaChan.main.data.user.TimeObject;
 import AlphaChan.main.handler.TableHandler;
+import AlphaChan.main.util.Log;
 import net.dv8tion.jda.api.entities.Emoji;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
@@ -33,8 +34,9 @@ public class SimpleEmbed extends TimeObject {
     private static final String SEPARATOR = ":";
 
     public SimpleEmbed(SlashCommandInteractionEvent event, int aliveLimit) {
-        super(aliveLimit, 0);
+        super(aliveLimit);
         this.event = event;
+
         TableHandler.add(this);
     }
 
@@ -50,6 +52,8 @@ public class SimpleEmbed extends TimeObject {
         interaction = event;
 
         String key = event.getComponentId();
+
+        Log.info("INTERACTION", event.getMember().getEffectiveName() + " pressed button " + key);
 
         if (requestor != null) {
             if (!getTriggerMember().getId().equals(requestor)) {

@@ -23,9 +23,9 @@ public class AddCommand extends SimpleBotSubcommand {
 
     public AddCommand() {
         super("add", "Yui only");
-        this.addOption(OptionType.STRING, "type", "Yui only", true, true).//
-                addOption(OptionType.USER, "user", "Yui only", true).//
-                addOption(OptionType.INTEGER, "point", "Yui only", true);
+        addOption(OptionType.STRING, "type", "Yui only", true, true);
+        addOption(OptionType.USER, "user", "Yui only", true);
+        addOption(OptionType.INTEGER, "point", "Yui only", true);
     }
 
     @Override
