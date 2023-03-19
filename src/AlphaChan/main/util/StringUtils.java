@@ -12,7 +12,7 @@ public class StringUtils {
         seconds %= 60 * 60;
         long minutes = seconds / 60;
         seconds %= 60;
-        return (hours > 0 ? hours + " giờ " : "") + (minutes < 10 ? "0" + minutes : minutes) + " phút"
+        return (hours > 0 ? hours + " giờ " : "") + (minutes < 10 ? "0" + minutes : minutes) + " phút "
                 + (seconds < 10 ? "0" + seconds : seconds) + " giây";
     }
 

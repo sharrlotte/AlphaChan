@@ -12,7 +12,7 @@ public abstract class TimeObject {
 
     public TimeObject(final int aliveTime) {
         this.ALIVE_TIME = aliveTime;
-        this.time = ALIVE_TIME;
+        this.time = aliveTime;
     }
 
     public boolean isAlive() {

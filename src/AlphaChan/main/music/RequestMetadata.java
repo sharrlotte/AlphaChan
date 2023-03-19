@@ -18,6 +18,10 @@ public class RequestMetadata {
         return user == null ? 0L : user.id;
     }
 
+    public String getRequester() {
+        return user == null ? null : user.username;
+    }
+
     public class RequestInfo {
         public final String query, url;
 

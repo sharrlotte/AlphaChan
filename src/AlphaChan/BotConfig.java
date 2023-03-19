@@ -98,7 +98,7 @@ public final class BotConfig {
             setProperty(Config.SCHEMATIC_DATA_COLLECTION, "SCHEMATIC_DATA");
             setProperty(Config.MAX_LOG_COUNT, 8000);
             setProperty(Config.TIME_INSERT, "_timeInserted");
-            setProperty(Config.MAX_TRACK_LENGTH, "60");
+            setProperty(Config.MAX_TRACK_LENGTH, "600");
 
             prop.store(output, "DEFAULT");
 

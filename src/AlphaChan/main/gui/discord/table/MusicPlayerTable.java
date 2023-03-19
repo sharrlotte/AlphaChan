@@ -3,7 +3,6 @@ package AlphaChan.main.gui.discord.table;
 import AlphaChan.main.command.SimplePageTable;
 import AlphaChan.main.handler.MessageHandler;
 import AlphaChan.main.music.MusicPlayer;
-
 import net.dv8tion.jda.api.entities.Emoji;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -25,6 +24,7 @@ public class MusicPlayerTable extends SimplePageTable {
         addButton(primary("next", Emoji.fromMarkdown("⏭️"), () -> {
             if (player.playNext())
                 MessageHandler.sendMessage(getEventTextChannel(), "Danh sách phát trống", 10);
+
         }));
 
         addButton(deny("X", () -> this.delete()));
@@ -34,6 +34,8 @@ public class MusicPlayerTable extends SimplePageTable {
 
     @Override
     public void updateTable() {
+
+        resetTimer();
 
         setButton(primary("play", Emoji.fromMarkdown(player.getTrackStatus()), () -> player.play()));
 

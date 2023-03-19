@@ -1,5 +1,8 @@
 package AlphaChan.main.command.slash.subcommands.music;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.sedmelluq.discord.lavaplayer.player.AudioLoadResultHandler;
 import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
 import com.sedmelluq.discord.lavaplayer.track.AudioPlaylist;
@@ -22,7 +25,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 public class PlayCommand extends SimpleBotSubcommand {
 
     public PlayCommand() {
-        super("play", "Phát một bản nhạc");
+        super("play", "Phát một bản nhạc qua link hoặc tên, gọi ra bảng điều khiển phát nhạc");
         addOption(OptionType.STRING, "source", "Link/Tên bài hát muốn phát");
     }
 
@@ -56,9 +59,11 @@ public class PlayCommand extends SimpleBotSubcommand {
                     new MusicPlayerTable(event, MusicPlayerHandler.getInstance().getMusicPlayer(event.getGuild()))
                             .sendTable();
                 } else {
+
                     event.getHook().deleteOriginal().queue();
-                    MusicPlayerHandler.getInstance().getMusicPlayer(event.getGuild()).start(channel);
                 }
+
+                MusicPlayerHandler.getInstance().getMusicPlayer(event.getGuild()).start(channel);
             } else {
 
                 new MusicPlayerTable(event, MusicPlayerHandler.getInstance().getMusicPlayer(event.getGuild()))
@@ -78,10 +83,6 @@ public class PlayCommand extends SimpleBotSubcommand {
 
         @Override
         public void trackLoaded(AudioTrack track) {
-            if (!MusicPlayer.isValidTrack(track)) {
-                reply(event, "Đoạn video này quá dài để có thể phát", 30);
-                return;
-            }
 
             MusicPlayer handler = (MusicPlayer) event.getGuild().getAudioManager().getSendingHandler();
 
@@ -92,16 +93,24 @@ public class PlayCommand extends SimpleBotSubcommand {
         @Override
         public void playlistLoaded(AudioPlaylist playlist) {
             StringBuffer string = new StringBuffer();
+            int count = 0;
+
+            List<QueuedTrack> tracks = new ArrayList<>();
+
+            MusicPlayer handler = (MusicPlayer) event.getGuild().getAudioManager().getSendingHandler();
+            playlist.getTracks().forEach((track) -> tracks.add(new QueuedTrack(track, event.getMember())));
+            handler.addTracks(tracks);
+
             for (AudioTrack track : playlist.getTracks()) {
 
-                if (!MusicPlayer.isValidTrack(track)) {
-
-                    MusicPlayer handler = (MusicPlayer) event.getGuild().getAudioManager().getSendingHandler();
-                    handler.addTrack(new QueuedTrack(track, event.getMember()));
+                if (string.length() + track.getInfo().title.length() < 900)
                     string.append(track.getInfo().title + "\n");
-                }
+                else
+                    count += 1;
+
             }
-            MessageHandler.sendMessage(event.getChannel(), string.toString(), 10);
+            MessageHandler.sendMessage(event.getChannel(), "Tải thành công: " +
+                    string.toString() + (count == 0 ? "" : " và " + count + " bài hát khác"), 10);
         }
 
         @Override

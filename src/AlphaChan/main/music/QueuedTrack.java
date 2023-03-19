@@ -26,6 +26,10 @@ public class QueuedTrack {
         return track.getUserData(RequestMetadata.class).getOwner();
     }
 
+    public String getRequester() {
+        return track.getUserData(RequestMetadata.class).getRequester();
+    }
+
     public AudioTrack getTrack() {
         return track;
     }

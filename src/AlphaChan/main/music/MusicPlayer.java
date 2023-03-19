@@ -1,8 +1,9 @@
 package AlphaChan.main.music;
 
 import java.nio.ByteBuffer;
-import java.util.ArrayDeque;
 import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -38,7 +39,7 @@ public class MusicPlayer extends AudioEventAdapter implements AudioSendHandler {
 
     private MusicPlayerTable table;
 
-    private ArrayDeque<QueuedTrack> queue = new ArrayDeque<QueuedTrack>();
+    private LinkedList<QueuedTrack> queue = new LinkedList<QueuedTrack>();
 
     public MusicPlayer(Guild guild, AudioPlayer player) {
 
@@ -54,26 +55,36 @@ public class MusicPlayer extends AudioEventAdapter implements AudioSendHandler {
         audioPlayer.setPaused(!audioPlayer.isPaused());
     }
 
-    public boolean playNext() {
-        if (queue.isEmpty())
-            return false;
+    public void play(QueuedTrack track) {
+        audioPlayer.playTrack(track.getTrack());
+    }
 
-        audioPlayer.playTrack(queue.poll().getTrack());
-        return true;
+    public boolean playNext() {
+        boolean result = false;
+
+        if (!queue.isEmpty()) {
+            play(queue.removeFirst());
+            result = true;
+        }
+
+        if (table == null)
+            return result;
+
+        table.updateTable();
+        return result;
     }
 
     public void destroy() {
         guild.getAudioManager().closeAudioConnection();
     }
 
-    public boolean addTrackToFront(QueuedTrack queueTrack) {
+    public boolean addTrack(QueuedTrack queueTrack) {
         boolean result = false;
-
         if (audioPlayer.getPlayingTrack() == null) {
-            audioPlayer.playTrack(queueTrack.getTrack());
+            play(queueTrack);
 
         } else {
-            queue.addFirst(queueTrack);
+            queue.add(queueTrack);
             result = true;
         }
 
@@ -83,13 +94,19 @@ public class MusicPlayer extends AudioEventAdapter implements AudioSendHandler {
         return result;
     }
 
-    public boolean addTrack(QueuedTrack queueTrack) {
+    public boolean addTracks(List<QueuedTrack> queueTrack) {
         boolean result = false;
+
+        if (queueTrack.isEmpty())
+            return result;
+
         if (audioPlayer.getPlayingTrack() == null) {
-            audioPlayer.playTrack(queueTrack.getTrack());
+            play(queueTrack.get(0));
+            queueTrack.remove(0);
+            queue.addAll(queueTrack);
 
         } else {
-            queue.addLast(queueTrack);
+            queue.addAll(queueTrack);
             result = true;
         }
 
@@ -113,6 +130,7 @@ public class MusicPlayer extends AudioEventAdapter implements AudioSendHandler {
 
         try {
             AudioTrack playing = audioPlayer.getPlayingTrack();
+
             if (playing != null) {
                 Pattern pattern = Pattern.compile("v=(.+)");
                 Matcher matcher = pattern.matcher(playing.getInfo().uri);
@@ -124,8 +142,11 @@ public class MusicPlayer extends AudioEventAdapter implements AudioSendHandler {
                 }
 
                 builder.addField("Now playing",
-                        "Tác giả: " + playing.getInfo().author + "\nVideo: [" + playing.getInfo().title + "]("
-                                + playing.getInfo().uri + ")\nThời lượng: " + StringUtils.toTime(playing.getDuration()),
+                        "Tác giả: " + playing.getInfo().author + //
+                                "\nVideo: [" + playing.getInfo().title + "](" + playing.getInfo().uri + ")" + //
+                                "\nThời lượng: " + StringUtils.toTime(playing.getDuration()) + //
+                                "\nNgười yêu cầu: " + playing.getUserData(RequestMetadata.class).getRequester(),
+
                         false);
             }
         } catch (Exception e) {
@@ -133,13 +154,17 @@ public class MusicPlayer extends AudioEventAdapter implements AudioSendHandler {
         }
 
         StringBuffer songList = new StringBuffer();
-        Iterator<QueuedTrack> it = queue.descendingIterator();
+        Iterator<QueuedTrack> it = queue.iterator();
         QueuedTrack current;
         int count = 1;
 
         while (it.hasNext()) {
             current = it.next();
-            songList.append("\t" + count + ": " + current.getTrack().getInfo().title + "\n");
+            // Max field string length is 1024
+            if (songList.length() + current.getTrack().getInfo().title.length() > 900)
+                break;
+
+            songList.append("\t" + count + ":    " + current.getTrack().getInfo().title + "\n");
             count++;
         }
 
@@ -161,15 +186,6 @@ public class MusicPlayer extends AudioEventAdapter implements AudioSendHandler {
 
     }
 
-    public static boolean isValidTrack(AudioTrack track) {
-
-        return (track.getDuration() / 1000f) < MAX_TRACK_LENGTH * 1000;
-    }
-
-    public ArrayDeque<QueuedTrack> getQueue() {
-        return queue;
-    }
-
     public Guild getGuild() {
         return guild;
     }
@@ -188,7 +204,8 @@ public class MusicPlayer extends AudioEventAdapter implements AudioSendHandler {
 
     @Override
     public void onTrackEnd(AudioPlayer player, AudioTrack track, AudioTrackEndReason endReason) {
-        playNext();
+        if (endReason == AudioTrackEndReason.FINISHED)
+            playNext();
     }
 
     @Override
