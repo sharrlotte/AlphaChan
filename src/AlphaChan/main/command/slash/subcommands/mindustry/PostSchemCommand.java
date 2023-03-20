@@ -40,8 +40,9 @@ public class PostSchemCommand extends SimpleBotSubcommand {
     private static List<String> tags = SchematicTag.getTags();
 
     public PostSchemCommand() {
-        super("postschem", "Chuyển tập tin bản thiết kế thành hình ảnh", false, true);
-        addOption(OptionType.ATTACHMENT, "schematicfile", "file to review", true);
+        super("postschem", "Chuyển tập tin bản thiết kế thành hình ảnh và đăng lên cơ sở dữ liệu", false, true);
+        addOption(OptionType.ATTACHMENT, "schematicfile", "File để đăng");
+        addOption(OptionType.STRING, "text", "Bản thiết kế để đăng");
         addOption(OptionType.STRING, "tag", "Gắn thẻ cho bản thiết kế", true, true);
         addOption(OptionType.BOOLEAN, "preview", "Gửi hình ảnh của bản thiết kế");
     }
@@ -54,8 +55,12 @@ public class PostSchemCommand extends SimpleBotSubcommand {
     @Override
     public void runCommand(SlashCommandInteractionEvent event) {
         OptionMapping fileOption = event.getOption("schematicfile");
-        if (fileOption == null)
-            throw new IllegalArgumentException("NO OPTIONS");
+        OptionMapping textOption = event.getOption("text");
+
+        if (fileOption == null && textOption == null) {
+            reply(event, "Thiếu dữ liệu bản thế kế (file/text)", MAX_OPTIONS);
+            return;
+        }
 
         OptionMapping tagOption = event.getOption("tag");
         if (tagOption == null)
@@ -76,35 +81,71 @@ public class PostSchemCommand extends SimpleBotSubcommand {
 
         } else {
 
-            OptionMapping previewOption = event.getOption("preview");
-            Attachment a = fileOption.getAsAttachment();
-            String data = NetworkHandler.downloadContent(a.getUrl());
-            String schematicDataCollectionName = BotConfig.readString(Config.SCHEMATIC_DATA_COLLECTION, null);
+            if (fileOption != null) {
 
-            if (schematicDataCollectionName == null) {
-                Log.error("Bot config: SCHEMATIC_DATA_COLLECTION not exist");
-                return;
+                OptionMapping previewOption = event.getOption("preview");
+                Attachment a = fileOption.getAsAttachment();
+
+                String data = NetworkHandler.downloadContent(a.getUrl());
+                String schematicDataCollectionName = BotConfig.readString(Config.SCHEMATIC_DATA_COLLECTION, null);
+
+                if (schematicDataCollectionName == null) {
+                    Log.error("Bot config: SCHEMATIC_DATA_COLLECTION not exist");
+                    return;
+                }
+
+                MongoCollection<SchematicData> collection = DatabaseHandler.getCollection(DATABASE.MINDUSTRY,
+                        schematicDataCollectionName, SchematicData.class);
+
+                Bson filter = new Document().append("data", data);
+                FindIterable<SchematicData> result = collection.find(filter);
+
+                if (result.first() != null) {
+                    reply(event, "Bản thiết kế đã tồn tại", 10);
+                    return;
+                }
+
+                String uuid = UUID.randomUUID().toString();
+                new SchematicData(uuid, data).update();
+                new SchematicInfo(uuid, member.getId(), tag).update();
+
+                if (previewOption != null && previewOption.getAsBoolean() == true)
+                    MessageHandler.sendSchematicPreview(event);
+
+                reply(event, "Đăng bản thiết kế thành công", 10);
             }
 
-            MongoCollection<SchematicData> collection = DatabaseHandler.getCollection(DATABASE.MINDUSTRY,
-                    schematicDataCollectionName, SchematicData.class);
+            if (textOption != null) {
 
-            Bson filter = new Document().append("data", data);
-            FindIterable<SchematicData> result = collection.find(filter);
+                OptionMapping previewOption = event.getOption("preview");
 
-            if (result.first() != null) {
-                reply(event, "Bản thiết kế đã tồn tại", 10);
-                return;
+                String data = textOption.getAsString();
+
+                String schematicDataCollectionName = BotConfig.readString(Config.SCHEMATIC_DATA_COLLECTION, null);
+
+                if (schematicDataCollectionName == null) {
+                    Log.error("Bot config: SCHEMATIC_DATA_COLLECTION not exist");
+                    return;
+                }
+
+                MongoCollection<SchematicData> collection = DatabaseHandler.getCollection(DATABASE.MINDUSTRY,
+                        schematicDataCollectionName, SchematicData.class);
+
+                Bson filter = new Document().append("data", data);
+                FindIterable<SchematicData> result = collection.find(filter);
+
+                if (result.first() != null) {
+                    reply(event, "Bản thiết kế đã tồn tại", 10);
+                    return;
+                }
+
+                String uuid = UUID.randomUUID().toString();
+                new SchematicData(uuid, data).update();
+                new SchematicInfo(uuid, member.getId(), tag).update();
+
+                if (previewOption != null && previewOption.getAsBoolean() == true)
+                    MessageHandler.sendSchematicPreview(event);
             }
-
-            String uuid = UUID.randomUUID().toString();
-            new SchematicData(uuid, data).update();
-            new SchematicInfo(uuid, member.getId(), tag).update();
-
-            if (previewOption != null && previewOption.getAsBoolean() == true)
-                MessageHandler.sendSchematicPreview(event);
-
-            reply(event, "Đăng bản thiết kế thành công", 10);
         }
     }
 

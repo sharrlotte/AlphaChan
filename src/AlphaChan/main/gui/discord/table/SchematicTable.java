@@ -136,22 +136,24 @@ public class SchematicTable extends SimplePageTable {
     }
 
     private void sendCode() {
+        if (currentData == null)
+            return;
+
+        String data = currentData.data;
+        if (data == null)
+            return;
+
         try {
-            if (currentData == null)
-                return;
-
-            String data = currentData.data;
-            if (data == null)
-                return;
-
-            if (currentCode == null)
+            if (currentCode == null || !currentCode.isFromGuild())
                 sendCodeData(data);
+
             else {
                 currentCode.delete().complete();
                 sendCodeData(data);
             }
 
         } catch (Exception e) {
+            sendCodeData(data);
             Log.error(e);
         }
     }

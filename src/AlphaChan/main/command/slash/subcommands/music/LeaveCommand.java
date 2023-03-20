@@ -12,5 +12,6 @@ public class LeaveCommand extends SimpleBotSubcommand {
     @Override
     public void runCommand(SlashCommandInteractionEvent event) {
         event.getGuild().getAudioManager().closeAudioConnection();
+        delete(event);
     }
 }

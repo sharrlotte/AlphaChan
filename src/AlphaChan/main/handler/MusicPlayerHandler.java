@@ -40,9 +40,8 @@ public class MusicPlayerHandler extends DefaultAudioPlayerManager {
             return musicPlayers.get(guild.getId());
 
         } else {
+
             AudioPlayer player = createPlayer();
-            // TODO Add volume setting
-            player.setVolume(100);
             MusicPlayer musicPlayer = new MusicPlayer(guild, player);
             player.addListener(musicPlayer);
             guild.getAudioManager().setSendingHandler(musicPlayer);

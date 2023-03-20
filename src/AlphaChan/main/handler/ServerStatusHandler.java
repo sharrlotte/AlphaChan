@@ -15,7 +15,7 @@ import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.entities.MessageHistory;
 import net.dv8tion.jda.api.entities.User;
 import AlphaChan.main.util.Log;
-
+import AlphaChan.main.util.StringUtils;
 import arc.util.Strings;
 
 import static AlphaChan.AlphaChan.*;
@@ -107,8 +107,8 @@ public final class ServerStatusHandler {
             field.append("Tên máy chủ: " + Strings.stripColors(result.name) + "\nNgười chơi: " + result.players
                     + (result.playerLimit == 0 ? "" : " \\ " + result.playerLimit) + "\nBản đồ: "
                     + Strings.stripColors(result.mapname) + "\nChế độ: "
-                    + (result.modeName == null ? MessageHandler.capitalize(result.mode.name())
-                            : MessageHandler.capitalize(result.modeName))
+                    + (result.modeName == null ? StringUtils.capitalize(result.mode.name())
+                            : StringUtils.capitalize(result.modeName))
                     + "\nĐợt: " + result.wave
                     + (result.description.length() == 0 ? "" : "\nMô tả: " + Strings.stripColors(result.description))
                     + "\nPhiên bản: " + result.version

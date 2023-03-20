@@ -19,18 +19,29 @@ import mindustry.entities.units.*;
 import mindustry.game.*;
 import mindustry.game.Schematic.*;
 import mindustry.io.*;
+import mindustry.type.ItemStack;
+import mindustry.type.LiquidStack;
 import mindustry.world.*;
 import mindustry.world.blocks.environment.*;
 import mindustry.world.blocks.legacy.*;
+import mindustry.world.blocks.production.GenericCrafter;
+import mindustry.world.blocks.units.Reconstructor;
+import mindustry.world.consumers.Consume;
+import mindustry.world.consumers.ConsumeItems;
+import mindustry.world.consumers.ConsumeLiquid;
+import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.Message.Attachment;
 
 import javax.imageio.*;
 
 import AlphaChan.main.util.Log;
 
-import java.awt.*;
+import java.awt.Graphics2D;
 import java.awt.geom.*;
 import java.awt.image.*;
 import java.io.*;
+import java.util.HashMap;
+import java.util.List;
 import java.util.zip.*;
 
 import static mindustry.Vars.*;
@@ -267,6 +278,139 @@ public class ContentHandler {
         requests.each(req -> req.block.drawPlanConfigTop(req, requests));
 
         return image;
+    }
+
+    public static void add(HashMap<String, Float> map, String key, float amount) {
+        if (map.containsKey(key)) {
+            map.put(key, map.get(key) + amount);
+        } else {
+            map.put(key, amount);
+        }
+    }
+
+    public static HashMap<String, Float> getSchematicInput(Schematic schem) {
+
+        HashMap<String, Float> input = new HashMap<>();
+
+        schem.tiles.forEach((tile) -> {
+
+            Block block = Vars.content.block(tile.block.name);
+            block.init();
+
+            if (block instanceof GenericCrafter) {
+
+                GenericCrafter crafter = (GenericCrafter) block;
+
+                for (Consume cons : crafter.consumers) {
+                    if (cons instanceof ConsumeItems) {
+                        ConsumeItems c = (ConsumeItems) cons;
+
+                        for (ItemStack stack : c.items) {
+                            add(input, stack.item.name, stack.amount / crafter.craftTime * 60);
+                        }
+
+                    } else if (cons instanceof ConsumeLiquid) {
+                        ConsumeLiquid c = (ConsumeLiquid) cons;
+                        add(input, c.liquid.name, c.amount * 60);
+                    }
+                }
+            } else if (block instanceof Reconstructor) {
+                Reconstructor constructor = (Reconstructor) block;
+
+                for (Consume cons : constructor.consumers) {
+                    if (cons instanceof ConsumeItems) {
+                        ConsumeItems c = (ConsumeItems) cons;
+
+                        for (ItemStack stack : c.items) {
+                            add(input, stack.item.name, stack.amount / constructor.constructTime * 60);
+                        }
+
+                    } else if (cons instanceof ConsumeLiquid) {
+                        ConsumeLiquid c = (ConsumeLiquid) cons;
+                        add(input, c.liquid.name, c.amount * 60);
+                    }
+                }
+            }
+        });
+        return input;
+    }
+
+    public static HashMap<String, Float> getSchematicOutput(Schematic schem) {
+
+        HashMap<String, Float> output = new HashMap<>();
+
+        schem.tiles.forEach((tile) -> {
+
+            Block block = Vars.content.block(tile.block.name);
+            block.init();
+
+            if (block instanceof GenericCrafter) {
+
+                GenericCrafter crafter = (GenericCrafter) block;
+
+                if (crafter.outputItem != null) {
+                    add(output, crafter.outputItem.item.name, crafter.outputItem.amount / crafter.craftTime * 60);
+
+                } else {
+                    if (crafter.outputItems != null) {
+                        for (ItemStack stack : crafter.outputItems) {
+                            add(output, stack.item.name, stack.amount / crafter.craftTime * 60);
+                        }
+                    }
+                }
+
+                if (crafter.outputLiquid != null) {
+                    add(output, crafter.outputLiquid.liquid.name, crafter.outputLiquid.amount * 60);
+
+                } else {
+                    if (crafter.outputLiquids != null) {
+                        for (LiquidStack stack : crafter.outputLiquids) {
+                            add(output, stack.liquid.name, stack.amount * 60);
+                        }
+                    }
+                }
+            }
+        });
+        return output;
+    }
+
+    public static boolean isSchematicText(Message message) {
+        return message.getContentRaw().startsWith(ContentHandler.schemHeader) && message.getAttachments().isEmpty();
+    }
+
+    public static boolean isSchematicFile(Attachment attachment) {
+        String fileExtension = attachment.getFileExtension();
+        if (fileExtension == null)
+            return true;
+        return fileExtension.equals(Vars.schematicExtension);
+    }
+
+    public static boolean isSchematicFile(List<Attachment> attachments) {
+        for (Attachment a : attachments) {
+            if (isSchematicFile(a))
+                return true;
+        }
+        return false;
+    }
+
+    public static boolean isMapFile(Attachment attachment) {
+        return attachment.getFileName().endsWith(".msav") || attachment.getFileExtension() == null;
+    }
+
+    public static boolean isMapFile(Message message) {
+        for (Attachment a : message.getAttachments()) {
+            if (isMapFile(a))
+                return true;
+        }
+        return false;
+    }
+
+    public static boolean isMapFile(List<Attachment> attachments) {
+        for (Attachment a : attachments) {
+            if (isMapFile(a))
+                return true;
+        }
+        return false;
     }
 
     public static Map readMap(InputStream is) throws IOException {

@@ -5,6 +5,7 @@ import arc.util.io.Streams;
 
 import mindustry.*;
 import mindustry.game.*;
+import mindustry.type.ItemStack;
 
 import net.dv8tion.jda.api.*;
 import net.dv8tion.jda.api.entities.*;
@@ -35,8 +36,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
-
-import mindustry.type.ItemStack;
 
 import static AlphaChan.AlphaChan.jda;
 
@@ -93,12 +92,13 @@ public final class MessageHandler extends ListenerAdapter {
         Member member = message.getMember();
 
         // Schematic preview
-        if ((isSchematicText(message) && attachments.isEmpty()) || isSchematicFile(attachments)) {
+        if ((ContentHandler.isSchematicText(message) && attachments.isEmpty()) || ContentHandler
+                .isSchematicFile(attachments)) {
             Log.system(getMessageSender(message) + ": sent a schematic ");
             sendSchematicPreview(message);
         }
 
-        else if (isMapFile(attachments)) {
+        else if (ContentHandler.isMapFile(attachments)) {
             sendMapPreview(message, message.getChannel());
         }
 
@@ -185,50 +185,6 @@ public final class MessageHandler extends ListenerAdapter {
             botLogChannel.forEach(c -> c.sendMessage("```" + content + "```").queue());
     }
 
-    public static boolean isSchematicText(Message message) {
-        return message.getContentRaw().startsWith(ContentHandler.schemHeader) && message.getAttachments().isEmpty();
-    }
-
-    public static boolean isSchematicFile(Attachment attachment) {
-        String fileExtension = attachment.getFileExtension();
-        if (fileExtension == null)
-            return true;
-        return fileExtension.equals(Vars.schematicExtension);
-    }
-
-    public static boolean isSchematicFile(List<Attachment> attachments) {
-        for (Attachment a : attachments) {
-            if (isSchematicFile(a))
-                return true;
-        }
-        return false;
-    }
-
-    public static boolean isMapFile(Attachment attachment) {
-        return attachment.getFileName().endsWith(".msav") || attachment.getFileExtension() == null;
-    }
-
-    public static boolean isMapFile(Message message) {
-        for (Attachment a : message.getAttachments()) {
-            if (isMapFile(a))
-                return true;
-        }
-        return false;
-    }
-
-    public static boolean isMapFile(List<Attachment> attachments) {
-        for (Attachment a : attachments) {
-            if (isMapFile(a))
-                return true;
-        }
-        return false;
-    }
-
-    // Its bad lol
-    public static String capitalize(String text) {
-        return Character.toUpperCase(text.charAt(0)) + text.substring(1);
-    }
-
     public static boolean isChannel(Guild guild, Channel channel,
             HashMap<String, HashMap<String, String>> guildChannelIds) {
         if (guildChannelIds.containsKey(guild.getId())) {
@@ -282,7 +238,7 @@ public final class MessageHandler extends ListenerAdapter {
     public static void sendMapPreview(Message message, MessageChannel channel) {
         for (int i = 0; i < message.getAttachments().size(); i++) {
             Attachment attachment = message.getAttachments().get(i);
-            if (isMapFile(attachment)) {
+            if (ContentHandler.isMapFile(attachment)) {
                 sendMapPreview(attachment, message.getMember(), channel);
                 message.delete().queue();
             }
@@ -295,7 +251,7 @@ public final class MessageHandler extends ListenerAdapter {
             return;
         Attachment attachment = fileOption.getAsAttachment();
 
-        if (!isMapFile(attachment)) {
+        if (!ContentHandler.isMapFile(attachment)) {
             event.reply("File được chọn không phải là file bản đồ");
             return;
         }
@@ -311,7 +267,7 @@ public final class MessageHandler extends ListenerAdapter {
             return;
         Attachment attachment = fileOption.getAsAttachment();
 
-        if (!isSchematicFile(attachment)) {
+        if (!ContentHandler.isSchematicFile(attachment)) {
             event.reply("File được chọn không phải là file bản thiết kế");
             return;
         }
@@ -325,13 +281,13 @@ public final class MessageHandler extends ListenerAdapter {
 
     public static void sendSchematicPreview(Message message) {
         try {
-            if (isSchematicText(message)) {
+            if (ContentHandler.isSchematicText(message)) {
                 sendSchematicPreview(ContentHandler.parseSchematic(message.getContentRaw()), message);
             } else {
                 for (int i = 0; i < message.getAttachments().size(); i++) {
                     Attachment attachment = message.getAttachments().get(i);
 
-                    if (isSchematicFile(attachment)) {
+                    if (ContentHandler.isSchematicFile(attachment)) {
                         sendSchematicPreview(ContentHandler.parseSchematicURL(attachment.getUrl()), message);
                     }
                 }
@@ -343,15 +299,7 @@ public final class MessageHandler extends ListenerAdapter {
     }
 
     public static void sendSchematicPreview(Schematic schem, Message message) {
-        try {
-            File schemFile = getSchematicFile(schem);
-            File previewFile = getSchematicPreviewFile(schem);
-            EmbedBuilder builder = getSchematicEmbedBuilder(schem, previewFile, message.getMember());
-
-            message.reply(schemFile).addFile(previewFile).setEmbeds(builder.build()).queue();
-        } catch (Exception e) {
-            sendMessage(message.getChannel(), "Lỗi: " + e.getMessage(), 30);
-        }
+        sendSchematicPreview(schem, message.getMember(), message.getChannel());
     }
 
     public static void sendSchematicPreview(Schematic schem, Member member, MessageChannel channel) {
@@ -373,36 +321,68 @@ public final class MessageHandler extends ListenerAdapter {
 
         if (!schem.description().isEmpty())
             builder.setFooter(schem.description());
-        StringBuilder field = new StringBuilder();
 
         // Schem heigh, width
-        field.append("- Kích thước:" + String.valueOf(schem.width) + "x" + String.valueOf(schem.height) + "\n");
-        field.append("- Tài nguyên cần: ");
+        builder.addField("Kích thước", "Rộng: " + String.valueOf(schem.width) + " Cao: " + String.valueOf(schem.height),
+                true);
+
+        StringBuilder requirement = new StringBuilder();
+
         // Item requirements
         for (ItemStack stack : schem.requirements()) {
-            String itemName = stack.item.name.replace("-", "");
-            if (itemName == null)
-                continue;
-            List<Emote> emotes = member.getGuild().getEmotesByName(itemName, true);
+            List<Emote> emotes = member.getGuild().getEmotesByName(stack.item.name.replace("-", ""), true);
+
             if (!emotes.isEmpty())
-                field.append(emotes.get(0).getAsMention()).append(stack.amount).append("  ");
+                requirement.append(emotes.get(0).getAsMention()).append(stack.amount).append("  ");
             else
-                field.append(stack.item.name + ": " + stack.amount + " ");
+                requirement.append(stack.item.name + ": " + stack.amount + " ");
         }
+
+        builder.addField("Tài nguyên cần", requirement.toString(), false);
 
         // Power input/output
 
+        requirement = new StringBuilder();
+
         int powerProduction = (int) Math.round(schem.powerProduction()) * 60;
         int powerConsumption = (int) Math.round(schem.powerConsumption()) * 60;
+
         if (powerConsumption != 0)
-            field.append("\n- Năng lượng sử dụng: " + String.valueOf(powerConsumption));
+            requirement.append("\nNăng lượng sử dụng: " + String.valueOf(powerConsumption) + "/s");
 
         if (powerProduction != 0)
-            field.append("\n- Năng lượng tạo ra: " + String.valueOf(powerProduction));
+            requirement.append("\nNăng lượng tạo ra: " + String.valueOf(powerProduction) + "/s");
 
-        builder.addField("*Thông tin*", field.toString(), true);
+        builder.addField("Năng lượng", requirement.toString(), false);
+
+        HashMap<String, Float> input = ContentHandler.getSchematicInput(schem);
+        HashMap<String, Float> output = ContentHandler.getSchematicOutput(schem);
+
+        StringBuilder inputString = new StringBuilder();
+
+        for (String key : input.keySet()) {
+
+            List<Emote> emotes = member.getGuild().getEmotesByName(key.replace("-", ""), true);
+
+            inputString.append(emotes.isEmpty() ? key + ": " : emotes.get(0).getAsMention());
+            inputString.append(" " + input.get(key) + "/s ");
+        }
+
+        StringBuilder outputString = new StringBuilder();
+
+        for (String key : output.keySet()) {
+
+            List<Emote> emotes = member.getGuild().getEmotesByName(key.replace("-", ""), true);
+
+            outputString.append(emotes.isEmpty() ? key + ": " : emotes.get(0).getAsMention());
+            outputString.append(" " + output.get(key) + "/s ");
+        }
+
+        builder.addField("Tổng đầu vào", inputString.toString(), false);
+        builder.addField("Tổng đầu ra", outputString.toString(), false);
 
         return builder;
+
     }
 
     public static @Nonnull File getSchematicFile(Schematic schem) throws IOException {
