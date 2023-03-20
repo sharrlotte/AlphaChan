@@ -61,7 +61,7 @@ public class GuildCommand extends SimpleBotSubcommand {
             table.addPage(builder);
             table.addButton(table.primary("<<<", () -> table.firstPage()));
             table.addButton(table.primary("<", () -> table.previousPage()));
-            table.addButton(table.deny("X", () -> table.delete()));
+            table.addButton(table.deny("X", () -> table.deleteTable()));
             table.addButton(table.primary(">", () -> table.nextPage()));
             table.addButton(table.primary(">>>", () -> table.lastPage()));
 

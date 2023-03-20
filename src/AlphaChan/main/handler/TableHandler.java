@@ -6,7 +6,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import javax.annotation.Nonnull;
 
 import AlphaChan.main.command.SimpleTable;
-import AlphaChan.main.command.SimplePageTable;
 import AlphaChan.main.util.Log;
 
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
@@ -33,10 +32,6 @@ public final class TableHandler extends ListenerAdapter implements Updatable {
     }
 
     public static void add(SimpleTable table) {
-        tableCache.put(table.getId(), table);
-    }
-
-    public static void add(SimplePageTable table) {
         tableCache.put(table.getId(), table);
     }
 

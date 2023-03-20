@@ -21,13 +21,14 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 
-public class SimpleTable extends TimeObject {
+public abstract class SimpleTable extends TimeObject {
 
     private List<RunnableButton> buttons = new ArrayList<RunnableButton>();
     private List<Integer> rows = new ArrayList<Integer>(Arrays.asList(0));
 
     protected ButtonInteractionEvent interaction;
     protected String requestor;
+    protected Message message;
 
     protected final SlashCommandInteractionEvent event;
 
@@ -37,12 +38,10 @@ public class SimpleTable extends TimeObject {
         super(aliveLimit);
         this.event = event;
 
-        TableHandler.add(this);
-    }
+        onTimeOut.connect((n) -> deleteTable());
+        onUpdate.connect((n) -> updateTable());
 
-    @Override
-    protected void finalize() {
-        delete();
+        TableHandler.add(this);
     }
 
     public void setRequestor(String userId) {
@@ -77,11 +76,14 @@ public class SimpleTable extends TimeObject {
         }
     }
 
-    public void delete() {
+    public abstract SimpleTable sendTable();
+
+    public abstract void updateTable();
+
+    public void deleteTable() {
         event.getHook().deleteOriginal().queue();
         if (interaction != null)
             interaction.getHook().deleteOriginal().queue();
-
     }
 
     public @Nonnull Guild getEventGuild() {

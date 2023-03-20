@@ -44,7 +44,7 @@ public class SchematicTable extends SimplePageTable {
     private Message currentCode;
 
     public SchematicTable(@Nonnull SlashCommandInteractionEvent event, FindIterable<SchematicInfo> schematicInfo) {
-        super(event, 30);
+        super(event, 10);
 
         MongoCursor<SchematicInfo> cursor = schematicInfo.cursor();
         while (cursor.hasNext()) {
@@ -57,7 +57,7 @@ public class SchematicTable extends SimplePageTable {
                 SchematicData.class);
 
         addButton(primary("<", () -> this.previousPage()));
-        addButton(deny("X", () -> this.delete()));
+        addButton(deny("X", () -> this.deleteTable()));
         addButton(primary(">", () -> this.nextPage()));
         addRow();
         addButton(primary("data", Emoji.fromMarkdown(BotConfig.FILE_EMOJI), () -> this.sendCode()));
@@ -74,7 +74,7 @@ public class SchematicTable extends SimplePageTable {
     }
 
     @Override
-    public void delete() {
+    public void deleteTable() {
         try {
             event.getHook().deleteOriginal().queue();
 
@@ -124,7 +124,7 @@ public class SchematicTable extends SimplePageTable {
             sendMessage("Đã xóa bản thiết kế", 10);
 
             if (schematicInfoList.size() == 0) {
-                delete();
+                deleteTable();
                 return;
             }
 

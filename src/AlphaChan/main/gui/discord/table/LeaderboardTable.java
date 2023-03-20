@@ -40,7 +40,7 @@ public class LeaderboardTable extends SimplePageTable {
 
         addButton(primary("<<<", () -> this.firstPage()));
         addButton(primary("<", () -> this.previousPage()));
-        addButton(deny("X", () -> this.delete()));
+        addButton(deny("X", () -> this.deleteTable()));
         addButton(primary(">", () -> this.nextPage()));
         addButton(primary(">>>", () -> this.lastPage()));
     }

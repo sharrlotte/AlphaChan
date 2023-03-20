@@ -12,19 +12,19 @@ public class StringUtils {
         seconds %= 60 * 60;
         long minutes = seconds / 60;
         seconds %= 60;
-        return (hours > 0 ? hours + " giờ " : "") + (minutes < 10 ? "0" + minutes : minutes) + " phút "
-                + (seconds < 10 ? "0" + seconds : seconds) + " giây";
+        return (hours > 0 ? hours + ":" : "") + (minutes < 10 ? "0" + minutes : minutes) + ":"
+                + (seconds < 10 ? "0" + seconds : seconds);
     }
 
-    
-    public static String toProgressBar(double percent) {
-        String str = "";
-        for (int i = 0; i < 12; i++)
-            if (i == (int) (percent * 12))
-                str += "\uD83D\uDD18"; // 🔘
+    public static String toProgressBar(double percent, int barLength, String mark, String head, String tail) {
+        String str = head;
+        for (int i = 0; i < barLength; i++)
+            if (i == (int) (percent * barLength) - 1)
+                str += mark;
             else
                 str += "▬";
-        return str;
+
+        return str + tail;
     }
 
     public static String filter(String input) {

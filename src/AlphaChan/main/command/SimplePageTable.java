@@ -19,8 +19,6 @@ public class SimplePageTable extends SimpleTable {
 
     public SimplePageTable(SlashCommandInteractionEvent event, int aliveLimit) {
         super(event, aliveLimit);
-
-        onTimeOut.connect((n) -> delete());
     }
 
     public boolean addPage(EmbedBuilder value) {

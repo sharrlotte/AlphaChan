@@ -26,5 +26,4 @@ public final class Signal<T> {
     public void disconnect(Consumer<T> listener) {
         listeners.remove(listener);
     }
-
 }

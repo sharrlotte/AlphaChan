@@ -37,6 +37,8 @@ public class AlphaChan {
                     .setMemberCachePolicy(MemberCachePolicy.ALL).build();
             jda.awaitReady();
 
+            Log.system("Ping: " + jda.getGatewayPing());
+
             ContentHandler.getInstance();
             GuildHandler.getInstance();
             UserHandler.getInstance();
@@ -64,7 +66,7 @@ public class AlphaChan {
     }
 
     public static void shutdown() {
-        
+
     }
 
     public static void main(String[] args) {

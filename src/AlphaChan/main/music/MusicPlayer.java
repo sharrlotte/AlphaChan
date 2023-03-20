@@ -22,6 +22,7 @@ import net.dv8tion.jda.api.audio.AudioSendHandler;
 import net.dv8tion.jda.api.entities.AudioChannel;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.utils.TimeFormat;
 
 import java.awt.Color;
 
@@ -34,7 +35,7 @@ public class MusicPlayer extends AudioEventAdapter implements AudioSendHandler {
 
     private MusicPlayerTable table;
 
-    private LinkedList<QueuedTrack> queue = new LinkedList<QueuedTrack>();
+    private LinkedList<MusicTrack> queue = new LinkedList<MusicTrack>();
 
     public MusicPlayer(Guild guild, AudioPlayer player) {
 
@@ -47,34 +48,74 @@ public class MusicPlayer extends AudioEventAdapter implements AudioSendHandler {
     }
 
     public void play() {
-        audioPlayer.setPaused(!audioPlayer.isPaused());
+
+        if (audioPlayer.getPlayingTrack() == null) {
+            playNext();
+
+        } else {
+            audioPlayer.setPaused(!audioPlayer.isPaused());
+
+        }
+        updateTable();
     }
 
-    public void play(QueuedTrack track) {
+    public void play(MusicTrack track) {
         audioPlayer.playTrack(track.getTrack());
     }
 
-    public boolean playNext() {
-        boolean result = false;
+    public void playNext() {
         audioPlayer.stopTrack();
 
         if (!queue.isEmpty()) {
             play(queue.removeFirst());
-            result = true;
+            return;
         }
 
         if (table == null)
-            return result;
+            return;
 
         table.updateTable();
-        return result;
+    }
+
+    public void skip(int number) {
+        if (number <= 0)
+            return;
+
+        if (number >= queue.size()) {
+            clear();
+            return;
+        }
+
+        for (int i = 0; i < number - 1; i++)
+            queue.removeFirst();
+
+        playNext();
+    }
+
+    public void clear() {
+        queue.clear();
+        audioPlayer.stopTrack();
+        updateTable();
+    }
+
+    public void addVolume(int amount) {
+
+        int volume = audioPlayer.getVolume();
+        volume += amount;
+        setVolume(volume);
+    }
+
+    public void setVolume(int volume) {
+        volume = Math.max(0, Math.min(100, volume));
+        audioPlayer.setVolume(volume);
+        updateTable();
     }
 
     public void destroy() {
         guild.getAudioManager().closeAudioConnection();
     }
 
-    public boolean addTrack(QueuedTrack queueTrack) {
+    public boolean addTrack(MusicTrack queueTrack) {
         boolean result = false;
         if (audioPlayer.getPlayingTrack() == null) {
             play(queueTrack);
@@ -88,7 +129,7 @@ public class MusicPlayer extends AudioEventAdapter implements AudioSendHandler {
         return result;
     }
 
-    public boolean addTracks(List<QueuedTrack> queueTrack) {
+    public boolean addTracks(List<MusicTrack> queueTrack) {
         boolean result = false;
 
         if (queueTrack.isEmpty())
@@ -109,25 +150,8 @@ public class MusicPlayer extends AudioEventAdapter implements AudioSendHandler {
     }
 
     private void updateTable() {
-
         if (table != null)
             table.updateTable();
-
-    }
-
-    public void clear() {
-        queue.clear();
-        audioPlayer.stopTrack();
-        updateTable();
-    }
-
-    public void addVolume(int amount) {
-
-        int volume = audioPlayer.getVolume();
-        volume += amount;
-        volume = Math.max(0, Math.min(100, volume));
-
-        audioPlayer.setVolume(volume);
     }
 
     public EmbedBuilder getEmbedBuilder() {
@@ -153,10 +177,13 @@ public class MusicPlayer extends AudioEventAdapter implements AudioSendHandler {
                 builder.addField("Now playing",
                         "Tác giả: " + playing.getInfo().author + //
                                 "\nVideo: [" + playing.getInfo().title + "](" + playing.getInfo().uri + ")" + //
-                                "\nThời lượng: " + StringUtils.toTime(playing.getDuration()) + //
+                                "\nThời lượng: " + TimeFormat.RELATIVE.now().minus(playing.getPosition()) + "/"
+                                + StringUtils.toTime(playing.getDuration()) + //
+
                                 "\nNgười yêu cầu: " + playing.getUserData(RequestMetadata.class).getRequester() +
-                                "\nÂm lượng: [" + StringUtils.toProgressBar(audioPlayer.getVolume() / 100d) + "] "
-                                + audioPlayer.getVolume(),
+                                "\nÂm lượng: "
+                                + StringUtils.toProgressBar(audioPlayer.getVolume() / 100d, 20, "||", "|", "|") 
+                                + audioPlayer.getVolume() + "%",
 
                         false);
             }
@@ -165,8 +192,8 @@ public class MusicPlayer extends AudioEventAdapter implements AudioSendHandler {
         }
 
         StringBuffer songList = new StringBuffer();
-        Iterator<QueuedTrack> it = queue.iterator();
-        QueuedTrack current;
+        Iterator<MusicTrack> it = queue.iterator();
+        MusicTrack current;
         int count = 0;
         boolean overload = false;
 
@@ -187,7 +214,7 @@ public class MusicPlayer extends AudioEventAdapter implements AudioSendHandler {
 
     public void setTable(MusicPlayerTable table) {
         if (this.table != null) {
-            this.table.delete();
+            this.table.deleteTable();
         }
         this.table = table;
 

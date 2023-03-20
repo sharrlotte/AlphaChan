@@ -13,7 +13,7 @@ import AlphaChan.main.gui.discord.table.MusicPlayerTable;
 import AlphaChan.main.handler.MessageHandler;
 import AlphaChan.main.handler.MusicPlayerHandler;
 import AlphaChan.main.music.MusicPlayer;
-import AlphaChan.main.music.QueuedTrack;
+import AlphaChan.main.music.MusicTrack;
 import AlphaChan.main.util.Log;
 import net.dv8tion.jda.api.entities.AudioChannel;
 import net.dv8tion.jda.api.entities.GuildVoiceState;
@@ -86,7 +86,7 @@ public class PlayCommand extends SimpleBotSubcommand {
 
             MusicPlayer handler = (MusicPlayer) event.getGuild().getAudioManager().getSendingHandler();
 
-            handler.addTrack(new QueuedTrack(track, event.getMember()));
+            handler.addTrack(new MusicTrack(track, event.getMember()));
             MessageHandler.sendMessage(event.getChannel(), "Tải thành công: " + track.getInfo().title, 10);
         }
 
@@ -95,10 +95,10 @@ public class PlayCommand extends SimpleBotSubcommand {
             StringBuffer string = new StringBuffer();
             int count = 0;
 
-            List<QueuedTrack> tracks = new ArrayList<>();
+            List<MusicTrack> tracks = new ArrayList<>();
 
             MusicPlayer handler = (MusicPlayer) event.getGuild().getAudioManager().getSendingHandler();
-            playlist.getTracks().forEach((track) -> tracks.add(new QueuedTrack(track, event.getMember())));
+            playlist.getTracks().forEach((track) -> tracks.add(new MusicTrack(track, event.getMember())));
             handler.addTracks(tracks);
 
             for (AudioTrack track : playlist.getTracks()) {

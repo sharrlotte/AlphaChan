@@ -2,7 +2,6 @@ package AlphaChan.main.gui.discord.table;
 
 import AlphaChan.BotConfig;
 import AlphaChan.main.command.SimplePageTable;
-import AlphaChan.main.handler.MessageHandler;
 import AlphaChan.main.music.MusicPlayer;
 import net.dv8tion.jda.api.entities.Emoji;
 import net.dv8tion.jda.api.entities.Message;
@@ -14,27 +13,22 @@ public class MusicPlayerTable extends SimplePageTable {
     private final MusicPlayer player;
 
     public MusicPlayerTable(SlashCommandInteractionEvent event, MusicPlayer player) {
-        super(event, 30);
+        super(event, 10);
         this.player = player;
 
-        addButton(primary("play", Emoji.fromMarkdown(player.getTrackStatus()), () -> {
-            player.play();
-            updateTable();
-        }));
-        addButton(primary("next", Emoji.fromMarkdown(BotConfig.NEXT_TRACK_EMOJI), () -> {
-            if (!player.playNext())
-                MessageHandler.sendMessage(getEventTextChannel(), "Danh sách phát trống", 10);
-        }));
-        addButton(deny("X", () -> this.delete()));
+        addButton(primary("play", Emoji.fromMarkdown(player.getTrackStatus()), () -> player.play()));
+        addButton(primary("next", Emoji.fromMarkdown(BotConfig.FORWARD_EMOJI), () -> player.playNext()));
+        addButton(primary("clear", Emoji.fromMarkdown(BotConfig.CLEAR_EMOJI), () -> player.clear()));
+        addButton(deny("X", () -> this.deleteTable()));
 
         player.setTable(this);
+        onTimeOut.connect((n) -> player.setTable(null));
     }
 
     @Override
     public void updateTable() {
 
         resetTimer();
-
         setButton(primary("play", Emoji.fromMarkdown(player.getTrackStatus()), () -> {
             player.play();
             updateTable();

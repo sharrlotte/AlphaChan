@@ -70,9 +70,10 @@ public class DeletedMessageCommand extends SimpleBotSubcommand {
         EmbedBuilder builder = new EmbedBuilder();
         StringBuilder field = new StringBuilder();
         SimplePageTable table = new SimplePageTable(event, 2);
+        
         table.addButton(table.primary("<<<", () -> table.firstPage()));
         table.addButton(table.primary("<", () -> table.previousPage()));
-        table.addButton(table.deny("X", () -> table.delete()));
+        table.addButton(table.deny("X", () -> table.deleteTable()));
         table.addButton(table.primary(">", () -> table.nextPage()));
         table.addButton(table.primary(">>>", () -> table.lastPage()));
 

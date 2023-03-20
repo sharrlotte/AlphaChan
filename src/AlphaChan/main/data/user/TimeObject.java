@@ -9,6 +9,7 @@ public abstract class TimeObject {
     private int time = 0;
 
     protected Signal<Integer> onTimeOut = new Signal<>();
+    protected Signal<Integer> onUpdate = new Signal<>();
 
     public TimeObject(final int aliveTime) {
         this.ALIVE_TIME = aliveTime;

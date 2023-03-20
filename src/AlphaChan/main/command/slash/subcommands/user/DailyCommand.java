@@ -3,6 +3,7 @@ package AlphaChan.main.command.slash.subcommands.user;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.utils.TimeFormat;
 import AlphaChan.main.command.SimpleBotSubcommand;
 import AlphaChan.main.data.user.UserData;
 import AlphaChan.main.handler.DatabaseHandler;
@@ -13,9 +14,6 @@ import org.bson.Document;
 import org.bson.conversions.Bson;
 
 import com.mongodb.client.MongoCollection;
-
-import java.text.DateFormat;
-import java.util.Date;
 
 public class DailyCommand extends SimpleBotSubcommand {
     public DailyCommand() {
@@ -70,15 +68,10 @@ public class DailyCommand extends SimpleBotSubcommand {
             if (data != null)
                 if (data.containsKey("time")) {
                     Long lastTime = ((Long) data.get("time"));
-                    Long time = lastTime + 86400000l - System.currentTimeMillis();
-                    Long sec = time / 1000;
-                    Long minute = sec / 60;
-                    Long hour = minute / 60;
-                    Date date = new Date(lastTime);
-                    reply(event,
-                            "📝Còn " + hour % 24 + " giờ " + minute % 60
-                                    + " phút nữa mới có thể điểm danh\n📝Lần điểm danh cuối: "
-                                    + DateFormat.getInstance().format(date),
+
+                    replyEmbed(event, "📝Còn " + TimeFormat.RELATIVE.atTimestamp(lastTime).plus(24 * 60 * 60 * 1000)
+                            + " nữa mới có thể điểm danh\n📝Lần điểm danh cuối: "
+                            + TimeFormat.DATE_TIME_SHORT.format(lastTime),
                             30);
                 }
         }

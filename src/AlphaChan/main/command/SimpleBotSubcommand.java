@@ -101,8 +101,19 @@ public abstract class SimpleBotSubcommand extends SubcommandData {
                 .queue(_message -> _message.delete().queueAfter(deleteAfter, TimeUnit.SECONDS));
     }
 
+    public void replyEmbed(SlashCommandInteractionEvent event, String content, int deleteAfter) {
+
+        EmbedBuilder builder = new EmbedBuilder();
+        builder.addField("", content, false);
+        replyEmbed(event, builder, deleteAfter);
+    }
+
     public void reply(SlashCommandInteractionEvent event, String content, int deleteAfter) {
         event.getHook().sendMessage("```" + content + "```")
                 .queue(_message -> _message.delete().queueAfter(deleteAfter, TimeUnit.SECONDS));
+    }
+
+    public void delete(SlashCommandInteractionEvent event) {
+        event.getHook().deleteOriginal().queue();
     }
 }

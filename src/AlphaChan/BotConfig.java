@@ -40,7 +40,7 @@ public final class BotConfig {
     public static final String PLAY_EMOJI = "▶️";
     public static final String PAUSE_EMOJI = "⏸";
     public static final String STOP_EMOJI = "⏹";
-    public static final String NEXT_TRACK_EMOJI = "⏯️";
+    public static final String CLEAR_EMOJI = "⏯️";
     public static final String FORWARD_EMOJI = "⏩";
     public static final String FILE_EMOJI = "📁";
     public static final String STAR_EMOJI = "⭐";
