@@ -1,6 +1,6 @@
 package AlphaChan.main.command.slash.subcommands.admin;
 
-import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import net.dv8tion.jda.api.events.interaction.command.CommandAutoCompleteInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
@@ -32,7 +32,7 @@ public class SetChannelCommand extends SimpleBotSubcommand {
             throw new IllegalStateException("Invalid option");
         String type = typeOption.getAsString();
 
-        TextChannel channel = event.getTextChannel();
+        MessageChannelUnion channel = event.getChannel();
         GuildData guildData = GuildHandler.getGuild(event.getGuild());
         if (guildData == null)
             throw new IllegalStateException("Guild data not found with <" + event.getGuild() + ">");

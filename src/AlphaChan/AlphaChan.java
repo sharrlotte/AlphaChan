@@ -1,5 +1,6 @@
 package AlphaChan;
 
+import AlphaChan.main.gui.Console;
 import AlphaChan.main.handler.CommandHandler;
 import AlphaChan.main.handler.ContentHandler;
 import AlphaChan.main.handler.DatabaseHandler;
@@ -30,14 +31,18 @@ public class AlphaChan {
 
             String TOKEN = System.getenv("TOKEN");
 
-            jda = JDABuilder.createDefault(TOKEN, GatewayIntent.GUILD_MESSAGES, GatewayIntent.GUILD_EMOJIS,
-                    GatewayIntent.GUILD_MEMBERS, GatewayIntent.GUILD_PRESENCES, GatewayIntent.GUILD_MESSAGE_REACTIONS,
-                    GatewayIntent.GUILD_VOICE_STATES)
+            jda = JDABuilder.createDefault(TOKEN, GatewayIntent.GUILD_MESSAGES, GatewayIntent.MESSAGE_CONTENT,
+                    GatewayIntent.GUILD_EMOJIS_AND_STICKERS, GatewayIntent.GUILD_MEMBERS, GatewayIntent.GUILD_PRESENCES,
+                    GatewayIntent.GUILD_MESSAGE_REACTIONS, GatewayIntent.GUILD_VOICE_STATES,
+                    GatewayIntent.GUILD_MODERATION, GatewayIntent.GUILD_INVITES)
+
                     .enableCache(CacheFlag.VOICE_STATE)
                     .setMemberCachePolicy(MemberCachePolicy.ALL).build();
             jda.awaitReady();
 
             Log.system("Ping: " + jda.getGatewayPing());
+
+            // Console console = new Console();
 
             ContentHandler.getInstance();
             GuildHandler.getInstance();
@@ -62,6 +67,7 @@ public class AlphaChan {
     private class ShutdownHook extends Thread {
 
         public void run() {
+
         }
     }
 

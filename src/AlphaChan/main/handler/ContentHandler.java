@@ -29,9 +29,13 @@ import mindustry.world.blocks.units.Reconstructor;
 import mindustry.world.consumers.Consume;
 import mindustry.world.consumers.ConsumeItems;
 import mindustry.world.consumers.ConsumeLiquid;
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.Message.Attachment;
+import net.dv8tion.jda.api.entities.emoji.RichCustomEmoji;
 
+import javax.annotation.Nonnull;
 import javax.imageio.*;
 
 import AlphaChan.main.util.Log;
@@ -42,6 +46,7 @@ import java.awt.image.*;
 import java.io.*;
 import java.util.HashMap;
 import java.util.List;
+import java.util.UUID;
 import java.util.zip.*;
 
 import static mindustry.Vars.*;
@@ -413,6 +418,103 @@ public class ContentHandler {
         return false;
     }
 
+    public static EmbedBuilder getSchematicEmbedBuilder(Schematic schem, File previewFile, Member member) {
+        EmbedBuilder builder = new EmbedBuilder().setImage("attachment://" + previewFile.getName())
+                .setAuthor(member.getEffectiveName(), member.getEffectiveAvatarUrl(), member.getEffectiveAvatarUrl())
+                .setTitle(schem.name());
+
+        if (!schem.description().isEmpty())
+            builder.setFooter(schem.description());
+
+        // Schem heigh, width
+        builder.addField("Kích thước",
+                "- Rộng: " + String.valueOf(schem.width) + " Cao: " + String.valueOf(schem.height),
+                true);
+
+        StringBuilder requirement = new StringBuilder();
+
+        // Item requirements
+        for (ItemStack stack : schem.requirements()) {
+            List<RichCustomEmoji> emotes = member.getGuild().getEmojisByName(stack.item.name.replace("-", ""), true);
+
+            if (!emotes.isEmpty())
+                requirement.append(emotes.get(0).getAsMention()).append(stack.amount).append("  ");
+            else
+                requirement.append(stack.item.name + ": " + stack.amount + " ");
+        }
+
+        builder.addField("Tài nguyên cần", "- " + requirement.toString(), false);
+
+        // Power input/output
+
+        requirement = new StringBuilder();
+
+        int powerProduction = (int) Math.round(schem.powerProduction()) * 60;
+        int powerConsumption = (int) Math.round(schem.powerConsumption()) * 60;
+
+        if (powerConsumption != 0)
+            requirement.append("\n- Năng lượng sử dụng: " + String.valueOf(powerConsumption) + "/s");
+
+        if (powerProduction != 0)
+            requirement.append("\n- Năng lượng tạo ra: " + String.valueOf(powerProduction) + "/s");
+
+        if (requirement.length() != 0)
+            builder.addField("Năng lượng", requirement.toString(), false);
+
+        HashMap<String, Float> input = ContentHandler.getSchematicInput(schem);
+        HashMap<String, Float> output = ContentHandler.getSchematicOutput(schem);
+
+        StringBuilder inputString = new StringBuilder();
+
+        for (String key : input.keySet()) {
+
+            List<RichCustomEmoji> emotes = member.getGuild().getEmojisByName(key.replace("-", ""), true);
+
+            inputString.append(emotes.isEmpty() ? key + ": " : emotes.get(0).getAsMention());
+            inputString.append(" " + input.get(key) + "/s ");
+        }
+
+        StringBuilder outputString = new StringBuilder();
+
+        for (String key : output.keySet()) {
+
+            List<RichCustomEmoji> emotes = member.getGuild().getEmojisByName(key.replace("-", ""), true);
+
+            outputString.append(emotes.isEmpty() ? key + ": " : emotes.get(0).getAsMention());
+            outputString.append(" " + output.get(key) + "/s ");
+        }
+
+        if (inputString.length() != 0)
+            builder.addField("Tổng đầu vào", "- " + inputString.toString(), false);
+
+        if (outputString.length() != 0)
+            builder.addField("Tổng đầu ra", "- " + outputString.toString(), false);
+
+        return builder;
+
+    }
+
+    public static @Nonnull File getSchematicFile(Schematic schem) throws IOException {
+        String sname = schem.name().replace("/", "_").replace(" ", "_").replace(":", "_");
+        new File("cache").mkdir();
+        if (sname.isEmpty())
+            sname = "empty";
+        File schemFile = new File("cache/temp/" + sname + "." + Vars.schematicExtension);
+        Schematics.write(schem, new Fi(schemFile));
+        return schemFile;
+    }
+
+    public static @Nonnull File getSchematicPreviewFile(Schematic schem) throws Exception {
+
+        BufferedImage preview = ContentHandler.previewSchematic(schem);
+        new File("cache").mkdir();
+        File previewFile = new File("cache/temp/img_" + UUID.randomUUID() + ".png");
+        ImageIO.write(preview, "png", previewFile);
+
+        return previewFile;
+
+    }
+
     public static Map readMap(InputStream is) throws IOException {
         try (InputStream ifs = new InflaterInputStream(is);
                 CounterInputStream counter = new CounterInputStream(ifs);
@@ -525,6 +627,38 @@ public class ContentHandler {
 
     static int conv(int rgba) {
         return co.set(rgba).argb8888();
+    }
+
+    public static File getMapFile(Attachment attachment) throws FileNotFoundException, IOException {
+        new File("cache/").mkdir();
+        new File("cache/temp/").mkdir();
+        File mapFile = new File("cache/temp/" + attachment.getFileName());
+        Streams.copy(NetworkHandler.download(attachment.getUrl()), new FileOutputStream(mapFile));
+
+        return mapFile;
+    }
+
+    public static File getMapImageFile(Map map) throws IOException {
+        new File("cache/").mkdir();
+        new File("cache/temp/").mkdir();
+        Fi imageFile = Fi.get("cache/temp/image_" + UUID.randomUUID() + ".png");
+        ImageIO.write(map.image, "png", imageFile.file());
+
+        return imageFile.file();
+    }
+
+    public static EmbedBuilder getMapEmbedBuilder(Map map, File mapFile, File imageFile, Member member) {
+
+        EmbedBuilder builder = new EmbedBuilder().setImage("attachment://" + imageFile.getName())
+                .setAuthor(member.getEffectiveName(), member.getEffectiveAvatarUrl(),
+                        member.getEffectiveAvatarUrl())
+                .setTitle(map.name == null ? "OH NO" : map.name);
+        builder.addField("Size: ", "- " + map.image.getWidth() + "x" + map.image.getHeight(), false);
+        if (map.description != null)
+            builder.setFooter(map.description);
+
+        return builder;
+
     }
 
     public static class Map {

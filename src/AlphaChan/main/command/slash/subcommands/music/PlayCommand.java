@@ -15,9 +15,9 @@ import AlphaChan.main.handler.MusicPlayerHandler;
 import AlphaChan.main.music.MusicPlayer;
 import AlphaChan.main.music.MusicTrack;
 import AlphaChan.main.util.Log;
-import net.dv8tion.jda.api.entities.AudioChannel;
 import net.dv8tion.jda.api.entities.GuildVoiceState;
 import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.channel.unions.AudioChannelUnion;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -46,7 +46,7 @@ public class PlayCommand extends SimpleBotSubcommand {
 
                 Member member = event.getMember();
                 GuildVoiceState voiceState = member.getVoiceState();
-                AudioChannel channel = voiceState.getChannel();
+                AudioChannelUnion channel = voiceState.getChannel();
 
                 if (!voiceState.inAudioChannel() && channel == null) {
                     reply(event, "Bạn phải ở trong kênh thoại để sử dụng lệnh này", 10);
@@ -55,7 +55,7 @@ public class PlayCommand extends SimpleBotSubcommand {
 
                 MusicPlayerHandler.getInstance().loadItemOrdered(event.getGuild(), source, new ResultHandler(event));
 
-                if (!MusicPlayerHandler.getInstance().hasMusicPlayer(event.getGuild())) {
+                if (!MusicPlayerHandler.getInstance().hasMusicPlayer(event.getGuild()) ) {
                     new MusicPlayerTable(event, MusicPlayerHandler.getInstance().getMusicPlayer(event.getGuild()))
                             .sendTable();
                 } else {

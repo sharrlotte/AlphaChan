@@ -82,7 +82,7 @@ public class LeaderboardTable extends SimplePageTable {
                 break;
 
             case GUILD:
-                Guild guild = event.getGuild();
+                Guild guild = getEvent().getGuild();
                 if (guild == null)
                     throw new IllegalStateException("Guild not found");
                 String guildId = guild.getId();
@@ -141,7 +141,7 @@ public class LeaderboardTable extends SimplePageTable {
 
     public EmbedBuilder getLeaderboard() {
 
-        Member member = event.getMember();
+        Member member = getEventMember();
         if (member == null)
             return new EmbedBuilder().addField("NULL", "Lỗi: Người dùng không tồn tại", false);
 

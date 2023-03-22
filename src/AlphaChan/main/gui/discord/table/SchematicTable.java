@@ -3,6 +3,7 @@ package AlphaChan.main.gui.discord.table;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import javax.annotation.Nonnull;
@@ -19,19 +20,21 @@ import AlphaChan.main.data.mindustry.SchematicData;
 import AlphaChan.main.data.mindustry.SchematicInfo;
 import AlphaChan.main.handler.ContentHandler;
 import AlphaChan.main.handler.DatabaseHandler;
-import AlphaChan.main.handler.MessageHandler;
 import AlphaChan.main.handler.UserHandler;
 import AlphaChan.main.handler.DatabaseHandler.DATABASE;
 import AlphaChan.main.util.Log;
 import AlphaChan.main.util.StringUtils;
+
 import mindustry.game.Schematic;
 
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.Emoji;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import net.dv8tion.jda.api.requests.restaction.WebhookMessageUpdateAction;
+import net.dv8tion.jda.api.interactions.components.LayoutComponent;
+import net.dv8tion.jda.api.requests.restaction.MessageEditAction;
+import net.dv8tion.jda.api.utils.FileUpload;
 
 import static AlphaChan.AlphaChan.*;
 
@@ -60,11 +63,11 @@ public class SchematicTable extends SimplePageTable {
         addButton(deny("X", () -> this.deleteTable()));
         addButton(primary(">", () -> this.nextPage()));
         addRow();
-        addButton(primary("data", Emoji.fromMarkdown(BotConfig.FILE_EMOJI), () -> this.sendCode()));
-        addButton(primary("star", Emoji.fromMarkdown(BotConfig.STAR_EMOJI), () -> this.addStar()));
-        addButton(primary("penguin", Emoji.fromMarkdown(BotConfig.PENGUIN_EMOJI), () -> this.addPenguin()));
+        addButton(primary("data", Emoji.fromUnicode(BotConfig.FILE_EMOJI), () -> this.sendSchematicCodeMessage()));
+        addButton(primary("star", Emoji.fromUnicode(BotConfig.STAR_EMOJI), () -> this.addStar()));
+        addButton(primary("penguin", Emoji.fromUnicode(BotConfig.PENGUIN_EMOJI), () -> this.addPenguin()));
         addRow();
-        addButton(primary("delete", Emoji.fromMarkdown(BotConfig.PUT_LITTER_EMOJI), () -> this.deleteSchematic()));
+        addButton(primary("delete", Emoji.fromUnicode(BotConfig.PUT_LITTER_EMOJI), () -> this.deleteSchematic()));
 
     }
 
@@ -76,12 +79,14 @@ public class SchematicTable extends SimplePageTable {
     @Override
     public void deleteTable() {
         try {
-            event.getHook().deleteOriginal().queue();
+            super.deleteTable();
+            getEvent().getHook().deleteOriginal().queue();
 
             this.killTimer();
 
             if (currentCode != null)
                 currentCode.delete().queue();
+
         } catch (Exception e) {
             Log.error(e);
         }
@@ -135,7 +140,7 @@ public class SchematicTable extends SimplePageTable {
         }
     }
 
-    private void sendCode() {
+    private void sendSchematicCodeMessage() {
         if (currentData == null)
             return;
 
@@ -144,55 +149,55 @@ public class SchematicTable extends SimplePageTable {
             return;
 
         try {
-            if (currentCode == null || !currentCode.isFromGuild())
-                sendCodeData(data);
-
-            else {
-                currentCode.delete().complete();
-                sendCodeData(data);
-            }
+            deleteSChematicCodeMessage();
+            sendSchematicCodeData(data);
 
         } catch (Exception e) {
-            sendCodeData(data);
             Log.error(e);
         }
     }
 
-    public void sendCodeData(@Nonnull String data) {
-        if (currentData.data.length() < 1000) {
-            event.getHook().sendMessage("```" + data + "```").queue(m -> this.currentCode = m);
+    // Delete old code message
+    private void deleteSChematicCodeMessage() {
+        if (currentCode != null) {
+            currentCode.delete().complete();
+            currentCode = null;
+        }
+    }
+
+    public void sendSchematicCodeData(@Nonnull String data) throws IOException {
+        // Can't send message that have more than 1024 letters
+        if (data.length() < 1024) {
+            getMessage().reply(data).queue(message -> this.currentCode = message);
             return;
         }
 
-        try {
-            File schematicFile = MessageHandler.getSchematicFile(ContentHandler.parseSchematic(data));
-            event.getHook().sendFile(schematicFile).queue(message -> this.currentCode = message);
+        File schematicFile = ContentHandler.getSchematicFile(ContentHandler.parseSchematic(data));
+        getMessage().replyFiles(FileUpload.fromData(schematicFile)).queue(message -> this.currentCode = message);
 
-        } catch (IOException e) {
-            Log.error(e);
-        }
     }
 
     @Override
     public void updateTable() {
         try {
-            if (currentCode != null)
-                currentCode.delete().queue();
 
-            pageNumber %= getMaxPage();
+            deleteSChematicCodeMessage();
 
             currentInfo = schematicInfoList.get(pageNumber);
             currentData = collection.find(Filters.eq("_id", currentInfo.id)).limit(1).first();
+
             if (currentData == null) {
-                event.getHook().editOriginal("Không có dữ liệu về bản thiết kế với id:" + currentInfo.id).queue();
+                getMessage().editMessage("Không có dữ liệu về bản thiết kế với id:" + currentInfo.id).queue();
                 return;
             }
 
             Schematic schem = ContentHandler.parseSchematic(currentData.getData());
-            File previewFile = MessageHandler.getSchematicPreviewFile(schem);
-            EmbedBuilder builder = MessageHandler.getSchematicEmbedBuilder(schem, previewFile, event.getMember());
+            File previewFile = ContentHandler.getSchematicPreviewFile(schem);
+            EmbedBuilder builder = ContentHandler.getSchematicEmbedBuilder(schem, previewFile, getEvent().getMember());
             StringBuilder field = new StringBuilder();
-            builder = addPageFooter(builder);
+
+            addPageFooter(builder);
+
             String authorId = currentInfo.authorId;
             if (authorId != null) {
                 User user = jda.getUserById(authorId);
@@ -201,8 +206,10 @@ public class SchematicTable extends SimplePageTable {
             }
 
             field.append("- Nhãn: ");
+
             for (int i = 0; i < currentInfo.tag.size() - 1; i++)
-                field.append(StringUtils.capitalize(currentInfo.tag.get(i).replace("_", " ").toLowerCase() + ", "));
+                field.append(StringUtils.capitalize(currentInfo.tag.get(
+                        i).replace("_", " ").toLowerCase() + ", "));
 
             field.append(StringUtils.capitalize(currentInfo.tag.get(
                     currentInfo.tag.size() - 1).replace("_", " ").toLowerCase() + "\n"));
@@ -210,14 +217,16 @@ public class SchematicTable extends SimplePageTable {
             field.append("- Sao: " + currentInfo.getStar() + "\n");
             field.append("- Cánh cụt: " + currentInfo.getPenguin() + "\n");
 
-            builder.addField("*Thông tin*", field.toString(), false);
+            builder.addField("Thông tin", field.toString(), false);
 
-            WebhookMessageUpdateAction<Message> action = event.getHook().editOriginal(previewFile);
+            MessageEditAction action = getMessage().editMessageEmbeds(builder.build())
+                    .setFiles(FileUpload.fromData(previewFile));
 
-            if (getTriggerMessage() != null)
-                action.retainFiles(getTriggerMessage().getAttachments());
+            Collection<LayoutComponent> row = getButtons();
+            if (row.size() > 0)
+                action.setComponents(row);
 
-            action.setEmbeds(builder.build()).setActionRows(getButton()).queue();
+            action.queue();
 
         } catch (Exception e) {
             Log.error(e);

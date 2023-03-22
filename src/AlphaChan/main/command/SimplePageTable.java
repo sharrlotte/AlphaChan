@@ -1,15 +1,12 @@
 package AlphaChan.main.command;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import net.dv8tion.jda.api.interactions.components.ActionRow;
-import net.dv8tion.jda.api.requests.restaction.WebhookMessageUpdateAction;
+import net.dv8tion.jda.api.requests.restaction.MessageEditAction;
 
 public class SimplePageTable extends SimpleTable {
 
@@ -70,27 +67,22 @@ public class SimplePageTable extends SimpleTable {
         updateTable();
     }
 
-    public SimplePageTable sendTable() {
-        updateTable();
-        return this;
-    }
-
     public void updateTable() {
         resetTimer();
         if (getMaxPage() <= 0) {
-            event.getHook().editOriginal("```Không có dữ liệu```").queue();
+            getMessage().editMessage("```Không có dữ liệu```").queue();
             return;
         }
         MessageEmbed message = getCurrentPage();
         if (message == null) {
-            event.getHook().editOriginal("```Đã hết dữ liệu```").queue();
+            getMessage().editMessage("```Đã hết dữ liệu```").queue();
             return;
         }
-        WebhookMessageUpdateAction<Message> action = event.getHook().editOriginalEmbeds(message);
 
-        Collection<ActionRow> row = getButton();
-        if (row.size() > 0)
-            action.setActionRows(row);
+        MessageEditAction action = getMessage().editMessageEmbeds(message);
+
+        setButtons(action);
+
         action.queue();
     }
 }

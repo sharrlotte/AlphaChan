@@ -1,7 +1,8 @@
 package AlphaChan.main.command.slash.subcommands.yui;
 
 import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import net.dv8tion.jda.api.events.interaction.command.CommandAutoCompleteInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
@@ -43,19 +44,19 @@ public class SayCommand extends SimpleBotSubcommand {
 
         String content = contentOption.getAsString();
         Guild guild;
-        TextChannel channel;
+        MessageChannelUnion channel;
         if (guildIdOption == null)
             guild = event.getGuild();
         else
             guild = jda.getGuildById(guildIdOption.getAsString());
 
         if (guild == null || channelIdOption == null)
-            channel = event.getTextChannel();
+            channel = event.getChannel();
         else
-            channel = guild.getTextChannelById(channelIdOption.getAsString());
+            channel = (MessageChannelUnion) guild.getTextChannelById(channelIdOption.getAsString());
 
         if (channel == null)
-            channel = event.getTextChannel();
+            channel = event.getChannel();
 
         if (replyIdOption == null)
             channel.sendMessage(content).queue();
@@ -99,19 +100,19 @@ public class SayCommand extends SimpleBotSubcommand {
             OptionMapping channelIdOption = event.getOption("channel");
 
             Guild guild;
-            TextChannel channel;
+            MessageChannelUnion channel;
             if (guildIdOption == null)
                 guild = event.getGuild();
             else
                 guild = jda.getGuildById(guildIdOption.getAsString());
 
             if (guild == null || channelIdOption == null)
-                channel = event.getTextChannel();
+                channel = event.getChannel();
             else
-                channel = guild.getTextChannelById(channelIdOption.getAsString());
+                channel = (MessageChannelUnion) guild.getTextChannelById(channelIdOption.getAsString());
 
             if (channel == null)
-                channel = event.getTextChannel();
+                channel = event.getChannel();
 
             channel.getHistory().retrieveFuture(10).queue(messages -> {
                 HashMap<String, String> messageContents = new HashMap<>();

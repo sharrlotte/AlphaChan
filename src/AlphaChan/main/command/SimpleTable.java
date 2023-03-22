@@ -11,26 +11,29 @@ import javax.annotation.Nonnull;
 import AlphaChan.main.data.user.TimeObject;
 import AlphaChan.main.handler.TableHandler;
 import AlphaChan.main.util.Log;
-import net.dv8tion.jda.api.entities.Emoji;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
+import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
+import net.dv8tion.jda.api.interactions.components.LayoutComponent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import net.dv8tion.jda.api.requests.restaction.MessageEditAction;
 
 public abstract class SimpleTable extends TimeObject {
 
-    private List<RunnableButton> buttons = new ArrayList<RunnableButton>();
+    private List<CallbackButton> buttons = new ArrayList<CallbackButton>();
     private List<Integer> rows = new ArrayList<Integer>(Arrays.asList(0));
 
-    protected ButtonInteractionEvent interaction;
-    protected String requestor;
-    protected Message message;
+    private ButtonInteractionEvent interaction;
+    private String requestor;
 
-    protected final SlashCommandInteractionEvent event;
+    private Message message;
+
+    private final SlashCommandInteractionEvent event;
 
     private static final String SEPARATOR = ":";
 
@@ -41,7 +44,17 @@ public abstract class SimpleTable extends TimeObject {
         onTimeOut.connect((n) -> deleteTable());
         onUpdate.connect((n) -> updateTable());
 
+        event.getHook().deleteOriginal().queue();
+
         TableHandler.add(this);
+    }
+
+    public SlashCommandInteractionEvent getEvent() {
+        return event;
+    }
+
+    public Message getMessage() {
+        return message;
     }
 
     public void setRequestor(String userId) {
@@ -53,12 +66,13 @@ public abstract class SimpleTable extends TimeObject {
     }
 
     public void onCommand(@Nonnull ButtonInteractionEvent event) {
-        interaction = event;
+        this.interaction = event;
 
         String key = event.getComponentId();
-        Log.info("INTERACTION", event.getMember().getEffectiveName() + " pressed button " + key);
 
         resetTimer();
+
+        Log.info("INTERACTION", event.getMember().getEffectiveName() + " pressed button " + key);
 
         if (requestor != null) {
             if (!getTriggerMember().getId().equals(requestor)) {
@@ -67,7 +81,7 @@ public abstract class SimpleTable extends TimeObject {
             }
         }
 
-        for (RunnableButton b : buttons) {
+        for (CallbackButton b : buttons) {
             String id = b.getId();
             if (id.equals(key)) {
                 b.getRunnable().run();
@@ -76,14 +90,21 @@ public abstract class SimpleTable extends TimeObject {
         }
     }
 
-    public abstract SimpleTable sendTable();
+    public final void sendTable() {
+        event.getChannel().sendMessage("PlaceHolder").queue(m -> {
+            message = m;
+            updateTable();
+        });
+    }
 
     public abstract void updateTable();
 
     public void deleteTable() {
-        event.getHook().deleteOriginal().queue();
         if (interaction != null)
             interaction.getHook().deleteOriginal().queue();
+
+        if (message != null)
+            message.delete().queue();
     }
 
     public @Nonnull Guild getEventGuild() {
@@ -100,8 +121,8 @@ public abstract class SimpleTable extends TimeObject {
         return member;
     }
 
-    public TextChannel getEventTextChannel() {
-        return event.getTextChannel();
+    public MessageChannelUnion getEventTextChannel() {
+        return event.getChannel();
     }
 
     public String getId() {
@@ -128,8 +149,8 @@ public abstract class SimpleTable extends TimeObject {
         return interaction.getMessage();
     }
 
-    public @Nonnull TextChannel getTriggerTextChannel() {
-        return interaction.getTextChannel();
+    public @Nonnull MessageChannelUnion getTriggerTextChannel() {
+        return interaction.getChannel();
     }
 
     public String getButtonName() {
@@ -138,69 +159,69 @@ public abstract class SimpleTable extends TimeObject {
         return interaction.getComponentId();
     }
 
-    public RunnableButton primary(@Nonnull String buttonName, @Nonnull Runnable runnable) {
+    public CallbackButton primary(@Nonnull String buttonName, @Nonnull Runnable runnable) {
         Button button = Button.primary(getId() + SEPARATOR + buttonName, buttonName);
-        RunnableButton tableButton = new RunnableButton(button, runnable);
+        CallbackButton tableButton = new CallbackButton(button, runnable);
 
         return tableButton;
     }
 
-    public RunnableButton primary(@Nonnull String buttonId, @Nonnull String buttonName, @Nonnull Runnable runnable) {
+    public CallbackButton primary(@Nonnull String buttonId, @Nonnull String buttonName, @Nonnull Runnable runnable) {
         Button button = Button.primary(getId() + SEPARATOR + buttonId, buttonName);
-        RunnableButton tableButton = new RunnableButton(button, runnable);
+        CallbackButton tableButton = new CallbackButton(button, runnable);
         return tableButton;
     }
 
-    public RunnableButton primary(@Nonnull String buttonId, @Nonnull Emoji emo, @Nonnull Runnable runnable) {
+    public CallbackButton primary(@Nonnull String buttonId, @Nonnull Emoji emo, @Nonnull Runnable runnable) {
         Button button = Button.primary(getId() + SEPARATOR + buttonId, emo);
-        RunnableButton tableButton = new RunnableButton(button, runnable);
+        CallbackButton tableButton = new CallbackButton(button, runnable);
 
         return tableButton;
     }
 
-    public RunnableButton success(@Nonnull String buttonName, @Nonnull Emoji emo, @Nonnull Runnable runnable) {
+    public CallbackButton success(@Nonnull String buttonName, @Nonnull Emoji emo, @Nonnull Runnable runnable) {
         Button button = Button.success(getId() + SEPARATOR + buttonName, emo);
-        RunnableButton tableButton = new RunnableButton(button, runnable);
+        CallbackButton tableButton = new CallbackButton(button, runnable);
 
         return tableButton;
     }
 
-    public RunnableButton success(@Nonnull String buttonId, @Nonnull String buttonName, @Nonnull Runnable runnable) {
+    public CallbackButton success(@Nonnull String buttonId, @Nonnull String buttonName, @Nonnull Runnable runnable) {
         Button button = Button.success(getId() + SEPARATOR + buttonId, buttonName);
-        RunnableButton tableButton = new RunnableButton(button, runnable);
+        CallbackButton tableButton = new CallbackButton(button, runnable);
 
         return tableButton;
     }
 
-    public RunnableButton deny(@Nonnull String buttonName, @Nonnull Runnable runnable) {
+    public CallbackButton deny(@Nonnull String buttonName, @Nonnull Runnable runnable) {
         Button button = Button.danger(getId() + SEPARATOR + buttonName, buttonName);
-        RunnableButton tableButton = new RunnableButton(button, runnable);
+        CallbackButton tableButton = new CallbackButton(button, runnable);
 
         return tableButton;
     }
 
-    public RunnableButton deny(@Nonnull String buttonName, @Nonnull Emoji emo, @Nonnull Runnable runnable) {
+    public CallbackButton deny(@Nonnull String buttonName, @Nonnull Emoji emo, @Nonnull Runnable runnable) {
         Button button = Button.danger(getId() + SEPARATOR + buttonName, emo);
-        RunnableButton tableButton = new RunnableButton(button, runnable);
+        CallbackButton tableButton = new CallbackButton(button, runnable);
 
         return tableButton;
     }
 
-    public RunnableButton deny(@Nonnull String buttonId, @Nonnull String buttonName, @Nonnull Runnable runnable) {
+    public CallbackButton deny(@Nonnull String buttonId, @Nonnull String buttonName, @Nonnull Runnable runnable) {
         Button button = Button.danger(getId() + SEPARATOR + buttonId, buttonName);
-        RunnableButton tableButton = new RunnableButton(button, runnable);
+        CallbackButton tableButton = new CallbackButton(button, runnable);
 
         return tableButton;
     }
 
-    public void addButton(RunnableButton tableButton) {
+    public void addButton(CallbackButton tableButton) {
         buttons.add(tableButton);
         int row = rows.size() - 1;
         int number = rows.get(row);
         rows.set(row, number + 1);
     }
 
-    public void setButton(RunnableButton replace) {
+    public void setButton(CallbackButton replace) {
         for (int i = 0; i < buttons.size(); i++) {
             if (buttons.get(i).getId().equals(replace.getId())) {
                 buttons.set(i, replace);
@@ -213,8 +234,16 @@ public abstract class SimpleTable extends TimeObject {
         rows.add(0);
     }
 
-    public @Nonnull Collection<ActionRow> getButton() {
-        Collection<ActionRow> row = new ArrayList<ActionRow>();
+    public MessageEditAction setButtons(MessageEditAction action) {
+        Collection<LayoutComponent> rows = getButtons();
+        if (rows.size() > 0)
+            action.setComponents(rows);
+
+        return action;
+    }
+
+    public @Nonnull Collection<LayoutComponent> getButtons() {
+        Collection<LayoutComponent> row = new ArrayList<>();
         if (buttons.size() == 0)
             return row;
         List<Button> button = new ArrayList<>();
@@ -258,11 +287,11 @@ public abstract class SimpleTable extends TimeObject {
         interaction.getHook().sendMessage("```" + content + "```").setEphemeral(ephemeral).queue();
     }
 
-    private class RunnableButton {
+    private class CallbackButton {
         private final Runnable runnable;
         private final Button button;
 
-        public RunnableButton(@Nonnull Button button, @Nonnull Runnable runnable) {
+        public CallbackButton(@Nonnull Button button, @Nonnull Runnable runnable) {
             this.runnable = runnable;
             this.button = button;
         }

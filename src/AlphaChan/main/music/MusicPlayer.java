@@ -19,9 +19,12 @@ import AlphaChan.main.util.Log;
 import AlphaChan.main.util.StringUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.audio.AudioSendHandler;
-import net.dv8tion.jda.api.entities.AudioChannel;
+import net.dv8tion.jda.api.audio.hooks.ConnectionListener;
+import net.dv8tion.jda.api.audio.hooks.ConnectionStatus;
+import net.dv8tion.jda.api.entities.channel.middleman.AudioChannel;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.utils.TimeFormat;
 
 import java.awt.Color;
@@ -41,6 +44,8 @@ public class MusicPlayer extends AudioEventAdapter implements AudioSendHandler {
 
         this.audioPlayer = player;
         this.guild = guild;
+
+        // guild.getAudioManager().setConnectionListener(new MusicListener());
     }
 
     public void start(AudioChannel channel) {
@@ -111,10 +116,6 @@ public class MusicPlayer extends AudioEventAdapter implements AudioSendHandler {
         updateTable();
     }
 
-    public void destroy() {
-        guild.getAudioManager().closeAudioConnection();
-    }
-
     public boolean addTrack(MusicTrack queueTrack) {
         boolean result = false;
         if (audioPlayer.getPlayingTrack() == null) {
@@ -182,7 +183,7 @@ public class MusicPlayer extends AudioEventAdapter implements AudioSendHandler {
 
                                 "\nNgười yêu cầu: " + playing.getUserData(RequestMetadata.class).getRequester() +
                                 "\nÂm lượng: "
-                                + StringUtils.toProgressBar(audioPlayer.getVolume() / 100d, 20, "||", "|", "|") 
+                                + StringUtils.toProgressBar(audioPlayer.getVolume() / 100d, 20, "||", "|", "|")
                                 + audioPlayer.getVolume() + "%",
 
                         false);
@@ -258,6 +259,32 @@ public class MusicPlayer extends AudioEventAdapter implements AudioSendHandler {
     @Override
     public boolean isOpus() {
         return true;
+    }
+
+    public class MusicListener implements ConnectionListener {
+
+        @Override
+        public void onPing(long ping) {
+            Log.system(String.valueOf(ping));
+        }
+
+        @Override
+        public void onStatusChange(ConnectionStatus status) {
+            Log.error(status.toString() + " Auto reconnect: " + guild.getAudioManager().isAutoReconnect() + " Muted: "
+                    + guild.getAudioManager().isSelfMuted());
+            if (guild.getAudioManager().isConnected()) {
+                Log.system("Connected");
+            } else {
+                Log.system("Disconnected");
+
+            }
+        }
+
+        @Override
+        public void onUserSpeaking(User user, boolean speaking) {
+
+        }
+
     }
 
 }

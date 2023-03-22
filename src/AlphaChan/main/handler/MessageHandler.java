@@ -1,18 +1,19 @@
 package AlphaChan.main.handler;
 
-import arc.files.*;
-import arc.util.io.Streams;
-
-import mindustry.*;
 import mindustry.game.*;
-import mindustry.type.ItemStack;
 
 import net.dv8tion.jda.api.*;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.entities.Message.Attachment;
+import net.dv8tion.jda.api.entities.channel.Channel;
+import net.dv8tion.jda.api.entities.channel.concrete.Category;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import net.dv8tion.jda.api.entities.channel.middleman.GuildChannel;
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.message.*;
 import net.dv8tion.jda.api.hooks.*;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
+import net.dv8tion.jda.api.utils.FileUpload;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberRemoveEvent;
 import net.dv8tion.jda.api.events.guild.member.update.GuildMemberUpdateNicknameEvent;
@@ -20,21 +21,19 @@ import net.dv8tion.jda.api.events.interaction.command.MessageContextInteractionE
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 
 import javax.annotation.Nonnull;
-import javax.imageio.*;
 
 import org.bson.Document;
 
 import AlphaChan.main.data.user.GuildData;
 import AlphaChan.main.data.user.UserData;
 import AlphaChan.main.data.user.GuildData.CHANNEL_TYPE;
+import AlphaChan.main.handler.ContentHandler.Map;
 import AlphaChan.main.handler.DatabaseHandler.LOG_TYPE;
 import AlphaChan.main.util.Log;
 
-import java.awt.image.*;
 import java.io.*;
 import java.util.HashMap;
 import java.util.List;
-import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 import static AlphaChan.AlphaChan.jda;
@@ -87,49 +86,55 @@ public final class MessageHandler extends ListenerAdapter {
     }
 
     public static void handleMessage(Message message) {
-        // Log all message that has been sent
-        List<Attachment> attachments = message.getAttachments();
-        Member member = message.getMember();
+        try {
+            // Log all message that has been sent
+            List<Attachment> attachments = message.getAttachments();
+            Member member = message.getMember();
 
-        // Schematic preview
-        if ((ContentHandler.isSchematicText(message) && attachments.isEmpty()) || ContentHandler
-                .isSchematicFile(attachments)) {
-            Log.system(getMessageSender(message) + ": sent a schematic ");
-            sendSchematicPreview(message);
-        }
-
-        else if (ContentHandler.isMapFile(attachments)) {
-            sendMapPreview(message, message.getChannel());
-        }
-
-        // Delete in channel that it should not be
-        GuildData guildData = GuildHandler.getGuild(message.getGuild());
-
-        guildData.resetTimer();
-        if (guildData._containsChannel(CHANNEL_TYPE.SCHEMATIC.name(), message.getTextChannel().getId()) || //
-                guildData._containsChannel(CHANNEL_TYPE.MAP.name(), message.getTextChannel().getId())) {
-            if (!message.getContentRaw().isEmpty()) {
-                message.delete().queue();
-                replyMessage(message, "Vui lòng không gửi tin nhắn vào kênh này!", 30);
+            // Schematic preview
+            if ((ContentHandler.isSchematicText(message) && attachments.isEmpty()) || ContentHandler
+                    .isSchematicFile(attachments)) {
+                Log.system(getMessageSender(message) + ": sent a schematic ");
+                sendSchematicPreview(message);
             }
+
+            else if (ContentHandler.isMapFile(attachments)) {
+                sendMapPreview(message, message.getChannel());
+            }
+
+            // Delete in channel that it should not be
+            GuildData guildData = GuildHandler.getGuild(message.getGuild());
+
+            guildData.resetTimer();
+            if (guildData._containsChannel(CHANNEL_TYPE.SCHEMATIC.name(), message.getChannel().getId()) || //
+                    guildData._containsChannel(CHANNEL_TYPE.MAP.name(), message.getChannel().getId())) {
+
+                if (!message.getContentRaw().isEmpty()) {
+                    message.delete().queue();
+                    replyMessage(message, "Vui lòng không gửi tin nhắn vào kênh này!", 30);
+                }
+            }
+
+            // Update exp on message sent
+            UserHandler.onMessage(message);
+            DatabaseHandler.log(LOG_TYPE.MESSAGE, new Document()//
+                    .append("message", getMessageSender(message) + ": " + message.getContentDisplay())//
+                    .append("messageId", message.getId())//
+                    .append("userId", member == null ? null : member.getId())//
+                    .append("guildId", message.getGuild().getId()));
+
+            // Log member message/file/image url to terminals
+            if (!message.getContentRaw().isEmpty())
+                Log.print("LOG", getMessageSender(message) + ": " + message.getContentDisplay());
+
+            else if (!message.getAttachments().isEmpty())
+                message.getAttachments().forEach(attachment -> {
+                    Log.print("LOG", getMessageSender(message) + ": " + attachment.getUrl());
+                });
+
+        } catch (Exception e) {
+            Log.error(e);
         }
-
-        // Update exp on message sent
-        UserHandler.onMessage(message);
-        DatabaseHandler.log(LOG_TYPE.MESSAGE, new Document()//
-                .append("message", getMessageSender(message) + ": " + message.getContentDisplay())//
-                .append("messageId", message.getId())//
-                .append("userId", member == null ? null : member.getId())//
-                .append("guildId", message.getGuild().getId()));
-
-        // Log member message/file/image url to terminals
-        if (!message.getContentRaw().isEmpty())
-            Log.print("LOG", getMessageSender(message) + ": " + message.getContentDisplay());
-
-        else if (!message.getAttachments().isEmpty())
-            message.getAttachments().forEach(attachment -> {
-                Log.print("LOG", getMessageSender(message) + ": " + attachment.getUrl());
-            });
 
     }
 
@@ -208,27 +213,13 @@ public final class MessageHandler extends ListenerAdapter {
 
     public static void sendMapPreview(Attachment attachment, Member member, MessageChannel channel) {
         try {
+            Map map = ContentHandler.readMap(NetworkHandler.download(attachment.getUrl()));
+            File mapFile = ContentHandler.getMapFile(attachment);
+            File mapImageFile = ContentHandler.getMapImageFile(map);
+            EmbedBuilder builder = ContentHandler.getMapEmbedBuilder(map, mapFile, mapImageFile, member);
 
-            ContentHandler.Map map = ContentHandler.readMap(NetworkHandler.download(attachment.getUrl()));
-            new File("cache/").mkdir();
-            new File("cache/temp/").mkdir();
-            File mapFile = new File("cache/temp/" + attachment.getFileName());
-            Fi imageFile = Fi.get("cache/temp/image_" + attachment.getFileName().replace(".msav", ".png"));
-            Streams.copy(NetworkHandler.download(attachment.getUrl()), new FileOutputStream(mapFile));
-            ImageIO.write(map.image, "png", imageFile.file());
-
-            EmbedBuilder builder = new EmbedBuilder().setImage("attachment://" + imageFile.name())
-                    .setAuthor(member.getEffectiveName(), member.getEffectiveAvatarUrl(),
-                            member.getEffectiveAvatarUrl())
-                    .setTitle(map.name == null ? attachment.getFileName().replace(".msav", "") : map.name);
-            builder.addField("Size: ", map.image.getWidth() + "x" + map.image.getHeight(), false);
-            if (map.description != null)
-                builder.setFooter(map.description);
-
-            File f = imageFile.file();
-            if (f == null)
-                return;
-            channel.sendFile(mapFile).addFile(f).setEmbeds(builder.build()).queue();
+            channel.sendFiles(FileUpload.fromData(mapFile), FileUpload.fromData(mapImageFile))
+                    .setEmbeds(builder.build()).queue();
 
         } catch (Exception e) {
             Log.error(e);
@@ -304,106 +295,15 @@ public final class MessageHandler extends ListenerAdapter {
 
     public static void sendSchematicPreview(Schematic schem, Member member, MessageChannel channel) {
         try {
-            File schemFile = getSchematicFile(schem);
-            File previewFile = getSchematicPreviewFile(schem);
-            EmbedBuilder builder = getSchematicEmbedBuilder(schem, previewFile, member);
+            File schemFile = ContentHandler.getSchematicFile(schem);
+            File previewFile = ContentHandler.getSchematicPreviewFile(schem);
+            EmbedBuilder builder = ContentHandler.getSchematicEmbedBuilder(schem, previewFile, member);
 
-            channel.sendFile(schemFile).addFile(previewFile).setEmbeds(builder.build()).queue();
+            channel.sendFiles(FileUpload.fromData(schemFile), FileUpload.fromData(previewFile))
+                    .setEmbeds(builder.build()).queue();
         } catch (Exception e) {
             sendMessage(channel, "Lỗi: " + e.getMessage(), 30);
         }
-    }
-
-    public static EmbedBuilder getSchematicEmbedBuilder(Schematic schem, File previewFile, Member member) {
-        EmbedBuilder builder = new EmbedBuilder().setImage("attachment://" + previewFile.getName())
-                .setAuthor(member.getEffectiveName(), member.getEffectiveAvatarUrl(), member.getEffectiveAvatarUrl())
-                .setTitle(schem.name());
-
-        if (!schem.description().isEmpty())
-            builder.setFooter(schem.description());
-
-        // Schem heigh, width
-        builder.addField("Kích thước", "Rộng: " + String.valueOf(schem.width) + " Cao: " + String.valueOf(schem.height),
-                true);
-
-        StringBuilder requirement = new StringBuilder();
-
-        // Item requirements
-        for (ItemStack stack : schem.requirements()) {
-            List<Emote> emotes = member.getGuild().getEmotesByName(stack.item.name.replace("-", ""), true);
-
-            if (!emotes.isEmpty())
-                requirement.append(emotes.get(0).getAsMention()).append(stack.amount).append("  ");
-            else
-                requirement.append(stack.item.name + ": " + stack.amount + " ");
-        }
-
-        builder.addField("Tài nguyên cần", requirement.toString(), false);
-
-        // Power input/output
-
-        requirement = new StringBuilder();
-
-        int powerProduction = (int) Math.round(schem.powerProduction()) * 60;
-        int powerConsumption = (int) Math.round(schem.powerConsumption()) * 60;
-
-        if (powerConsumption != 0)
-            requirement.append("\nNăng lượng sử dụng: " + String.valueOf(powerConsumption) + "/s");
-
-        if (powerProduction != 0)
-            requirement.append("\nNăng lượng tạo ra: " + String.valueOf(powerProduction) + "/s");
-
-        builder.addField("Năng lượng", requirement.toString(), false);
-
-        HashMap<String, Float> input = ContentHandler.getSchematicInput(schem);
-        HashMap<String, Float> output = ContentHandler.getSchematicOutput(schem);
-
-        StringBuilder inputString = new StringBuilder();
-
-        for (String key : input.keySet()) {
-
-            List<Emote> emotes = member.getGuild().getEmotesByName(key.replace("-", ""), true);
-
-            inputString.append(emotes.isEmpty() ? key + ": " : emotes.get(0).getAsMention());
-            inputString.append(" " + input.get(key) + "/s ");
-        }
-
-        StringBuilder outputString = new StringBuilder();
-
-        for (String key : output.keySet()) {
-
-            List<Emote> emotes = member.getGuild().getEmotesByName(key.replace("-", ""), true);
-
-            outputString.append(emotes.isEmpty() ? key + ": " : emotes.get(0).getAsMention());
-            outputString.append(" " + output.get(key) + "/s ");
-        }
-
-        builder.addField("Tổng đầu vào", inputString.toString(), false);
-        builder.addField("Tổng đầu ra", outputString.toString(), false);
-
-        return builder;
-
-    }
-
-    public static @Nonnull File getSchematicFile(Schematic schem) throws IOException {
-        String sname = schem.name().replace("/", "_").replace(" ", "_").replace(":", "_");
-        new File("cache").mkdir();
-        if (sname.isEmpty())
-            sname = "empty";
-        File schemFile = new File("cache/temp/" + sname + "." + Vars.schematicExtension);
-        Schematics.write(schem, new Fi(schemFile));
-        return schemFile;
-    }
-
-    public static @Nonnull File getSchematicPreviewFile(Schematic schem) throws Exception {
-
-        BufferedImage preview = ContentHandler.previewSchematic(schem);
-        new File("cache").mkdir();
-        File previewFile = new File("cache/temp/img_" + UUID.randomUUID() + ".png");
-        ImageIO.write(preview, "png", previewFile);
-
-        return previewFile;
-
     }
 
     // Message send commands

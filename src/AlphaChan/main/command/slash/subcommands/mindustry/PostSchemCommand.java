@@ -41,9 +41,9 @@ public class PostSchemCommand extends SimpleBotSubcommand {
 
     public PostSchemCommand() {
         super("postschem", "Chuyển tập tin bản thiết kế thành hình ảnh và đăng lên cơ sở dữ liệu", false, true);
+        addOption(OptionType.STRING, "tag", "Gắn thẻ cho bản thiết kế", true, true);
         addOption(OptionType.ATTACHMENT, "schematicfile", "File để đăng");
         addOption(OptionType.STRING, "text", "Bản thiết kế để đăng");
-        addOption(OptionType.STRING, "tag", "Gắn thẻ cho bản thiết kế", true, true);
         addOption(OptionType.BOOLEAN, "preview", "Gửi hình ảnh của bản thiết kế");
     }
 

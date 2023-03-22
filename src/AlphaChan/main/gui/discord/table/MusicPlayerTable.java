@@ -3,10 +3,9 @@ package AlphaChan.main.gui.discord.table;
 import AlphaChan.BotConfig;
 import AlphaChan.main.command.SimplePageTable;
 import AlphaChan.main.music.MusicPlayer;
-import net.dv8tion.jda.api.entities.Emoji;
-import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import net.dv8tion.jda.api.requests.restaction.WebhookMessageUpdateAction;
+import net.dv8tion.jda.api.requests.restaction.MessageEditAction;
 
 public class MusicPlayerTable extends SimplePageTable {
 
@@ -16,9 +15,9 @@ public class MusicPlayerTable extends SimplePageTable {
         super(event, 10);
         this.player = player;
 
-        addButton(primary("play", Emoji.fromMarkdown(player.getTrackStatus()), () -> player.play()));
-        addButton(primary("next", Emoji.fromMarkdown(BotConfig.FORWARD_EMOJI), () -> player.playNext()));
-        addButton(primary("clear", Emoji.fromMarkdown(BotConfig.CLEAR_EMOJI), () -> player.clear()));
+        addButton(primary("play", Emoji.fromUnicode(player.getTrackStatus()), () -> player.play()));
+        addButton(primary("next", Emoji.fromUnicode(BotConfig.FORWARD_EMOJI), () -> player.playNext()));
+        addButton(primary("clear", Emoji.fromUnicode(BotConfig.CLEAR_EMOJI), () -> player.clear()));
         addButton(deny("X", () -> this.deleteTable()));
 
         player.setTable(this);
@@ -29,13 +28,11 @@ public class MusicPlayerTable extends SimplePageTable {
     public void updateTable() {
 
         resetTimer();
-        setButton(primary("play", Emoji.fromMarkdown(player.getTrackStatus()), () -> {
-            player.play();
-            updateTable();
-        }));
+        setButton(primary("play", Emoji.fromUnicode(player.getTrackStatus()), () -> player.play()));
 
-        WebhookMessageUpdateAction<Message> action = event.getHook()
-                .editOriginalEmbeds(player.getEmbedBuilder().build()).setActionRows(getButton());
+        MessageEditAction action = getMessage().editMessageEmbeds(player.getEmbedBuilder().build());
+
+        setButtons(action);
 
         action.queue();
     }
