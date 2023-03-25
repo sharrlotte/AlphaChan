@@ -38,23 +38,21 @@ public final class DatabaseHandler {
         MESSAGE, Database, USER, MESSAGE_DELETED
     }
 
+    private static final String DATABASE_URL = System.getenv("DATABASE_URL");
+
     private static DatabaseHandler instance = new DatabaseHandler();
 
-    private static String databaseURL = System.getenv("databaseURL");
-    private static ConnectionString connectionString = new ConnectionString(databaseURL);
+    private static ConnectionString connectionString = new ConnectionString(DATABASE_URL);
     private static MongoClientSettings settings = MongoClientSettings.builder().applyConnectionString(connectionString)
             .serverApi(ServerApi.builder().version(ServerApiVersion.V1).build()).build();
 
     private static MongoClient mongoClient = MongoClients.create(settings);
-
     private static CodecProvider pojoCodecProvider = PojoCodecProvider.builder().automatic(true).build();
     private static CodecRegistry pojoCodecRegistry = fromRegistries(getDefaultCodecRegistry(), fromProviders(pojoCodecProvider));
 
     private static ConcurrentHashMap<String, MongoDatabase> database = new ConcurrentHashMap<String, MongoDatabase>();
 
     private DatabaseHandler() {
-
-        // Generate index
 
         Log.system("Database handler up");
     }
