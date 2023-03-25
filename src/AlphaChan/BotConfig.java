@@ -31,7 +31,8 @@ public final class BotConfig {
         TIME_INSERT, // Time field name in Database
 
         MAX_TRACK_LENGTH, // Max length for a youtube video track that can be played in second
-        ;
+
+        CHAT_GPT_TOKEN;
     }
 
     public static final String PLAY_EMOJI = "▶️";
@@ -106,6 +107,7 @@ public final class BotConfig {
             setProperty(Config.MAX_LOG_COUNT, 8000);
             setProperty(Config.TIME_INSERT, "_timeInserted");
             setProperty(Config.MAX_TRACK_LENGTH, "600");
+            setProperty(Config.CHAT_GPT_TOKEN, "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");
 
             prop.store(output, "DEFAULT");
 

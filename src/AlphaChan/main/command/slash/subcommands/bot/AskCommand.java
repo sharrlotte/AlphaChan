@@ -3,28 +3,31 @@ package AlphaChan.main.command.slash.subcommands.bot;
 import com.theokanning.openai.completion.CompletionRequest;
 import com.theokanning.openai.service.OpenAiService;
 
-import AlphaChan.main.command.SimpleBotSubcommand;
+import AlphaChan.BotConfig;
+import AlphaChan.BotConfig.Config;
+import AlphaChan.main.command.SlashSubcommand;
+import AlphaChan.main.handler.UpdatableHandler;
 import AlphaChan.main.util.StringUtils;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 
-public class AskCommand extends SimpleBotSubcommand {
+public class AskCommand extends SlashSubcommand {
 
     private long lastTime = 0;
     private String chatGPTKey;
     private int tries = 0;
     private OpenAiService api;
 
-    private Boolean giau = false;
+    private Boolean hasKey = false;
 
-    private int cooldown = 1000 * 60;
+    private int cooldown = 1000 * 60 * 2; // 2 min for every question
 
     public AskCommand() {
         super("ask", "Hỏi bot");
         addOption(OptionType.STRING, "question", "Câu hỏi", true);
 
-        chatGPTKey = System.getenv("CHAT_GPT_TOKEN");
+        chatGPTKey = BotConfig.readString(Config.CHAT_GPT_TOKEN, "NULL");
 
         if (chatGPTKey.isBlank()) {
             throw new IllegalArgumentException("No chat gpt key found on env");
@@ -36,16 +39,16 @@ public class AskCommand extends SimpleBotSubcommand {
     @Override
     public void runCommand(SlashCommandInteractionEvent command) {
 
-        long remain = System.currentTimeMillis() - lastTime;
+        long remain = cooldown + lastTime - System.currentTimeMillis();
 
         tries += 1;
 
-        if (giau != true) {
+        if (hasKey != true) {
             reply(command, "Ad chưa có tiền mua acc chat gpt nên chưa dùng được :v", 10);
             return;
         }
 
-        if (remain < cooldown) {
+        if (remain > 0) {
             reply(command, "Vui lòng đợi " + StringUtils.toTime(remain) + " để sử dụng lệnh", 10);
             return;
         }
@@ -58,23 +61,30 @@ public class AskCommand extends SimpleBotSubcommand {
         }
         String text = questionOption.getAsString();
 
-        try {
+        UpdatableHandler.run("ChatGPT", 0, () -> {
 
-            CompletionRequest request = CompletionRequest.builder().prompt(text)//
-                    .model("ada")//
-                    .build();//
+            try {
+                CompletionRequest request = CompletionRequest.builder().prompt(text)//
+                        .model("text-davinci-003")//
+                        .temperature(0.3d)//
+                        .maxTokens(1000)//
+                        .n(1)//
+                        .build();//
 
-            api.createCompletion(request).getChoices().forEach((reponse -> reply(command, reponse.toString(), 60)));
+                reply(command, text + "\n\n" + api.createCompletion(request).getChoices().get(0).getText());
 
-        } catch (Exception e) {
-            if (tries < 10) {
-                runCommand(command);
+                lastTime = System.currentTimeMillis();
 
-            } else {
-                delete(command);
-                e.printStackTrace();
-                tries = 0;
+            } catch (Exception e) {
+                if (tries < 10) {
+                    runCommand(command);
+
+                } else {
+                    delete(command);
+                    e.printStackTrace();
+                    tries = 0;
+                }
             }
-        }
+        });
     }
 }

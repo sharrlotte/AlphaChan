@@ -1,5 +1,6 @@
 package AlphaChan;
 
+import AlphaChan.main.event.Signal;
 import AlphaChan.main.handler.CommandHandler;
 import AlphaChan.main.handler.ContentHandler;
 import AlphaChan.main.handler.DatabaseHandler;
@@ -22,19 +23,21 @@ public class AlphaChan {
 
     public static JDA jda;
 
+    public static Signal<Integer> onShutDown = new Signal<>();
+
     public AlphaChan() {
         try {
-
             BotConfig.load();
 
             Log.system("Connecting to discord");
 
             String TOKEN = System.getenv("TOKEN");
 
-            jda = JDABuilder.createDefault(TOKEN, GatewayIntent.GUILD_MESSAGES, GatewayIntent.MESSAGE_CONTENT,
-                    GatewayIntent.GUILD_EMOJIS_AND_STICKERS, GatewayIntent.GUILD_MEMBERS, GatewayIntent.GUILD_PRESENCES,
-                    GatewayIntent.GUILD_MESSAGE_REACTIONS, GatewayIntent.GUILD_VOICE_STATES,
-                    GatewayIntent.GUILD_MODERATION, GatewayIntent.GUILD_INVITES)
+            jda = JDABuilder
+                    .createDefault(TOKEN, GatewayIntent.GUILD_MESSAGES, GatewayIntent.MESSAGE_CONTENT,
+                            GatewayIntent.GUILD_EMOJIS_AND_STICKERS, GatewayIntent.GUILD_MEMBERS, GatewayIntent.GUILD_PRESENCES,
+                            GatewayIntent.GUILD_MESSAGE_REACTIONS, GatewayIntent.GUILD_VOICE_STATES, GatewayIntent.GUILD_MODERATION,
+                            GatewayIntent.GUILD_INVITES)
 
                     .enableCache(CacheFlag.VOICE_STATE).setMemberCachePolicy(MemberCachePolicy.ALL).build();
             jda.awaitReady();
@@ -63,13 +66,11 @@ public class AlphaChan {
 
     private class ShutdownHook extends Thread {
 
+        @Override
         public void run() {
-
+            onShutDown.emit(0);
+            Log.system("Bot shutdown");
         }
-    }
-
-    public static void shutdown() {
-
     }
 
     public static void main(String[] args) {

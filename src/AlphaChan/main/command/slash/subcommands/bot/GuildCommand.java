@@ -3,8 +3,8 @@ package AlphaChan.main.command.slash.subcommands.bot;
 import java.util.HashMap;
 import java.util.List;
 
-import AlphaChan.main.command.SimpleBotSubcommand;
-import AlphaChan.main.command.SimplePageTable;
+import AlphaChan.main.command.SlashSubcommand;
+import AlphaChan.main.command.PageTable;
 import AlphaChan.main.data.user.GuildCache;
 import AlphaChan.main.handler.GuildHandler;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -18,7 +18,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 
 import static AlphaChan.AlphaChan.*;
 
-public class GuildCommand extends SimpleBotSubcommand {
+public class GuildCommand extends SlashSubcommand {
 
     private final int MAX_DISPLAY = 7;
 
@@ -40,7 +40,7 @@ public class GuildCommand extends SimpleBotSubcommand {
             List<Guild> guilds = jda.getGuilds();
             EmbedBuilder builder = new EmbedBuilder();
             StringBuilder field = new StringBuilder();
-            SimplePageTable table = new SimplePageTable(event, 2);
+            PageTable table = new PageTable(event, 2);
 
             for (int i = 0; i < guilds.size(); i++) {
                 Guild guild = guilds.get(i);

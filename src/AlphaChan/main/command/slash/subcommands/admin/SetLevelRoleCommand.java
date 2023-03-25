@@ -9,11 +9,11 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 
 import java.util.HashMap;
 
-import AlphaChan.main.command.SimpleBotSubcommand;
+import AlphaChan.main.command.SlashSubcommand;
 import AlphaChan.main.data.user.GuildCache;
 import AlphaChan.main.handler.GuildHandler;
 
-public class SetLevelRoleCommand extends SimpleBotSubcommand {
+public class SetLevelRoleCommand extends SlashSubcommand {
     public SetLevelRoleCommand() {
         super("setlevelrole", "Cài đặt các vai trò của máy chủ");
         addOption(OptionType.ROLE, "role", "Vai trò muốn gán", true);

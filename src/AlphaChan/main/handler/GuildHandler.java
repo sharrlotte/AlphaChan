@@ -15,10 +15,13 @@ import com.mongodb.client.MongoCollection;
 import AlphaChan.BotConfig;
 import AlphaChan.BotConfig.Config;
 import AlphaChan.main.data.user.GuildCache;
+import AlphaChan.main.data.user.GuildData;
 import AlphaChan.main.handler.DatabaseHandler.Database;
 import AlphaChan.main.util.Log;
 
 import net.dv8tion.jda.api.entities.Guild;
+
+import static AlphaChan.AlphaChan.*;
 
 public class GuildHandler implements Updatable {
 
@@ -27,6 +30,8 @@ public class GuildHandler implements Updatable {
 
     private GuildHandler() {
         UpdatableHandler.addListener(this);
+
+        onShutDown.connect((code) -> save());
 
         Log.system("Guild handler up");
     }
@@ -50,13 +55,19 @@ public class GuildHandler implements Updatable {
         while (iterator.hasNext()) {
             GuildCache guild = iterator.next();
             if (!guild.isAlive(1)) {
-                Log.info("STATUS",
-                        "Guild <" + guild.getGuild().getName() + ":" + guild.getGuild().getId() + "> offline");
+                Log.info("STATUS", "Guild <" + guild.getGuild().getName() + ":" + guild.getGuild().getId() + "> offline");
                 UpdatableHandler.updateStatus();
                 guild.update();
                 iterator.remove();
-
             }
+        }
+    }
+
+    public void save() {
+        Iterator<GuildCache> iterator = guildCaches.values().iterator();
+        while (iterator.hasNext()) {
+            GuildCache guild = iterator.next();
+            guild.update();
         }
     }
 
@@ -86,7 +97,7 @@ public class GuildHandler implements Updatable {
             return guildData;
         }
 
-        String guildCollectionName = BotConfig.readString(Config.GUILD_COLLECTION, "GUILD_COLLECTION");
+        String guildCollectionName = BotConfig.readString(Config.GUILD_COLLECTION, null);
 
         // Create new guild cache to store temporary guild data
         if (!DatabaseHandler.collectionExists(Database.GUILD, guildCollectionName)) {
@@ -94,22 +105,26 @@ public class GuildHandler implements Updatable {
             return addGuild(guildId);
         }
 
-        MongoCollection<GuildCache> collection = DatabaseHandler.getDatabase(Database.GUILD)
-                .getCollection(guildCollectionName, GuildCache.class);
+        MongoCollection<GuildData> collection = DatabaseHandler.getDatabase(Database.GUILD).getCollection(guildCollectionName,
+                GuildData.class);
 
         // Get guild from Database
         Bson filter = new Document().append("guildId", guildId);
-        FindIterable<GuildCache> data = collection.find(filter).limit(1);
-        GuildCache first = data.first();
-        UpdatableHandler.updateStatus();
+        FindIterable<GuildData> data = collection.find(filter).limit(1);
+        GuildData first = data.first();
+
+        GuildCache cache;
+
         if (first != null) {
-            Log.info("STATUS", "Guild <" + first.getGuild().getName() + ":" + guildId + "> online");
-            guildCaches.put(guildId, first);
-            return first;
+            cache = new GuildCache(first);
+            Log.info("STATUS", "Guild <" + cache.getGuild().getName() + ":" + guildId + "> online");
+            guildCaches.put(guildId, cache);
+            return cache;
+
         } else {
-            first = addGuild(guildId);
-            Log.info("STATUS", "New guild <" + first.getGuild().getName() + ":" + guildId + "> online");
-            return first;
+            cache = addGuild(guildId);
+            Log.info("STATUS", "New guild <" + cache.getGuild().getName() + ":" + guildId + "> online");
+            return cache;
         }
     }
 }

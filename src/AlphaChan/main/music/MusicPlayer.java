@@ -194,7 +194,7 @@ public class MusicPlayer extends AudioEventAdapter implements AudioSendHandler {
 
                                 "\nNgười yêu cầu: " + playing.getUserData(RequestMetadata.class).getRequester() +
                                 "\nÂm lượng: "
-                                + StringUtils.toProgressBar(audioPlayer.getVolume() / 100d, 20, "||", "|", "|")
+                                + StringUtils.getProgressBar(audioPlayer.getVolume() / 100d, 20, "||", "|", "|")
                                 + audioPlayer.getVolume() + "%",
 
                         false);

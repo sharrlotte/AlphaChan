@@ -11,7 +11,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 
 import javax.annotation.Nonnull;
 
-import AlphaChan.main.command.SimpleBotSubcommand;
+import AlphaChan.main.command.SlashSubcommand;
 import AlphaChan.main.data.user.UserCache;
 import AlphaChan.main.data.user.UserCache.PointType;
 import AlphaChan.main.handler.UserHandler;
@@ -19,7 +19,7 @@ import AlphaChan.main.handler.UserHandler;
 import java.util.List;
 import java.awt.Color;
 
-public class InfoCommand extends SimpleBotSubcommand {
+public class InfoCommand extends SlashSubcommand {
     public InfoCommand() {
         super("info", "Hiển thị thông tin người dùng", true, false);
         this.addOption(OptionType.USER, "user", "Tên thành viên", false);

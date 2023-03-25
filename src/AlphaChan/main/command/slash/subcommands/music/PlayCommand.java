@@ -8,7 +8,7 @@ import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
 import com.sedmelluq.discord.lavaplayer.track.AudioPlaylist;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 
-import AlphaChan.main.command.SimpleBotSubcommand;
+import AlphaChan.main.command.SlashSubcommand;
 import AlphaChan.main.gui.discord.table.MusicPlayerTable;
 import AlphaChan.main.handler.MessageHandler;
 import AlphaChan.main.handler.MusicPlayerHandler;
@@ -22,7 +22,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 
-public class PlayCommand extends SimpleBotSubcommand {
+public class PlayCommand extends SlashSubcommand {
 
     public PlayCommand() {
         super("play", "Phát một bản nhạc qua link hoặc tên, gọi ra bảng điều khiển phát nhạc");

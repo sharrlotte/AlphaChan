@@ -8,8 +8,8 @@ import com.mongodb.client.MongoCursor;
 
 import AlphaChan.BotConfig;
 import AlphaChan.BotConfig.Config;
-import AlphaChan.main.command.SimpleBotSubcommand;
-import AlphaChan.main.command.SimplePageTable;
+import AlphaChan.main.command.SlashSubcommand;
+import AlphaChan.main.command.PageTable;
 import AlphaChan.main.handler.DatabaseHandler;
 import AlphaChan.main.handler.DatabaseHandler.Database;
 import AlphaChan.main.handler.DatabaseHandler.LogType;
@@ -20,7 +20,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 
-public class DeletedMessageCommand extends SimpleBotSubcommand {
+public class DeletedMessageCommand extends SlashSubcommand {
 
     private final int MAX_RETRIEVE = 100;
     private final int MAX_DISPLAY = 10;
@@ -69,7 +69,7 @@ public class DeletedMessageCommand extends SimpleBotSubcommand {
         Document messageData;
         EmbedBuilder builder = new EmbedBuilder();
         StringBuilder field = new StringBuilder();
-        SimplePageTable table = new SimplePageTable(event, 2);
+        PageTable table = new PageTable(event, 2);
 
         table.addButton(table.primary("<<<", () -> table.firstPage()));
         table.addButton(table.primary("<", () -> table.previousPage()));

@@ -1,13 +1,13 @@
 package AlphaChan.main.gui.discord.table;
 
 import AlphaChan.BotConfig;
-import AlphaChan.main.command.SimplePageTable;
+import AlphaChan.main.command.PageTable;
 import AlphaChan.main.music.MusicPlayer;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.requests.restaction.MessageEditAction;
 
-public class MusicPlayerTable extends SimplePageTable {
+public class MusicPlayerTable extends PageTable {
 
     private final MusicPlayer player;
 

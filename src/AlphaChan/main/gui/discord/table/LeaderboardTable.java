@@ -9,24 +9,25 @@ import javax.annotation.Nonnull;
 import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
 
-import AlphaChan.main.command.SimplePageTable;
+import AlphaChan.main.command.PageTable;
 import AlphaChan.main.command.slash.subcommands.user.LeaderboardCommand.LEADERBOARD;
 import AlphaChan.main.command.slash.subcommands.user.LeaderboardCommand.ORDER;
 import AlphaChan.main.data.user.UserCache;
+import AlphaChan.main.data.user.UserData;
 import AlphaChan.main.data.user.UserCache.PointType;
 import AlphaChan.main.handler.DatabaseHandler;
 import AlphaChan.main.handler.UserHandler;
 import AlphaChan.main.handler.DatabaseHandler.Database;
 import AlphaChan.main.util.Log;
+
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 
 import static AlphaChan.AlphaChan.*;
 
-public class LeaderboardTable extends SimplePageTable {
+public class LeaderboardTable extends PageTable {
 
     private final LEADERBOARD leaderboard;
     private final ORDER order;
@@ -47,11 +48,11 @@ public class LeaderboardTable extends SimplePageTable {
     }
 
     @Override
-    public MessageEmbed getCurrentPage() {
+    public EmbedBuilder getCurrentPage() {
         if (users.size() <= 0)
             getLeaderboardData(this.leaderboard, this.order);
 
-        return addPageFooter(getLeaderboard()).build();
+        return addPageFooter(getLeaderboard());
     }
 
     @Override
@@ -71,10 +72,10 @@ public class LeaderboardTable extends SimplePageTable {
         case ALL:
             jda.getGuilds().forEach(guild -> {
                 String guildId = guild.getId();
-                MongoCollection<UserCache> collection = DatabaseHandler.getCollection(Database.USER, guildId, UserCache.class);
+                MongoCollection<UserData> collection = DatabaseHandler.getCollection(Database.USER, guildId, UserData.class);
                 try {
-                    FindIterable<UserCache> data = collection.find();
-                    data.forEach(d -> users.add(d));
+                    FindIterable<UserData> data = collection.find();
+                    data.forEach(d -> users.add(new UserCache(d)));
                 } catch (Exception e) {
 
                 }
@@ -85,20 +86,18 @@ public class LeaderboardTable extends SimplePageTable {
             Guild guild = getEvent().getGuild();
             if (guild == null)
                 throw new IllegalStateException("Guild not found");
+
             String guildId = guild.getId();
-            MongoCollection<UserCache> collection = DatabaseHandler.getCollection(Database.USER, guildId, UserCache.class);
+            MongoCollection<UserData> collection = DatabaseHandler.getCollection(Database.USER, guildId, UserData.class);
 
-            try {
-                FindIterable<UserCache> data = collection.find();
-                data.forEach(d -> users.add(d));
-            } catch (Exception e) {
-
-            }
+            FindIterable<UserData> data = collection.find();
+            data.forEach(d -> users.add(new UserCache(d)));
             break;
 
         case ONLINE:
             users.addAll(UserHandler.getCachedUser());
         }
+
         switch (order) {
         case MONEY:
             users.sort(new Comparator<UserCache>() {
@@ -156,10 +155,8 @@ public class LeaderboardTable extends SimplePageTable {
 
     public String getUserInformation(UserCache user, ORDER order) {
         try {
-            String data = user.getData().getName() + ": ";
-
+            String data = user.getName() + ": ";
             switch (order) {
-
             case MONEY:
                 data += user.getPoint(PointType.MONEY) + " Alpha";
                 break;

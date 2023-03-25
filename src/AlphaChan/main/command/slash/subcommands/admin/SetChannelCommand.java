@@ -8,12 +8,12 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 
 import java.util.HashMap;
 
-import AlphaChan.main.command.SimpleBotSubcommand;
+import AlphaChan.main.command.SlashSubcommand;
 import AlphaChan.main.data.user.GuildCache;
 import AlphaChan.main.data.user.GuildCache.ChannelType;
 import AlphaChan.main.handler.GuildHandler;
 
-public class SetChannelCommand extends SimpleBotSubcommand {
+public class SetChannelCommand extends SlashSubcommand {
 
     public SetChannelCommand() {
         super("setchannel", "Cài đặt các kênh của máy chủ");

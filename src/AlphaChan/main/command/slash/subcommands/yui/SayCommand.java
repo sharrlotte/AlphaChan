@@ -11,11 +11,11 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import java.util.HashMap;
 import java.util.List;
 
-import AlphaChan.main.command.SimpleBotSubcommand;
+import AlphaChan.main.command.SlashSubcommand;
 
 import static AlphaChan.AlphaChan.*;
 
-public class SayCommand extends SimpleBotSubcommand {
+public class SayCommand extends SlashSubcommand {
 
     public SayCommand() {
         super("say", "Yui only");

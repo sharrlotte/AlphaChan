@@ -2,10 +2,10 @@ package AlphaChan.main.command.console;
 
 import AlphaChan.BotConfig;
 import AlphaChan.main.command.ConsoleCommandEvent;
-import AlphaChan.main.command.SimpleConsoleCommand;
+import AlphaChan.main.command.ConsoleCommand;
 import AlphaChan.main.util.Log;
 
-public class ShowConfigConsole extends SimpleConsoleCommand {
+public class ShowConfigConsole extends ConsoleCommand {
 
     public ShowConfigConsole() {
         super("show-config", "\n\t- <> Show bot configures");

@@ -1,6 +1,6 @@
 package AlphaChan.main.command.slash.subcommands.user;
 
-import AlphaChan.main.command.SimpleBotSubcommand;
+import AlphaChan.main.command.SlashSubcommand;
 import AlphaChan.main.data.user.UserCache;
 import AlphaChan.main.data.user.UserCache.PointType;
 import AlphaChan.main.handler.UserHandler;
@@ -14,7 +14,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 
 import java.util.HashMap;
 
-public class TransferCommand extends SimpleBotSubcommand {
+public class TransferCommand extends SlashSubcommand {
 
     public TransferCommand() {
         super("transfer", "Chuyển chỉ số cho người khác", true, false);
@@ -69,7 +69,7 @@ public class TransferCommand extends SimpleBotSubcommand {
                 if (sender.getPoint(type) - point >= 0) {
                     sender.addPoint(type, -point);
                     receiver.addPoint(type, point);
-                    result = "Đã chuyển " + point + " điểm PVP cho " + receiver.getData().getName();
+                    result = "Đã chuyển " + point + " điểm PVP cho " + receiver.getName();
 
                 } else {
                     result = "Không đủ điểm để chuyển";

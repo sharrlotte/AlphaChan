@@ -23,7 +23,7 @@ import com.mongodb.client.MongoCollection;
 
 import AlphaChan.BotConfig;
 import AlphaChan.BotConfig.Config;
-import AlphaChan.main.command.SimpleBotSubcommand;
+import AlphaChan.main.command.SlashSubcommand;
 import AlphaChan.main.data.mindustry.SchematicCache;
 import AlphaChan.main.data.mindustry.SchematicData;
 import AlphaChan.main.data.mindustry.SchematicInfo;
@@ -35,7 +35,7 @@ import AlphaChan.main.handler.NetworkHandler;
 import AlphaChan.main.handler.DatabaseHandler.Database;
 import AlphaChan.main.util.Log;
 
-public class PostSchemCommand extends SimpleBotSubcommand {
+public class PostSchemCommand extends SlashSubcommand {
 
     private final String SEPARATOR = ",";
 

@@ -5,7 +5,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import javax.annotation.Nonnull;
 
-import AlphaChan.main.command.SimpleTable;
+import AlphaChan.main.command.Table;
 import AlphaChan.main.util.Log;
 
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
@@ -16,12 +16,11 @@ import static AlphaChan.AlphaChan.*;
 public final class TableHandler extends ListenerAdapter implements Updatable {
 
     private static TableHandler instance = new TableHandler();
-    private static ConcurrentHashMap<String, SimpleTable> tableCache = new ConcurrentHashMap<String, SimpleTable>();
+    private static ConcurrentHashMap<String, Table> tableCache = new ConcurrentHashMap<String, Table>();
 
     private TableHandler() {
         jda.addEventListener(this);
         UpdatableHandler.addListener(this);
-
         Log.system("Table handler up");
     }
 
@@ -31,7 +30,10 @@ public final class TableHandler extends ListenerAdapter implements Updatable {
         return instance;
     }
 
-    public static void add(SimpleTable table) {
+    public static void add(Table table) {
+        if (tableCache.containsKey(table.getId()))
+            tableCache.get(table.getId()).deleteTable();
+
         tableCache.put(table.getId(), table);
     }
 
@@ -50,9 +52,9 @@ public final class TableHandler extends ListenerAdapter implements Updatable {
     }
 
     public void update() {
-        Iterator<SimpleTable> iterator = tableCache.values().iterator();
+        Iterator<Table> iterator = tableCache.values().iterator();
         while (iterator.hasNext()) {
-            SimpleTable table = iterator.next();
+            Table table = iterator.next();
             if (!table.isAlive(1)) {
                 iterator.remove();
             }

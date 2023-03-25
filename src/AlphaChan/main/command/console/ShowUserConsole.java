@@ -1,12 +1,12 @@
 package AlphaChan.main.command.console;
 
 import AlphaChan.main.command.ConsoleCommandEvent;
-import AlphaChan.main.command.SimpleConsoleCommand;
+import AlphaChan.main.command.ConsoleCommand;
 import AlphaChan.main.data.user.UserCache;
 import AlphaChan.main.handler.UserHandler;
 import AlphaChan.main.util.Log;
 
-public class ShowUserConsole extends SimpleConsoleCommand {
+public class ShowUserConsole extends ConsoleCommand {
 
     public ShowUserConsole() {
         super("show-user", "\n\t- <>: Show all guild that has been cached" + //
@@ -19,7 +19,7 @@ public class ShowUserConsole extends SimpleConsoleCommand {
         if (command.getArgumentCount() == 0) {
             Log.info("USER STATUS", "Users count: " + UserHandler.getActiveUserCount());
             for (UserCache ud : UserHandler.getUserCache()) {
-                Log.info("USER STATUS", ud.getData().toDocument().toJson().toString());
+                Log.info("USER STATUS", ud.getData().toDocument().toString());
             }
         } else if (command.getArgumentCount() == 2) {
             String guildId = command.nextString();

@@ -42,6 +42,7 @@ public final class UpdatableHandler {
                 listener.update();
 
             updateStatus();
+
         } catch (Exception e) {
             Log.error(e);
         }
@@ -51,8 +52,8 @@ public final class UpdatableHandler {
         if (jda == null)
             return;
 
-        jda.getPresence().setActivity(Activity.playing("with " + GuildHandler.getActiveGuildCount() + " servers | "
-                + UserHandler.getActiveUserCount() + " users"));
+        jda.getPresence().setActivity(Activity
+                .playing("with " + GuildHandler.getActiveGuildCount() + " servers | " + UserHandler.getActiveUserCount() + " users"));
     }
 
     public static void run(String name, long delay, long period, Runnable r) {

@@ -1,12 +1,12 @@
 package AlphaChan.main.command.slash.subcommands.music;
 
-import AlphaChan.main.command.SimpleBotSubcommand;
+import AlphaChan.main.command.SlashSubcommand;
 import AlphaChan.main.handler.MusicPlayerHandler;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 
-public class SkipCommand extends SimpleBotSubcommand {
+public class SkipCommand extends SlashSubcommand {
 
     public SkipCommand() {
         super("skip", "Bỏ qua danh sách phát");

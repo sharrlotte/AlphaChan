@@ -1,12 +1,12 @@
 package AlphaChan.main.command.context;
 
-import AlphaChan.main.command.SimpleBotContextMenu;
+import AlphaChan.main.command.ContextMenu;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.MessageEmbed.AuthorInfo;
 import net.dv8tion.jda.api.events.interaction.command.MessageContextInteractionEvent;
 
-public class DeleteMessageContextMenu extends SimpleBotContextMenu {
+public class DeleteMessageContextMenu extends ContextMenu {
 
     public DeleteMessageContextMenu() {
         super("Delete Message");

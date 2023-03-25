@@ -1,16 +1,23 @@
 package AlphaChan.main.data.user;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import org.bson.Document;
 
-public class UserData extends TimeObject {
+public class UserData {
 
     private String userId = new String();
     private String name = new String();
     private String guildId = new String();
 
-    private int[] pointList = new int[UserCache.PointType.values().length];
+    private List<Integer> points = Arrays.asList(0, 0, 0, 0);// new ArrayList<>(UserCache.PointType.values().length);
+
+    // For codec
+    public UserData() {
+
+    }
 
     public String getUserId() {
         return this.userId;
@@ -36,37 +43,18 @@ public class UserData extends TimeObject {
         this.guildId = guildId;
     }
 
-    public int[] getPoints() {
-        return this.pointList;
+    public List<Integer> getPoints() {
+        return this.points;
     }
 
-    public void setPoints(int[] point) {
-        this.pointList = point;
-    }
-
-    // For codec
-    public UserData() {
-
-    }
-
-    public UserData(String guildId, String userId, String name, Integer point, Integer level, Integer money,
-            Integer pvpPoint) {
-        this.userId = userId;
-        this.guildId = guildId;
-        this.name = name;
-    }
-
-    @Override
-    public String toString() {
-        return "userId:" + this.userId + "\n" + "guildId:" + this.guildId + "\n" + "point:" + Arrays.toString(pointList)
-                + "\n";
+    public void setPoints(ArrayList<Integer> points) {
+        this.points = points;
     }
 
     public Document toDocument() {
         return new Document().append("userId", this.userId).//
                 append("name", this.name).//
                 append("guildId", this.guildId).//
-                append("point", this.pointList);
+                append("point", this.points);
     }
-
 }

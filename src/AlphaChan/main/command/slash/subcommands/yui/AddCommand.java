@@ -10,12 +10,12 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 
 import java.util.HashMap;
 
-import AlphaChan.main.command.SimpleBotSubcommand;
+import AlphaChan.main.command.SlashSubcommand;
 import AlphaChan.main.data.user.UserCache;
 import AlphaChan.main.data.user.UserCache.PointType;
 import AlphaChan.main.handler.UserHandler;
 
-public class AddCommand extends SimpleBotSubcommand {
+public class AddCommand extends SlashSubcommand {
 
     public AddCommand() {
         super("add", "Yui only");
@@ -40,6 +40,7 @@ public class AddCommand extends SimpleBotSubcommand {
         OptionMapping pointOption = event.getOption("point");
         if (pointOption == null)
             return;
+
         Guild guild = event.getGuild();
         if (guild == null)
             return;
@@ -47,15 +48,13 @@ public class AddCommand extends SimpleBotSubcommand {
         User user = userOption.getAsUser();
         int point = pointOption.getAsInt();
         Member r = guild.getMember(user);
-        Member s = event.getMember();
 
-        if (r == null || s == null)
+        if (r == null)
             return;
 
         try {
             PointType type = PointType.valueOf(typeOption.getAsString());
 
-            UserCache sender = UserHandler.getUserNoCache(s);
             UserCache receiver = UserHandler.getUserNoCache(r);
 
             String result = "Loại điểm muốn chuyển không hợp lệ";
@@ -66,15 +65,8 @@ public class AddCommand extends SimpleBotSubcommand {
                 break;
 
             default:
-                if (sender.getPoint(type) - point >= 0) {
-                    sender.addPoint(type, -point);
-                    receiver.addPoint(type, point);
-                    result = "Đã chuyển " + point + " điểm PVP cho " + receiver.getData().getName();
-
-                } else {
-                    result = "Không đủ điểm để chuyển";
-                    break;
-                }
+                receiver.addPoint(type, point);
+                result = "Đã thêm " + point + " điểm " + type.name() + " cho " + receiver.getName();
             }
 
             reply(event, result, 30);

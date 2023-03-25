@@ -1,9 +1,9 @@
 package AlphaChan.main.command.console;
 
 import AlphaChan.main.command.ConsoleCommandEvent;
-import AlphaChan.main.command.SimpleConsoleCommand;
+import AlphaChan.main.command.ConsoleCommand;
 
-public class ShutdownConsole extends SimpleConsoleCommand {
+public class ShutdownConsole extends ConsoleCommand {
 
     public ShutdownConsole() {
         super("shutdown", "\n\t- Shutdown the bot");

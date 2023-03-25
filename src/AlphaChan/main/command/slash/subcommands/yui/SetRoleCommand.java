@@ -1,6 +1,6 @@
 package AlphaChan.main.command.slash.subcommands.yui;
 
-import AlphaChan.main.command.SimpleBotSubcommand;
+import AlphaChan.main.command.SlashSubcommand;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
@@ -9,7 +9,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 
-public class SetRoleCommand extends SimpleBotSubcommand {
+public class SetRoleCommand extends SlashSubcommand {
 
     public SetRoleCommand() {
         super("setrole", "Yui only");

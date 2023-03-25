@@ -4,11 +4,11 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
-import AlphaChan.main.command.SimpleBotSubcommand;
+import AlphaChan.main.command.SlashSubcommand;
 import AlphaChan.main.handler.NetworkHandler;
 import AlphaChan.main.handler.ServerStatusHandler;
 
-public class PingCommand extends SimpleBotSubcommand {
+public class PingCommand extends SlashSubcommand {
     public PingCommand() {
         super("ping", "Ping máy chủ mindustry thông qua ip");
         this.addOption(OptionType.STRING, "ip", "Ip của máy chủ", true);

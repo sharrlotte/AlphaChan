@@ -1,10 +1,10 @@
 package AlphaChan.main.command.slash.subcommands.music;
 
-import AlphaChan.main.command.SimpleBotSubcommand;
+import AlphaChan.main.command.SlashSubcommand;
 import AlphaChan.main.music.MusicPlayer;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 
-public class LeaveCommand extends SimpleBotSubcommand {
+public class LeaveCommand extends SlashSubcommand {
 
     public LeaveCommand() {
         super("leave", "Khiến bot rời khỏi phòng nhạc");

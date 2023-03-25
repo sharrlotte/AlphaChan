@@ -1,15 +1,15 @@
 package AlphaChan.main.command;
 
-public abstract class SimpleConsoleCommand {
+public abstract class ConsoleCommand {
 
     private String name = new String();
     private String description = new String();
 
-    public SimpleConsoleCommand(String name) {
+    public ConsoleCommand(String name) {
         this.name = name;
     }
 
-    public SimpleConsoleCommand(String name, String description) {
+    public ConsoleCommand(String name, String description) {
         this.name = name;
         this.description = description;
     }

@@ -23,7 +23,7 @@ import net.dv8tion.jda.api.interactions.components.LayoutComponent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.requests.restaction.MessageEditAction;
 
-public abstract class SimpleTable extends TimeObject {
+public abstract class Table extends TimeObject {
 
     private List<CallbackButton> buttons = new ArrayList<CallbackButton>();
     private List<Integer> rows = new ArrayList<Integer>(Arrays.asList(0));
@@ -37,7 +37,7 @@ public abstract class SimpleTable extends TimeObject {
 
     private static final String SEPARATOR = ":";
 
-    public SimpleTable(SlashCommandInteractionEvent event, int aliveLimit) {
+    public Table(SlashCommandInteractionEvent event, int aliveLimit) {
         super(aliveLimit);
         this.event = event;
 

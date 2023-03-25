@@ -15,7 +15,7 @@ import com.mongodb.client.model.Filters;
 
 import AlphaChan.BotConfig;
 import AlphaChan.BotConfig.Config;
-import AlphaChan.main.command.SimplePageTable;
+import AlphaChan.main.command.PageTable;
 import AlphaChan.main.data.mindustry.SchematicCache;
 import AlphaChan.main.data.mindustry.SchematicData;
 import AlphaChan.main.data.mindustry.SchematicInfo;
@@ -40,7 +40,7 @@ import net.dv8tion.jda.api.utils.FileUpload;
 
 import static AlphaChan.AlphaChan.*;
 
-public class SchematicTable extends SimplePageTable {
+public class SchematicTable extends PageTable {
 
     private List<SchematicInfoCache> schematicInfoList = new ArrayList<>();
 

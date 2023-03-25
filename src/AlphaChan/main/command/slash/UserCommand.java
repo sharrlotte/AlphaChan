@@ -1,6 +1,6 @@
 package AlphaChan.main.command.slash;
 
-import AlphaChan.main.command.SimpleBotCommand;
+import AlphaChan.main.command.SlashCommand;
 import AlphaChan.main.command.slash.subcommands.user.AvatarCommand;
 import AlphaChan.main.command.slash.subcommands.user.DailyCommand;
 import AlphaChan.main.command.slash.subcommands.user.DeletedMessageCommand;
@@ -8,7 +8,7 @@ import AlphaChan.main.command.slash.subcommands.user.InfoCommand;
 import AlphaChan.main.command.slash.subcommands.user.LeaderboardCommand;
 import AlphaChan.main.command.slash.subcommands.user.TransferCommand;
 
-public class UserCommand extends SimpleBotCommand {
+public class UserCommand extends SlashCommand {
     public UserCommand() {
         super("user", "Lệnh liên quan đến người dùng");
         addSubcommands(new DailyCommand());

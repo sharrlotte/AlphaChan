@@ -16,7 +16,7 @@ public class StringUtils {
                 + (seconds < 10 ? "0" + seconds : seconds);
     }
 
-    public static String toProgressBar(double percent, int barLength, String mark, String head, String tail) {
+    public static String getProgressBar(double percent, int barLength, String mark, String head, String tail) {
         String str = head;
         for (int i = 0; i < barLength; i++)
             if (i == (int) (percent * barLength) - 1)

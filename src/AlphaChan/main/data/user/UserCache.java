@@ -14,7 +14,7 @@ import AlphaChan.main.handler.GuildHandler;
 import AlphaChan.main.handler.DatabaseHandler.Database;
 import AlphaChan.main.handler.DatabaseHandler.LogType;
 
-import static AlphaChan.AlphaChan.jda;
+import static AlphaChan.AlphaChan.*;
 
 public class UserCache extends TimeObject implements DatabaseObject {
 
@@ -24,7 +24,7 @@ public class UserCache extends TimeObject implements DatabaseObject {
         EXP, LEVEL, MONEY, PVP_POINT;
     }
 
-    public UserCache(String userId, String guildId) {
+    public UserCache(String guildId, String userId) {
         this.data = new UserData();
         this.data.setUserId(userId);
         this.data.setGuildId(guildId);
@@ -36,6 +36,16 @@ public class UserCache extends TimeObject implements DatabaseObject {
 
     public UserData getData() {
         return data;
+    }
+
+    public String getName() {
+        if (!data.getName().isBlank())
+            return data.getName();
+
+        Member member = getMember();
+        data.setName(member.getEffectiveName());
+
+        return data.getName();
     }
 
     public String getHashId() {
@@ -56,7 +66,7 @@ public class UserCache extends TimeObject implements DatabaseObject {
         Member member = guild.getMemberById(data.getUserId());
         if (member == null) {
             killTimer();
-            throw new IllegalStateException("MEMBER IS NOT EXISTS");
+            throw new IllegalStateException("Member not found with id <" + data.getUserId() + ">");
         }
         return member;
     }
@@ -65,13 +75,13 @@ public class UserCache extends TimeObject implements DatabaseObject {
         Guild guild = jda.getGuildById(data.getGuildId());
         if (guild == null) {
             killTimer();
-            throw new IllegalStateException("GUILD IS NOT EXISTS");
+            throw new IllegalStateException("Guild not found with id + <" + data.getGuildId() + ">");
         }
         return guild;
     }
 
     public int getPoint(PointType pointType, UserData data) {
-        return data.getPoints()[pointType.ordinal()];
+        return data.getPoints().get(pointType.ordinal());
     }
 
     public int getPoint(PointType pointType) {
@@ -79,7 +89,7 @@ public class UserCache extends TimeObject implements DatabaseObject {
     }
 
     public void setPoint(PointType pointType, int value, UserData data) {
-        data.getPoints()[pointType.ordinal()] = value;
+        data.getPoints().set(pointType.ordinal(), value);
     }
 
     public void setPoint(PointType pointType, int value) {
@@ -87,7 +97,7 @@ public class UserCache extends TimeObject implements DatabaseObject {
     }
 
     public int addPoint(PointType pointType, int value, UserData data) {
-        data.getPoints()[pointType.ordinal()] += value;
+        data.getPoints().set(pointType.ordinal(), value + getPoint(pointType, data));
         return value;
     }
 

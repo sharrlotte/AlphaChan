@@ -2,11 +2,11 @@ package AlphaChan.main.command.console;
 
 import AlphaChan.BotConfig;
 import AlphaChan.main.command.ConsoleCommandEvent;
-import AlphaChan.main.command.SimpleConsoleCommand;
+import AlphaChan.main.command.ConsoleCommand;
 import AlphaChan.main.util.Log;
 import AlphaChan.main.util.StringUtils;
 
-public class SetConfigConsole extends SimpleConsoleCommand {
+public class SetConfigConsole extends ConsoleCommand {
 
     public SetConfigConsole() {
         super("set-config", "\n\t- <key> <value>: Set bot configure");

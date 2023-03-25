@@ -1,13 +1,13 @@
 package AlphaChan.main.command.slash;
 
-import AlphaChan.main.command.SimpleBotCommand;
+import AlphaChan.main.command.SlashCommand;
 import AlphaChan.main.command.slash.subcommands.bot.AskCommand;
 import AlphaChan.main.command.slash.subcommands.bot.GuildCommand;
 import AlphaChan.main.command.slash.subcommands.bot.HelpCommand;
 import AlphaChan.main.command.slash.subcommands.bot.InfoCommand;
 import AlphaChan.main.command.slash.subcommands.bot.PingCommand;
 
-public class BotCommand extends SimpleBotCommand {
+public class BotCommand extends SlashCommand {
     public BotCommand() {
         super("bot", "Các lệnh liên quan đến bot");
         addSubcommands(new InfoCommand());

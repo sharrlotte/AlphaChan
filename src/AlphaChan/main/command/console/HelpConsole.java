@@ -4,11 +4,11 @@ import java.util.ArrayList;
 import java.util.Comparator;
 
 import AlphaChan.main.command.ConsoleCommandEvent;
-import AlphaChan.main.command.SimpleConsoleCommand;
+import AlphaChan.main.command.ConsoleCommand;
 import AlphaChan.main.handler.CommandHandler.ConsoleCommandHandler;
 import AlphaChan.main.util.Log;
 
-public class HelpConsole extends SimpleConsoleCommand {
+public class HelpConsole extends ConsoleCommand {
 
     public HelpConsole() {
         super("help", "\n\t- <>: Show all commands" + //
@@ -44,7 +44,7 @@ public class HelpConsole extends SimpleConsoleCommand {
         } else if (command.getArgumentCount() == 1) {
             String commandName = command.nextString();
 
-            SimpleConsoleCommand cc = ConsoleCommandHandler.getCommand(commandName);
+            ConsoleCommand cc = ConsoleCommandHandler.getCommand(commandName);
             if (cc == null)
                 Log.warning("Command with name " + commandName + " doesn't exists");
             else

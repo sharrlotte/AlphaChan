@@ -9,10 +9,10 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 
 import java.util.HashMap;
 
-import AlphaChan.main.command.SimpleBotSubcommand;
+import AlphaChan.main.command.SlashSubcommand;
 import AlphaChan.main.gui.discord.table.LeaderboardTable;
 
-public class LeaderboardCommand extends SimpleBotSubcommand {
+public class LeaderboardCommand extends SlashSubcommand {
 
     public enum ORDER {
         LEVEL, MONEY, PVP_POINT

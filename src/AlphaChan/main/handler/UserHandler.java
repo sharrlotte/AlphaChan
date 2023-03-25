@@ -18,6 +18,7 @@ import AlphaChan.BotConfig;
 import AlphaChan.BotConfig.Config;
 import AlphaChan.main.data.user.GuildCache;
 import AlphaChan.main.data.user.UserCache;
+import AlphaChan.main.data.user.UserData;
 import AlphaChan.main.data.user.UserCache.PointType;
 import AlphaChan.main.handler.DatabaseHandler.Database;
 import AlphaChan.main.handler.DatabaseHandler.LogType;
@@ -27,6 +28,8 @@ import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.Role;
 
+import static AlphaChan.AlphaChan.*;
+
 public final class UserHandler implements Updatable {
 
     private static UserHandler instance = new UserHandler();
@@ -35,6 +38,8 @@ public final class UserHandler implements Updatable {
 
     private UserHandler() {
         UpdatableHandler.addListener(this);
+
+        onShutDown.connect((code) -> save());
 
         Log.system("User handler up");
     }
@@ -58,11 +63,19 @@ public final class UserHandler implements Updatable {
         while (iterator.hasNext()) {
             UserCache user = iterator.next();
             if (!user.isAlive(1)) {
-                Log.info("STATUS", "User <" + user.getData().getName() + ":" + user.getData().getUserId() + "> offline");
+                Log.info("STATUS", "User <" + user.getName() + ":" + user.getData().getUserId() + "> offline");
                 UpdatableHandler.updateStatus();
                 user.update();
                 iterator.remove();
             }
+        }
+    }
+
+    public void save() {
+        Iterator<UserCache> iterator = userCache.values().iterator();
+        while (iterator.hasNext()) {
+            UserCache user = iterator.next();
+            user.update();
         }
     }
 
@@ -126,7 +139,7 @@ public final class UserHandler implements Updatable {
         UserCache userData = new UserCache(guildId, userId);
         // Key is hashId = guildId + userId
         userCache.put(userData.getHashId(), userData);
-        Log.info("STATUS", "User <" + userData.getData().getName() + ":" + userId + "> online");
+        Log.info("STATUS", "User <" + userData.getName() + ":" + userId + "> online");
         UpdatableHandler.updateStatus();
         return userData;
     }
@@ -140,6 +153,8 @@ public final class UserHandler implements Updatable {
         String hashId = guildId + userId;
         if (userCache.containsKey(hashId))
             return userCache.get(hashId);
+
+        // If user exist in cache then return, else query user from Database
         return getUserFromDatabase(guildId, userId);
     }
 
@@ -147,7 +162,6 @@ public final class UserHandler implements Updatable {
     public static UserCache getUserNoCache(@Nonnull Member member) {
         String guildId = member.getGuild().getId();
         String userId = member.getId();
-        // If user exist in cache then return, else query user from Database
         return getUserNoCache(guildId, userId);
     }
 
@@ -184,14 +198,19 @@ public final class UserHandler implements Updatable {
             return new UserCache(guildId, userId);
 
         }
-        MongoCollection<UserCache> collection = DatabaseHandler.getDatabase(Database.USER).getCollection(guildId, UserCache.class);
+        MongoCollection<UserData> collection = DatabaseHandler.getDatabase(Database.USER).getCollection(guildId, UserData.class);
 
         // Get user from Database
         Bson filter = new Document().append("userId", userId);
-        FindIterable<UserCache> data = collection.find(filter);
-        UserCache first = data.first();
+        FindIterable<UserData> data = collection.find(filter);
+        UserData first = data.first();
+        UserCache cache;
+
         if (first == null)
-            first = new UserCache(guildId, userId);
-        return first;
+            cache = new UserCache(guildId, userId);
+        else
+            cache = new UserCache(first);
+
+        return cache;
     }
 }

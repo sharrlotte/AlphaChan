@@ -15,7 +15,7 @@ import AlphaChan.main.handler.DatabaseHandler;
 import AlphaChan.main.handler.DatabaseHandler.Database;
 import AlphaChan.main.handler.DatabaseHandler.LogType;
 
-import static AlphaChan.AlphaChan.jda;
+import static AlphaChan.AlphaChan.*;
 
 public class GuildCache extends TimeObject implements DatabaseObject {
 

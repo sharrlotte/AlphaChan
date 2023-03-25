@@ -2,7 +2,7 @@ package AlphaChan.main.command.slash.subcommands.admin;
 
 import java.util.List;
 
-import AlphaChan.main.command.SimpleBotSubcommand;
+import AlphaChan.main.command.SlashSubcommand;
 import AlphaChan.main.data.user.GuildCache;
 import AlphaChan.main.handler.GuildHandler;
 import net.dv8tion.jda.api.entities.Role;
@@ -10,7 +10,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 
-public class SetAdminCommand extends SimpleBotSubcommand {
+public class SetAdminCommand extends SlashSubcommand {
 
     public SetAdminCommand() {
         super("setadmin", "Cài đặt vai trò admin cho máy chủ");

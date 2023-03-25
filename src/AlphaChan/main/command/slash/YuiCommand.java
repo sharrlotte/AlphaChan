@@ -2,14 +2,14 @@ package AlphaChan.main.command.slash;
 
 import net.dv8tion.jda.api.events.interaction.command.CommandAutoCompleteInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import AlphaChan.main.command.SimpleBotCommand;
+import AlphaChan.main.command.SlashCommand;
 import AlphaChan.main.command.slash.subcommands.yui.AddCommand;
 import AlphaChan.main.command.slash.subcommands.yui.SayCommand;
 import AlphaChan.main.command.slash.subcommands.yui.SetRoleCommand;
 import AlphaChan.main.command.slash.subcommands.yui.UpdateCommand;
 import AlphaChan.main.handler.UserHandler;
 
-public class YuiCommand extends SimpleBotCommand {
+public class YuiCommand extends SlashCommand {
 
     public YuiCommand() {
         super("yui", "Yui only");

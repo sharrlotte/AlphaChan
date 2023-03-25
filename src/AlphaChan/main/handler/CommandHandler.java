@@ -3,9 +3,9 @@ package AlphaChan.main.handler;
 import org.jetbrains.annotations.NotNull;
 
 import AlphaChan.main.command.ConsoleCommandEvent;
-import AlphaChan.main.command.SimpleBotCommand;
-import AlphaChan.main.command.SimpleBotContextMenu;
-import AlphaChan.main.command.SimpleConsoleCommand;
+import AlphaChan.main.command.SlashCommand;
+import AlphaChan.main.command.ContextMenu;
+import AlphaChan.main.command.ConsoleCommand;
 import AlphaChan.main.command.console.HelpConsole;
 import AlphaChan.main.command.console.ReloadConfigConsole;
 import AlphaChan.main.command.console.ReloadSlashCommandConsole;
@@ -83,7 +83,7 @@ public class CommandHandler {
 
     public class SlashCommandHandler extends ListenerAdapter {
 
-        private static HashMap<String, SimpleBotCommand> slashCommands;
+        private static HashMap<String, SlashCommand> slashCommands;
 
         private void init() {
 
@@ -99,20 +99,20 @@ public class CommandHandler {
             Log.system("Slash command handler up");
         }
 
-        public static Collection<SimpleBotCommand> getCommands() {
+        public static Collection<SlashCommand> getCommands() {
             return slashCommands.values();
         }
 
-        public static HashMap<String, SimpleBotCommand> getCommandMap() {
+        public static HashMap<String, SlashCommand> getCommandMap() {
             return slashCommands;
         }
 
-        public static void addCommand(SimpleBotCommand command) {
+        public static void addCommand(SlashCommand command) {
             slashCommands.put(command.getName(), command);
         }
 
         public static void registerCommand(Guild guild) {
-            for (SimpleBotCommand command : slashCommands.values()) {
+            for (SlashCommand command : slashCommands.values()) {
                 guild.upsertCommand(command.command).queue();
             }
         }
@@ -186,7 +186,7 @@ public class CommandHandler {
         private static String command = new String();
         private static final String SEPARATOR = " ";
 
-        private static HashMap<String, SimpleConsoleCommand> consoleCommands;
+        private static HashMap<String, ConsoleCommand> consoleCommands;
 
         private void init() {
             consoleCommands = new HashMap<>();
@@ -209,11 +209,11 @@ public class CommandHandler {
             return consoleCommands.keySet();
         }
 
-        public static SimpleConsoleCommand getCommand(String name) {
+        public static ConsoleCommand getCommand(String name) {
             return consoleCommands.get(name);
         }
 
-        public static void addCommand(SimpleConsoleCommand command) {
+        public static void addCommand(ConsoleCommand command) {
             consoleCommands.put(command.getName(), command);
         }
 
@@ -264,7 +264,7 @@ public class CommandHandler {
 
     public final class ContextMenuHandler extends ListenerAdapter {
 
-        private static HashMap<String, SimpleBotContextMenu> contextCommands;
+        private static HashMap<String, ContextMenu> contextCommands;
 
         private void init() {
 
@@ -278,11 +278,11 @@ public class CommandHandler {
 
         }
 
-        public static Collection<SimpleBotContextMenu> getCommands() {
+        public static Collection<ContextMenu> getCommands() {
             return contextCommands.values();
         }
 
-        public static void addCommand(SimpleBotContextMenu command) {
+        public static void addCommand(ContextMenu command) {
             contextCommands.put(command.getName(), command);
         }
 

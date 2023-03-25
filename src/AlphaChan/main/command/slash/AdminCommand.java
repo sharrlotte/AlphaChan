@@ -1,7 +1,7 @@
 package AlphaChan.main.command.slash;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import AlphaChan.main.command.SimpleBotCommand;
+import AlphaChan.main.command.SlashCommand;
 import AlphaChan.main.command.slash.subcommands.admin.RefreshSlashCommand;
 import AlphaChan.main.command.slash.subcommands.admin.ReloadServerCommand;
 import AlphaChan.main.command.slash.subcommands.admin.SetAdminCommand;
@@ -9,7 +9,7 @@ import AlphaChan.main.command.slash.subcommands.admin.SetChannelCommand;
 import AlphaChan.main.command.slash.subcommands.admin.SetLevelRoleCommand;
 import AlphaChan.main.handler.UserHandler;
 
-public class AdminCommand extends SimpleBotCommand {
+public class AdminCommand extends SlashCommand {
 
     public AdminCommand() {
         super("admin", "Admin only");

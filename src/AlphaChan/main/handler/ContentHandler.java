@@ -486,7 +486,6 @@ public class ContentHandler {
             builder.addField("Tổng đầu ra", "- " + outputString.toString(), false);
 
         return builder;
-
     }
 
     public static File getSchematicFile(Schematic schem) throws IOException {

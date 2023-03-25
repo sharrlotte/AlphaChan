@@ -1,9 +1,9 @@
 package AlphaChan.main.command.slash.subcommands.bot;
 
-import AlphaChan.main.command.SimpleBotSubcommand;
+import AlphaChan.main.command.SlashSubcommand;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 
-public class PingCommand extends SimpleBotSubcommand {
+public class PingCommand extends SlashSubcommand {
 
     public PingCommand() {
         super("ping", "Hiển thị tốc độ kết nối giữa bot và discord");

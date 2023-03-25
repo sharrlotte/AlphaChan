@@ -4,7 +4,7 @@ import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.utils.TimeFormat;
-import AlphaChan.main.command.SimpleBotSubcommand;
+import AlphaChan.main.command.SlashSubcommand;
 import AlphaChan.main.data.user.UserCache;
 import AlphaChan.main.data.user.UserCache.PointType;
 import AlphaChan.main.handler.DatabaseHandler;
@@ -16,7 +16,7 @@ import org.bson.conversions.Bson;
 
 import com.mongodb.client.MongoCollection;
 
-public class DailyCommand extends SimpleBotSubcommand {
+public class DailyCommand extends SlashSubcommand {
     public DailyCommand() {
         super("daily", "Điểm danh", true, false);
     }

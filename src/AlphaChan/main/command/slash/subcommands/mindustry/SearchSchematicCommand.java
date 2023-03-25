@@ -12,7 +12,7 @@ import com.mongodb.client.model.Filters;
 
 import AlphaChan.BotConfig;
 import AlphaChan.BotConfig.Config;
-import AlphaChan.main.command.SimpleBotSubcommand;
+import AlphaChan.main.command.SlashSubcommand;
 import AlphaChan.main.data.mindustry.SchematicInfo;
 import AlphaChan.main.data.mindustry.SchematicTag;
 import AlphaChan.main.gui.discord.table.SchematicTable;
@@ -29,7 +29,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 
 import static com.mongodb.client.model.Sorts.descending;
 
-public class SearchSchematicCommand extends SimpleBotSubcommand {
+public class SearchSchematicCommand extends SlashSubcommand {
 
     private final String SEPARATOR = ",";
 

@@ -9,13 +9,13 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.interaction.command.MessageContextInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 
-public abstract class SimpleBotContextMenu {
+public abstract class ContextMenu {
 
     private String name;
 
     public CommandData command;
 
-    public SimpleBotContextMenu(@Nonnull String name) {
+    public ContextMenu(@Nonnull String name) {
         this.name = name;
         command = Commands.message(name);
     }

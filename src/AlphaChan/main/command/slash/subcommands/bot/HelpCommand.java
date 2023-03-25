@@ -7,11 +7,11 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 
 import java.util.HashMap;
 
-import AlphaChan.main.command.SimpleBotCommand;
-import AlphaChan.main.command.SimpleBotSubcommand;
+import AlphaChan.main.command.SlashCommand;
+import AlphaChan.main.command.SlashSubcommand;
 import AlphaChan.main.handler.CommandHandler.SlashCommandHandler;
 
-public class HelpCommand extends SimpleBotSubcommand {
+public class HelpCommand extends SlashSubcommand {
     public HelpCommand() {
         super("help", "Hiển thị thông tin các lệnh");
         addOption(OptionType.STRING, "command", "Tên lệnh", true, true);
@@ -34,7 +34,7 @@ public class HelpCommand extends SimpleBotSubcommand {
         String command = commandOption.getAsString();
         String subcommand = subcommandOption.getAsString();
         if (SlashCommandHandler.getCommandMap().containsKey(command))
-            reply(event, "/" + command + " " + subcommand + "\n"
+            reply(event, "/" + command + " " + subcommand + ":"
                     + SlashCommandHandler.getCommandMap().get(command).getHelpString(subcommand), 60);
         else
             reply(event, "Lệnh " + command + " " + subcommand + " không tồn tại", 10);
@@ -53,7 +53,7 @@ public class HelpCommand extends SimpleBotSubcommand {
             if (commandOption == null)
                 return;
             String command = commandOption.getAsString();
-            SimpleBotCommand subcommands = SlashCommandHandler.getCommandMap().get(command);
+            SlashCommand subcommands = SlashCommandHandler.getCommandMap().get(command);
             if (subcommands == null)
                 return;
             HashMap<String, String> options = new HashMap<String, String>();

@@ -2,10 +2,10 @@ package AlphaChan.main.command.console;
 
 import AlphaChan.BotConfig;
 import AlphaChan.main.command.ConsoleCommandEvent;
-import AlphaChan.main.command.SimpleConsoleCommand;
+import AlphaChan.main.command.ConsoleCommand;
 import AlphaChan.main.util.Log;
 
-public class SaveConfigConsole extends SimpleConsoleCommand {
+public class SaveConfigConsole extends ConsoleCommand {
 
     public SaveConfigConsole() {
         super("save-config", "<> Save bot config");

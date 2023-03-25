@@ -8,13 +8,13 @@ import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.requests.restaction.MessageEditAction;
 
-public class SimplePageTable extends SimpleTable {
+public class PageTable extends Table {
 
     private List<EmbedBuilder> table = new ArrayList<EmbedBuilder>();
     protected int pageNumber = 0;
     protected boolean showPageNumber = true;
 
-    public SimplePageTable(SlashCommandInteractionEvent event, int aliveLimit) {
+    public PageTable(SlashCommandInteractionEvent event, int aliveLimit) {
         super(event, aliveLimit);
     }
 
@@ -24,9 +24,9 @@ public class SimplePageTable extends SimpleTable {
         return table.add(new EmbedBuilder(value));
     }
 
-    public MessageEmbed getCurrentPage() {
+    public EmbedBuilder getCurrentPage() {
         EmbedBuilder value = table.get(pageNumber);
-        return addPageFooter(value).build();
+        return addPageFooter(value);
     }
 
     public EmbedBuilder addPageFooter(EmbedBuilder value) {
@@ -73,7 +73,7 @@ public class SimplePageTable extends SimpleTable {
             getMessage().editMessage("```Không có dữ liệu```").queue();
             return;
         }
-        MessageEmbed message = getCurrentPage();
+        MessageEmbed message = getCurrentPage().build();
         if (message == null) {
             getMessage().editMessage("```Đã hết dữ liệu```").queue();
             return;

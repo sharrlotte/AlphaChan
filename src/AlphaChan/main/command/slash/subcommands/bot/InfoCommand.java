@@ -8,7 +8,7 @@ import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import AlphaChan.BotConfig;
 import AlphaChan.BotConfig.Config;
-import AlphaChan.main.command.SimpleBotSubcommand;
+import AlphaChan.main.command.SlashSubcommand;
 import AlphaChan.main.handler.GuildHandler;
 import AlphaChan.main.handler.UserHandler;
 
@@ -16,7 +16,7 @@ import static AlphaChan.AlphaChan.*;
 
 import java.time.format.DateTimeFormatter;
 
-public class InfoCommand extends SimpleBotSubcommand {
+public class InfoCommand extends SlashSubcommand {
     public InfoCommand() {
         super("info", "Hiển thị thông tin cơ bản của bot");
     }
