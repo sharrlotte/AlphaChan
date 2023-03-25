@@ -12,7 +12,8 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import javax.annotation.Nonnull;
 
 import AlphaChan.main.command.SimpleBotSubcommand;
-import AlphaChan.main.data.user.UserData;
+import AlphaChan.main.data.user.UserCache;
+import AlphaChan.main.data.user.UserCache.PointType;
 import AlphaChan.main.handler.UserHandler;
 
 import java.util.List;
@@ -74,16 +75,16 @@ public class InfoCommand extends SimpleBotSubcommand {
             roleString = roleString.substring(0, roleString.length() - 2);
         // Display point
 
-        UserData user = UserHandler.getUserNoCache(member);
-        user._displayLevelName();
+        UserCache user = UserHandler.getUserNoCache(member);
 
         builder.addField("Vai trò", roleString, false);
         builder.addField("Thông tin cơ bản",
-                "Cấp: " + user.level + " (" + user.point + "\\" + user._getLevelCap() + ")" + //
-                        "\nTổng kinh nghiệm: " + user._getTotalPoint(),
+                "Cấp: " + user.getPoint(PointType.LEVEL) + " (" + user.getPoint(PointType.EXP) + "\\" + user.getLevelCap() + ")" + //
+                        "\nTổng kinh nghiệm: " + user.getTotalPoint(),
                 false);
-        builder.addField("Điểm", "Tổng điểm cống hiến: " + user.money + //
-                "\nTổng điểm pvp: " + user.pvpPoint, false);
+
+        builder.addField("Điểm",
+                "Tổng điểm cống hiến: " + user.getPoint(PointType.MONEY) + "\nTổng điểm pvp: " + user.getPoint(PointType.PVP_POINT), false);
 
         builder.setColor(Color.BLUE);
 

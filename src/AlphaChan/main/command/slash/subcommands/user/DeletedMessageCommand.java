@@ -11,8 +11,8 @@ import AlphaChan.BotConfig.Config;
 import AlphaChan.main.command.SimpleBotSubcommand;
 import AlphaChan.main.command.SimplePageTable;
 import AlphaChan.main.handler.DatabaseHandler;
-import AlphaChan.main.handler.DatabaseHandler.DATABASE;
-import AlphaChan.main.handler.DatabaseHandler.LOG_TYPE;
+import AlphaChan.main.handler.DatabaseHandler.Database;
+import AlphaChan.main.handler.DatabaseHandler.LogType;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
@@ -57,11 +57,11 @@ public class DeletedMessageCommand extends SimpleBotSubcommand {
         else
             amount = Math.min(amountOption.getAsInt(), MAX_RETRIEVE);
 
-        MongoCollection<Document> deletedCollection = DatabaseHandler.getDatabase(DATABASE.LOG)
-                .getCollection(LOG_TYPE.MESSAGE_DELETED.name());
+        MongoCollection<Document> deletedCollection = DatabaseHandler.getDatabase(Database.LOG)
+                .getCollection(LogType.MESSAGE_DELETED.name());
 
-        MongoCollection<Document> messageCollection = DatabaseHandler.getDatabase(DATABASE.LOG)
-                .getCollection(LOG_TYPE.MESSAGE.name());
+        MongoCollection<Document> messageCollection = DatabaseHandler.getDatabase(Database.LOG)
+                .getCollection(LogType.MESSAGE.name());
 
         FindIterable<Document> data = deletedCollection.find()
                 .sort(new Document().append(BotConfig.readString(Config.TIME_INSERT, "_timeInsert"), -1));
@@ -70,7 +70,7 @@ public class DeletedMessageCommand extends SimpleBotSubcommand {
         EmbedBuilder builder = new EmbedBuilder();
         StringBuilder field = new StringBuilder();
         SimplePageTable table = new SimplePageTable(event, 2);
-        
+
         table.addButton(table.primary("<<<", () -> table.firstPage()));
         table.addButton(table.primary("<", () -> table.previousPage()));
         table.addButton(table.deny("X", () -> table.deleteTable()));

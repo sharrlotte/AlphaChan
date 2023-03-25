@@ -17,7 +17,7 @@ import AlphaChan.main.data.mindustry.SchematicInfo;
 import AlphaChan.main.data.mindustry.SchematicTag;
 import AlphaChan.main.gui.discord.table.SchematicTable;
 import AlphaChan.main.handler.DatabaseHandler;
-import AlphaChan.main.handler.DatabaseHandler.DATABASE;
+import AlphaChan.main.handler.DatabaseHandler.Database;
 
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
@@ -67,13 +67,12 @@ public class SearchSchematicCommand extends SimpleBotSubcommand {
                 filter.append("authorId", member.getId());
         }
 
-        MongoCollection<SchematicInfo> collection = DatabaseHandler.getCollection(DATABASE.MINDUSTRY,
+        MongoCollection<SchematicInfo> collection = DatabaseHandler.getCollection(Database.MINDUSTRY,
                 BotConfig.readString(Config.SCHEMATIC_INFO_COLLECTION, null), SchematicInfo.class);
 
         FindIterable<SchematicInfo> schematicInfo;
         if (tags.length <= 0) {
-            schematicInfo = collection.find(filter, SchematicInfo.class)
-                    .sort(descending("star"));
+            schematicInfo = collection.find(filter, SchematicInfo.class).sort(descending("star"));
         } else {
             schematicInfo = collection.find(Filters.and(Filters.all("tag", tags), filter), SchematicInfo.class)
                     .sort(descending("star"));

@@ -30,7 +30,7 @@ import AlphaChan.main.data.mindustry.SchematicTag;
 import AlphaChan.main.handler.DatabaseHandler;
 import AlphaChan.main.handler.MessageHandler;
 import AlphaChan.main.handler.NetworkHandler;
-import AlphaChan.main.handler.DatabaseHandler.DATABASE;
+import AlphaChan.main.handler.DatabaseHandler.Database;
 import AlphaChan.main.util.Log;
 
 public class PostSchemCommand extends SimpleBotSubcommand {
@@ -94,7 +94,7 @@ public class PostSchemCommand extends SimpleBotSubcommand {
                     return;
                 }
 
-                MongoCollection<SchematicData> collection = DatabaseHandler.getCollection(DATABASE.MINDUSTRY,
+                MongoCollection<SchematicData> collection = DatabaseHandler.getCollection(Database.MINDUSTRY,
                         schematicDataCollectionName, SchematicData.class);
 
                 Bson filter = new Document().append("data", data);
@@ -128,7 +128,7 @@ public class PostSchemCommand extends SimpleBotSubcommand {
                     return;
                 }
 
-                MongoCollection<SchematicData> collection = DatabaseHandler.getCollection(DATABASE.MINDUSTRY,
+                MongoCollection<SchematicData> collection = DatabaseHandler.getCollection(Database.MINDUSTRY,
                         schematicDataCollectionName, SchematicData.class);
 
                 Bson filter = new Document().append("data", data);

@@ -1,7 +1,9 @@
 package AlphaChan.main.command.slash.subcommands.admin;
 
+import java.util.List;
+
 import AlphaChan.main.command.SimpleBotSubcommand;
-import AlphaChan.main.data.user.GuildData;
+import AlphaChan.main.data.user.GuildCache;
 import AlphaChan.main.handler.GuildHandler;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -29,17 +31,19 @@ public class SetAdminCommand extends SimpleBotSubcommand {
         Role role = roleOption.getAsRole();
         String roleId = role.getId();
 
-        GuildData guildData = GuildHandler.getGuild(event.getGuild());
+        GuildCache guildData = GuildHandler.getGuild(event.getGuild());
         if (guildData == null)
             throw new IllegalStateException("Guild data not found with <" + event.getGuild() + ">");
 
-        if (guildData.adminRoleId.contains(roleId)) {
-            if (guildData.adminRoleId.remove(roleId))
+        List<String> adminRoleIds = guildData.getData().getAdminRoleId();
+
+        if (adminRoleIds.contains(roleId)) {
+            if (adminRoleIds.remove(roleId))
                 reply(event, "Xóa vai trò thành công", 30);
             else
                 reply(event, "Xóa vai trò thất bại", 30);
         } else {
-            if (guildData.adminRoleId.add(roleId))
+            if (adminRoleIds.add(roleId))
                 reply(event, "Thêm vai trò thành công", 30);
             else
                 reply(event, "Thêm vai trò thất bại", 30);

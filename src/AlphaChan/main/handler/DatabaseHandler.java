@@ -28,18 +28,18 @@ import AlphaChan.main.util.Log;
 
 public final class DatabaseHandler {
 
-    public static enum DATABASE {
+    public static enum Database {
         USER, GUILD, LOG, DAILY, MINDUSTRY, STAR, PENGUIN
     }
 
-    public static enum LOG_TYPE {
-        MESSAGE, DATABASE, USER, MESSAGE_DELETED
+    public static enum LogType {
+        MESSAGE, Database, USER, MESSAGE_DELETED
     }
 
     private static DatabaseHandler instance = new DatabaseHandler();
 
-    private static String DATABASE_URL = System.getenv("DATABASE_URL");
-    private static ConnectionString connectionString = new ConnectionString(DATABASE_URL);
+    private static String databaseURL = System.getenv("databaseURL");
+    private static ConnectionString connectionString = new ConnectionString(databaseURL);
     private static MongoClientSettings settings = MongoClientSettings.builder().applyConnectionString(connectionString)
             .serverApi(ServerApi.builder().version(ServerApiVersion.V1).build()).build();
 
@@ -64,7 +64,7 @@ public final class DatabaseHandler {
         return instance;
     }
 
-    public static MongoDatabase getDatabase(DATABASE name) {
+    public static MongoDatabase getDatabase(Database name) {
         if (database.containsKey(name.name()))
             return database.get(name.name());
 
@@ -73,7 +73,7 @@ public final class DatabaseHandler {
         return db;
     }
 
-    public static <T> MongoCollection<T> getCollection(DATABASE databaseName, final String collectionName,
+    public static <T> MongoCollection<T> getCollection(Database databaseName, final String collectionName,
             Class<T> type) {
         if (!DatabaseHandler.collectionExists(databaseName, collectionName)) {
             DatabaseHandler.createCollection(databaseName, collectionName);
@@ -83,9 +83,9 @@ public final class DatabaseHandler {
     }
 
     // Check if collection exists
-    public static boolean collectionExists(MongoDatabase database, final String collectionName) {
+    public static boolean collectionExists(MongoDatabase Database, final String collectionName) {
         try {
-            MongoCursor<String> collectionNames = database.listCollectionNames().iterator();
+            MongoCursor<String> collectionNames = Database.listCollectionNames().iterator();
             String name;
             while (collectionNames.hasNext()) {
                 name = collectionNames.next();
@@ -100,18 +100,18 @@ public final class DatabaseHandler {
         }
     }
 
-    public static boolean collectionExists(DATABASE databaseName, final String collectionName) {
+    public static boolean collectionExists(Database databaseName, final String collectionName) {
         return collectionExists(getDatabase(databaseName), collectionName);
     }
 
-    public static void createCollection(DATABASE databaseName, final String collectionName) {
+    public static void createCollection(Database databaseName, final String collectionName) {
         getDatabase(databaseName).createCollection(collectionName);
-        log(LOG_TYPE.DATABASE, new Document().append("CREATE GUILD", collectionName));
+        log(LogType.Database, new Document().append("CREATE GUILD", collectionName));
     }
 
-    public static void log(LOG_TYPE log, Document content) {
+    public static void log(LogType log, Document content) {
         // Create collection if it doesn't exist
-        MongoDatabase logDatabase = getDatabase(DATABASE.LOG);
+        MongoDatabase logDatabase = getDatabase(Database.LOG);
         if (!collectionExists(logDatabase, log.name()))
             logDatabase.createCollection(log.name());
 
@@ -127,9 +127,8 @@ public final class DatabaseHandler {
             }
         }
         // Insert log message
-        collection.insertOne(
-                content.append(BotConfig.readString(Config.TIME_INSERT, "_timeInsert"),
-                        new BsonDateTime(System.currentTimeMillis())));
+        collection.insertOne(content.append(BotConfig.readString(Config.TIME_INSERT, "_timeInsert"),
+                new BsonDateTime(System.currentTimeMillis())));
 
     }
 }

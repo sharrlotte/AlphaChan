@@ -21,7 +21,7 @@ import AlphaChan.main.data.mindustry.SchematicInfo;
 import AlphaChan.main.handler.ContentHandler;
 import AlphaChan.main.handler.DatabaseHandler;
 import AlphaChan.main.handler.UserHandler;
-import AlphaChan.main.handler.DatabaseHandler.DATABASE;
+import AlphaChan.main.handler.DatabaseHandler.Database;
 import AlphaChan.main.util.Log;
 import AlphaChan.main.util.StringUtils;
 
@@ -56,7 +56,7 @@ public class SchematicTable extends SimplePageTable {
 
         String schematicDataCollectionName = BotConfig.readString(Config.SCHEMATIC_DATA_COLLECTION, null);
 
-        collection = DatabaseHandler.getCollection(DATABASE.MINDUSTRY, schematicDataCollectionName,
+        collection = DatabaseHandler.getCollection(Database.MINDUSTRY, schematicDataCollectionName,
                 SchematicData.class);
 
         addButton(primary("<", () -> this.previousPage()));
@@ -208,11 +208,10 @@ public class SchematicTable extends SimplePageTable {
             field.append("- Nhãn: ");
 
             for (int i = 0; i < currentInfo.tag.size() - 1; i++)
-                field.append(StringUtils.capitalize(currentInfo.tag.get(
-                        i).replace("_", " ").toLowerCase() + ", "));
+                field.append(StringUtils.capitalize(currentInfo.tag.get(i).replace("_", " ").toLowerCase() + ", "));
 
-            field.append(StringUtils.capitalize(currentInfo.tag.get(
-                    currentInfo.tag.size() - 1).replace("_", " ").toLowerCase() + "\n"));
+            field.append(StringUtils.capitalize(
+                    currentInfo.tag.get(currentInfo.tag.size() - 1).replace("_", " ").toLowerCase() + "\n"));
 
             field.append("- Sao: " + currentInfo.getStar() + "\n");
             field.append("- Cánh cụt: " + currentInfo.getPenguin() + "\n");

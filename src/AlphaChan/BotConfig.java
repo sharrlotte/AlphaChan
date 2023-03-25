@@ -22,16 +22,13 @@ public final class BotConfig {
 
         // Cache
         UPDATE_PERIOD, // Time between each update
-        UPDATE_LIMIT,
-        GUILD_ALIVE_TIME,
-        USER_ALIVE_TIME,
+        UPDATE_LIMIT, GUILD_ALIVE_TIME, USER_ALIVE_TIME,
 
         // Database
-        GUILD_COLLECTION,
-        SCHEMATIC_INFO_COLLECTION,
-        SCHEMATIC_DATA_COLLECTION,
-        MAX_LOG_COUNT, // Max log that database can store for each type
-        TIME_INSERT, // Time field name in database
+        GUILD_COLLECTION, SCHEMATIC_INFO_COLLECTION, SCHEMATIC_DATA_COLLECTION, MAX_LOG_COUNT, // Max log that Database
+                                                                                               // can store for each
+                                                                                               // type
+        TIME_INSERT, // Time field name in Database
 
         MAX_TRACK_LENGTH, // Max length for a youtube video track that can be played in second
         ;

@@ -16,10 +16,11 @@ import com.mongodb.client.MongoCollection;
 
 import AlphaChan.BotConfig;
 import AlphaChan.BotConfig.Config;
-import AlphaChan.main.data.user.GuildData;
-import AlphaChan.main.data.user.UserData;
-import AlphaChan.main.handler.DatabaseHandler.DATABASE;
-import AlphaChan.main.handler.DatabaseHandler.LOG_TYPE;
+import AlphaChan.main.data.user.GuildCache;
+import AlphaChan.main.data.user.UserCache;
+import AlphaChan.main.data.user.UserCache.PointType;
+import AlphaChan.main.handler.DatabaseHandler.Database;
+import AlphaChan.main.handler.DatabaseHandler.LogType;
 import AlphaChan.main.util.Log;
 
 import net.dv8tion.jda.api.entities.Member;
@@ -30,7 +31,7 @@ public final class UserHandler implements Updatable {
 
     private static UserHandler instance = new UserHandler();
     // Hash map to store user cache
-    private static ConcurrentHashMap<String, UserData> userCache = new ConcurrentHashMap<>();
+    private static ConcurrentHashMap<String, UserCache> userCache = new ConcurrentHashMap<>();
 
     private UserHandler() {
         UpdatableHandler.addListener(this);
@@ -44,7 +45,7 @@ public final class UserHandler implements Updatable {
         return instance;
     }
 
-    public static Collection<UserData> getUserCache() {
+    public static Collection<UserCache> getUserCache() {
         return userCache.values();
     }
 
@@ -53,11 +54,12 @@ public final class UserHandler implements Updatable {
     }
 
     public void updateCache() {
-        Iterator<UserData> iterator = userCache.values().iterator();
+        Iterator<UserCache> iterator = userCache.values().iterator();
         while (iterator.hasNext()) {
-            UserData user = iterator.next();
+            UserCache user = iterator.next();
             if (!user.isAlive(1)) {
-                Log.info("STATUS", "User <" + user.getName() + ":" + user.userId + "> offline");
+                Log.info("STATUS",
+                        "User <" + user.getData().getName() + ":" + user.getData().getUserId() + "> offline");
                 UpdatableHandler.updateStatus();
                 user.update();
                 iterator.remove();
@@ -69,7 +71,7 @@ public final class UserHandler implements Updatable {
         return userCache.size();
     }
 
-    public static Collection<UserData> getCachedUser() {
+    public static Collection<UserCache> getCachedUser() {
         return userCache.values();
     }
 
@@ -84,12 +86,12 @@ public final class UserHandler implements Updatable {
         if (member == null) {
             throw new IllegalStateException("MEMBER IS NOT EXISTS");
         }
-        UserData user = getUserAwait(member);
+        UserCache user = getUserAwait(member);
+
         user.resetTimer();
 
-        user._addMoney(1);
-        user._addPoint(1);
-        user._checkLevelRole();
+        user.addPoint(PointType.MONEY, 1);
+        user.addExp(1);
     }
 
     public static boolean isYui(Member member) {
@@ -110,8 +112,8 @@ public final class UserHandler implements Updatable {
 
         List<Role> roles = member.getRoles();
 
-        GuildData guildData = GuildHandler.getGuild(member.getGuild().getId());
-        for (String adminId : guildData.adminRoleId) {
+        GuildCache guildData = GuildHandler.getGuild(member.getGuild().getId());
+        for (String adminId : guildData.getData().getAdminRoleId()) {
             for (Role role : roles) {
                 if (role.getId().equals(adminId))
                     return true;
@@ -121,21 +123,21 @@ public final class UserHandler implements Updatable {
     }
 
     // Add user to cache
-    public static UserData addUser(@Nonnull String guildId, @Nonnull String userId) {
-        UserData userData = new UserData(guildId, userId);
+    public static UserCache addUser(@Nonnull String guildId, @Nonnull String userId) {
+        UserCache userData = new UserCache(guildId, userId);
         // Key is hashId = guildId + userId
-        userCache.put(userData._getHashId(), userData);
-        Log.info("STATUS", "User <" + userData.getName() + ":" + userId + "> online");
+        userCache.put(userData.getHashId(), userData);
+        Log.info("STATUS", "User <" + userData.getData().getName() + ":" + userId + "> online");
         UpdatableHandler.updateStatus();
         return userData;
     }
 
     // Add user to cache
-    public static UserData addUser(Member member) {
+    public static UserCache addUser(Member member) {
         return addUser(member.getGuild().getId(), member.getId());
     }
 
-    public static UserData getUserNoCache(@Nonnull String guildId, @Nonnull String userId) {
+    public static UserCache getUserNoCache(@Nonnull String guildId, @Nonnull String userId) {
         String hashId = guildId + userId;
         if (userCache.containsKey(hashId))
             return userCache.get(hashId);
@@ -143,55 +145,55 @@ public final class UserHandler implements Updatable {
     }
 
     // Get user without adding it to cache
-    public static UserData getUserNoCache(@Nonnull Member member) {
+    public static UserCache getUserNoCache(@Nonnull Member member) {
         String guildId = member.getGuild().getId();
         String userId = member.getId();
-        // If user exist in cache then return, else query user from database
+        // If user exist in cache then return, else query user from Database
         return getUserNoCache(guildId, userId);
     }
 
-    // Waiting for data from database
-    public static UserData getUserAwait(@Nonnull Member member) {
+    // Waiting for data from Database
+    public static UserCache getUserAwait(@Nonnull Member member) {
         String guildId = member.getGuild().getId();
         String userId = member.getId();
-        // If user exist in cache then return, else query user from database
+        // If user exist in cache then return, else query user from Database
         String hashId = guildId + userId;
         if (userCache.containsKey(hashId))
             return userCache.get(hashId);
 
-        UserData userFromCache = addUser(guildId, userId);
-        UserData userFromDatabase = getUserFromDatabase(guildId, userId);
-        userFromDatabase._merge(userFromCache);
+        UserCache userFromCache = addUser(guildId, userId);
+        UserCache userFromDatabase = getUserFromDatabase(guildId, userId);
+        userFromDatabase.merge(userFromCache);
         userCache.put(hashId, userFromDatabase);
         return userFromDatabase;
     }
 
-    public static ConcurrentHashMap<String, UserData> getUserFromGuild(@Nonnull String guildId) {
-        ConcurrentHashMap<String, UserData> users = new ConcurrentHashMap<String, UserData>();
+    public static ConcurrentHashMap<String, UserCache> getUserFromGuild(@Nonnull String guildId) {
+        ConcurrentHashMap<String, UserCache> users = new ConcurrentHashMap<String, UserCache>();
         userCache.values().forEach(user -> {
-            if (user.guildId.equals(guildId))
-                users.put(user.userId, user);
+            if (user.getData().getGuildId().equals(guildId))
+                users.put(user.getData().getUserId(), user);
         });
         return users;
     }
 
-    public static UserData getUserFromDatabase(@Nonnull String guildId, @Nonnull String userId) {
+    public static UserCache getUserFromDatabase(@Nonnull String guildId, @Nonnull String userId) {
         // User from a new guild
-        if (!DatabaseHandler.collectionExists(DATABASE.USER, guildId)) {
-            DatabaseHandler.getDatabase(DATABASE.USER).createCollection(guildId);
-            DatabaseHandler.log(LOG_TYPE.DATABASE, new Document().append("NEW GUILD", guildId));
-            return new UserData(guildId, userId);
+        if (!DatabaseHandler.collectionExists(Database.USER, guildId)) {
+            DatabaseHandler.getDatabase(Database.USER).createCollection(guildId);
+            DatabaseHandler.log(LogType.Database, new Document().append("NEW GUILD", guildId));
+            return new UserCache(guildId, userId);
 
         }
-        MongoCollection<UserData> collection = DatabaseHandler.getDatabase(DATABASE.USER).getCollection(guildId,
-                UserData.class);
+        MongoCollection<UserCache> collection = DatabaseHandler.getDatabase(Database.USER).getCollection(guildId,
+                UserCache.class);
 
-        // Get user from database
+        // Get user from Database
         Bson filter = new Document().append("userId", userId);
-        FindIterable<UserData> data = collection.find(filter);
-        UserData first = data.first();
+        FindIterable<UserCache> data = collection.find(filter);
+        UserCache first = data.first();
         if (first == null)
-            first = new UserData(guildId, userId);
+            first = new UserCache(guildId, userId);
         return first;
     }
 }

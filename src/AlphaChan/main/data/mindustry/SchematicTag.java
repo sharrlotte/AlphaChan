@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.List;
 
 public enum SchematicTag {
+    // Planet
     SERPULO, EREKIR,
     // Resource
     COPPER, LEAD, COAL, SCRAP, GRAPHITE, METAGLASS, SILICON, SPORE_POD, TITANIUM, PLASTANIUM, PYRATITE, BLAST_COMPOUND,

@@ -8,7 +8,6 @@ import net.dv8tion.jda.api.entities.Message.Attachment;
 import net.dv8tion.jda.api.entities.channel.Channel;
 import net.dv8tion.jda.api.entities.channel.concrete.Category;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
-import net.dv8tion.jda.api.entities.channel.middleman.GuildChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.message.*;
 import net.dv8tion.jda.api.hooks.*;
@@ -24,11 +23,11 @@ import javax.annotation.Nonnull;
 
 import org.bson.Document;
 
-import AlphaChan.main.data.user.GuildData;
-import AlphaChan.main.data.user.UserData;
-import AlphaChan.main.data.user.GuildData.CHANNEL_TYPE;
+import AlphaChan.main.data.user.GuildCache;
+
+import AlphaChan.main.data.user.GuildCache.ChannelType;
 import AlphaChan.main.handler.ContentHandler.Map;
-import AlphaChan.main.handler.DatabaseHandler.LOG_TYPE;
+import AlphaChan.main.handler.DatabaseHandler.LogType;
 import AlphaChan.main.util.Log;
 
 import java.io.*;
@@ -92,24 +91,24 @@ public final class MessageHandler extends ListenerAdapter {
             Member member = message.getMember();
 
             // Schematic preview
-            if ((ContentHandler.isSchematicText(message) && attachments.isEmpty()) || ContentHandler
-                    .isSchematicFile(attachments)) {
-                Log.system(getMessageSender(message) + ": sent a schematic ");
+            if ((ContentHandler.isSchematicText(message) && attachments.isEmpty()) || ContentHandler.isSchematicFile(attachments)) {
                 sendSchematicPreview(message);
+                Log.system(getMessageSender(message) + ": sent a schematic ");
             }
 
             else if (ContentHandler.isMapFile(attachments)) {
                 sendMapPreview(message, message.getChannel());
+                Log.system(getMessageSender(message) + ": sent a map ");
             }
 
             // Delete in channel that it should not be
-            GuildData guildData = GuildHandler.getGuild(message.getGuild());
+            GuildCache guildData = GuildHandler.getGuild(message.getGuild());
 
             guildData.resetTimer();
-            if (guildData._containsChannel(CHANNEL_TYPE.SCHEMATIC.name(), message.getChannel().getId()) || //
-                    guildData._containsChannel(CHANNEL_TYPE.MAP.name(), message.getChannel().getId())) {
+            if (guildData.hasChannel(ChannelType.SCHEMATIC, message.getChannel().getId()) ||
+                    guildData.hasChannel(ChannelType.MAP, message.getChannel().getId())) {
 
-                if (!message.getContentRaw().isEmpty()) {
+                if (!(ContentHandler.isSchematicText(message) && attachments.isEmpty()) || ContentHandler.isSchematicFile(attachments)) {
                     message.delete().queue();
                     replyMessage(message, "Vui lòng không gửi tin nhắn vào kênh này!", 30);
                 }
@@ -117,7 +116,7 @@ public final class MessageHandler extends ListenerAdapter {
 
             // Update exp on message sent
             UserHandler.onMessage(message);
-            DatabaseHandler.log(LOG_TYPE.MESSAGE, new Document()//
+            DatabaseHandler.log(LogType.MESSAGE, new Document()//
                     .append("message", getMessageSender(message) + ": " + message.getContentDisplay())//
                     .append("messageId", message.getId())//
                     .append("userId", member == null ? null : member.getId())//
@@ -141,23 +140,18 @@ public final class MessageHandler extends ListenerAdapter {
     @Override
     public void onGuildMemberUpdateNickname(@Nonnull GuildMemberUpdateNicknameEvent event) {
         Member member = event.getMember();
-        Member bot = event.getGuild().getMember(jda.getSelfUser());
+        Member bot = event.getGuild().getSelfMember();
         if (member == bot)
             return;
-        Member target = event.getEntity();
-        UserData userData = UserHandler.getUserNoCache(target);
-        if (userData == null)
-            throw new IllegalStateException("No user data found");
 
-        if (bot == null)
-            throw new IllegalStateException("Bot not in guild");
-        userData._displayLevelName();
+        Member target = event.getEntity();
+        log(event.getGuild(), target.getUser().getName() + " đã đổi tên thành " + target.getEffectiveName());
 
     }
 
     @Override
     public void onMessageDelete(@Nonnull MessageDeleteEvent event) {
-        DatabaseHandler.log(LOG_TYPE.MESSAGE_DELETED, new Document("messageId", event.getMessageId()));
+        DatabaseHandler.log(LogType.MESSAGE_DELETED, new Document("messageId", event.getMessageId()));
     }
 
     @Override
@@ -179,36 +173,15 @@ public final class MessageHandler extends ListenerAdapter {
     }
 
     public static void log(Guild guild, @Nonnull String content) {
-        GuildData guildData = GuildHandler.getGuild(guild);
+        GuildCache guildData = GuildHandler.getGuild(guild);
         if (guildData == null)
             throw new IllegalStateException("No guild data found");
 
-        List<TextChannel> botLogChannel = guildData._getChannels(CHANNEL_TYPE.BOT_LOG.name());
+        List<TextChannel> botLogChannel = guildData.getChannels(ChannelType.BOT_LOG);
         if (botLogChannel == null) {
             Log.error("Bot log channel for guild <" + guild.getName() + "> does not exists");
         } else
             botLogChannel.forEach(c -> c.sendMessage("```" + content + "```").queue());
-    }
-
-    public static boolean isChannel(Guild guild, Channel channel,
-            HashMap<String, HashMap<String, String>> guildChannelIds) {
-        if (guildChannelIds.containsKey(guild.getId())) {
-            if (guildChannelIds.get(guild.getId()).containsKey(channel.getId()))
-                return true;
-        }
-        return false;
-    }
-
-    public static boolean hasChannel(@Nonnull String guildId, @Nonnull String channelId) {
-        Guild guild = jda.getGuildById(guildId);
-        if (guild == null)
-            return false;
-        List<GuildChannel> channel = guild.getChannels();
-        for (GuildChannel c : channel) {
-            if (c.getId().equals(channelId))
-                return true;
-        }
-        return false;
     }
 
     public static void sendMapPreview(Attachment attachment, Member member, MessageChannel channel) {
@@ -218,8 +191,7 @@ public final class MessageHandler extends ListenerAdapter {
             File mapImageFile = ContentHandler.getMapImageFile(map);
             EmbedBuilder builder = ContentHandler.getMapEmbedBuilder(map, mapFile, mapImageFile, member);
 
-            channel.sendFiles(FileUpload.fromData(mapFile), FileUpload.fromData(mapImageFile))
-                    .setEmbeds(builder.build()).queue();
+            channel.sendFiles(FileUpload.fromData(mapFile), FileUpload.fromData(mapImageFile)).setEmbeds(builder.build()).queue();
 
         } catch (Exception e) {
             Log.error(e);
@@ -274,15 +246,16 @@ public final class MessageHandler extends ListenerAdapter {
         try {
             if (ContentHandler.isSchematicText(message)) {
                 sendSchematicPreview(ContentHandler.parseSchematic(message.getContentRaw()), message);
-            } else {
-                for (int i = 0; i < message.getAttachments().size(); i++) {
-                    Attachment attachment = message.getAttachments().get(i);
+                return;
+            }
 
-                    if (ContentHandler.isSchematicFile(attachment)) {
-                        sendSchematicPreview(ContentHandler.parseSchematicURL(attachment.getUrl()), message);
-                    }
+            for (int i = 0; i < message.getAttachments().size(); i++) {
+                Attachment attachment = message.getAttachments().get(i);
+                if (ContentHandler.isSchematicFile(attachment)) {
+                    sendSchematicPreview(ContentHandler.parseSchematicURL(attachment.getUrl()), message);
                 }
             }
+
         } catch (Exception e) {
             Log.error(e);
         }
@@ -299,8 +272,7 @@ public final class MessageHandler extends ListenerAdapter {
             File previewFile = ContentHandler.getSchematicPreviewFile(schem);
             EmbedBuilder builder = ContentHandler.getSchematicEmbedBuilder(schem, previewFile, member);
 
-            channel.sendFiles(FileUpload.fromData(schemFile), FileUpload.fromData(previewFile))
-                    .setEmbeds(builder.build()).queue();
+            channel.sendFiles(FileUpload.fromData(schemFile), FileUpload.fromData(previewFile)).setEmbeds(builder.build()).queue();
         } catch (Exception e) {
             sendMessage(channel, "Lỗi: " + e.getMessage(), 30);
         }
@@ -313,8 +285,7 @@ public final class MessageHandler extends ListenerAdapter {
 
     public static void sendMessage(MessageChannel channel, String content, int deleteAfter) {
         if (channel != null)
-            channel.sendMessage("```" + content + "```")
-                    .queue(m -> m.delete().queueAfter(deleteAfter, TimeUnit.SECONDS));
+            channel.sendMessage("```" + content + "```").queue(m -> m.delete().queueAfter(deleteAfter, TimeUnit.SECONDS));
     }
 
     public static void replyMessage(Message message, String content, int deleteAfter) {
@@ -326,17 +297,14 @@ public final class MessageHandler extends ListenerAdapter {
     }
 
     public static void sendEmbed(SlashCommandInteractionEvent event, EmbedBuilder builder, int deleteAfter) {
-        event.getHook().sendMessageEmbeds(builder.build())
-                .queue(_message -> _message.delete().queueAfter(deleteAfter, TimeUnit.SECONDS));
+        event.getHook().sendMessageEmbeds(builder.build()).queue(_message -> _message.delete().queueAfter(deleteAfter, TimeUnit.SECONDS));
     }
 
     public static void sendEmbed(MessageContextInteractionEvent event, EmbedBuilder builder, int deleteAfter) {
-        event.getHook().sendMessageEmbeds(builder.build())
-                .queue(_message -> _message.delete().queueAfter(deleteAfter, TimeUnit.SECONDS));
+        event.getHook().sendMessageEmbeds(builder.build()).queue(_message -> _message.delete().queueAfter(deleteAfter, TimeUnit.SECONDS));
     }
 
     public static void sendMessage(MessageContextInteractionEvent event, String content, int deleteAfter) {
-        event.getHook().sendMessage("```" + content + "```")
-                .queue(_message -> _message.delete().queueAfter(deleteAfter, TimeUnit.SECONDS));
+        event.getHook().sendMessage("```" + content + "```").queue(_message -> _message.delete().queueAfter(deleteAfter, TimeUnit.SECONDS));
     }
 }

@@ -49,18 +49,18 @@ public class MusicPlayer extends AudioEventAdapter implements AudioSendHandler {
     }
 
     public void start(AudioChannel channel) {
+        this.channel = channel;
         guild.getAudioManager().openAudioConnection(channel);
     }
 
     public void play() {
 
-        if (audioPlayer.getPlayingTrack() == null) {
+        if (audioPlayer.getPlayingTrack() == null)
             playNext();
-
-        } else {
+        else
             audioPlayer.setPaused(!audioPlayer.isPaused());
 
-        }
+        guild.getAudioManager().openAudioConnection(channel);
         updateTable();
     }
 
@@ -79,6 +79,9 @@ public class MusicPlayer extends AudioEventAdapter implements AudioSendHandler {
         if (table == null)
             return;
 
+        if (channel != null)
+            start(channel);
+
         table.updateTable();
     }
 
@@ -95,6 +98,14 @@ public class MusicPlayer extends AudioEventAdapter implements AudioSendHandler {
             queue.removeFirst();
 
         playNext();
+    }
+
+    public void leave() {
+        if (guild == null)
+            return;
+
+        clear();
+        guild.getAudioManager().closeAudioConnection();
     }
 
     public void clear() {

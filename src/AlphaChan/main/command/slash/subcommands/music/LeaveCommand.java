@@ -1,6 +1,7 @@
 package AlphaChan.main.command.slash.subcommands.music;
 
 import AlphaChan.main.command.SimpleBotSubcommand;
+import AlphaChan.main.music.MusicPlayer;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 
 public class LeaveCommand extends SimpleBotSubcommand {
@@ -11,7 +12,8 @@ public class LeaveCommand extends SimpleBotSubcommand {
 
     @Override
     public void runCommand(SlashCommandInteractionEvent event) {
-        event.getGuild().getAudioManager().closeAudioConnection();
+        MusicPlayer player = (MusicPlayer) event.getGuild().getAudioManager().getSendingHandler();
+        player.leave();
         delete(event);
     }
 }

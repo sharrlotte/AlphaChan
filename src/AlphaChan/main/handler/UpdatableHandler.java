@@ -48,6 +48,9 @@ public final class UpdatableHandler {
     }
 
     public static void updateStatus() {
+        if (jda == null)
+            return;
+
         jda.getPresence().setActivity(Activity.playing("with " + GuildHandler.getActiveGuildCount() + " servers | "
                 + UserHandler.getActiveUserCount() + " users"));
     }

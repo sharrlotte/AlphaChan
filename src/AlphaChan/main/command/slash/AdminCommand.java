@@ -2,7 +2,6 @@ package AlphaChan.main.command.slash;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import AlphaChan.main.command.SimpleBotCommand;
-import AlphaChan.main.command.slash.subcommands.admin.GuildShowLevelCommand;
 import AlphaChan.main.command.slash.subcommands.admin.RefreshSlashCommand;
 import AlphaChan.main.command.slash.subcommands.admin.ReloadServerCommand;
 import AlphaChan.main.command.slash.subcommands.admin.SetAdminCommand;
@@ -18,7 +17,6 @@ public class AdminCommand extends SimpleBotCommand {
         addSubcommands(new ReloadServerCommand());
         addSubcommands(new SetChannelCommand());
         addSubcommands(new SetLevelRoleCommand());
-        addSubcommands(new GuildShowLevelCommand());
         addSubcommands(new SetAdminCommand());
     }
 

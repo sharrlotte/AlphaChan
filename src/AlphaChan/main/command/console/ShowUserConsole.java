@@ -2,7 +2,7 @@ package AlphaChan.main.command.console;
 
 import AlphaChan.main.command.ConsoleCommandEvent;
 import AlphaChan.main.command.SimpleConsoleCommand;
-import AlphaChan.main.data.user.UserData;
+import AlphaChan.main.data.user.UserCache;
 import AlphaChan.main.handler.UserHandler;
 import AlphaChan.main.util.Log;
 
@@ -18,8 +18,8 @@ public class ShowUserConsole extends SimpleConsoleCommand {
 
         if (command.getArgumentCount() == 0) {
             Log.info("USER STATUS", "Users count: " + UserHandler.getActiveUserCount());
-            for (UserData ud : UserHandler.getUserCache()) {
-                Log.info("USER STATUS", ud.toDocument().toJson().toString());
+            for (UserCache ud : UserHandler.getUserCache()) {
+                Log.info("USER STATUS", ud.getData().toDocument().toJson().toString());
             }
         } else if (command.getArgumentCount() == 2) {
             String guildId = command.nextString();
@@ -28,10 +28,10 @@ public class ShowUserConsole extends SimpleConsoleCommand {
 
                 if (guildId == null || userId == null)
                     throw new IllegalArgumentException();
-                    
-                UserData ud = UserHandler.getUserNoCache(guildId, userId);
+
+                UserCache ud = UserHandler.getUserNoCache(guildId, userId);
                 Log.info("USER STATUS", "User id: " + userId + //
-                        "\n" + ud.toDocument().toString());
+                        "\n" + ud.getData().toDocument().toString());
             } catch (Exception e) {
                 Log.warning("User with id " + userId + " in guild " + guildId + " not found");
             }

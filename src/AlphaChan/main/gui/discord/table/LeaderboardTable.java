@@ -12,10 +12,11 @@ import com.mongodb.client.MongoCollection;
 import AlphaChan.main.command.SimplePageTable;
 import AlphaChan.main.command.slash.subcommands.user.LeaderboardCommand.LEADERBOARD;
 import AlphaChan.main.command.slash.subcommands.user.LeaderboardCommand.ORDER;
-import AlphaChan.main.data.user.UserData;
+import AlphaChan.main.data.user.UserCache;
+import AlphaChan.main.data.user.UserCache.PointType;
 import AlphaChan.main.handler.DatabaseHandler;
 import AlphaChan.main.handler.UserHandler;
-import AlphaChan.main.handler.DatabaseHandler.DATABASE;
+import AlphaChan.main.handler.DatabaseHandler.Database;
 import AlphaChan.main.util.Log;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
@@ -31,7 +32,7 @@ public class LeaderboardTable extends SimplePageTable {
     private final ORDER order;
     private final int MAX_DISPLAY = 10;
 
-    private List<UserData> users = new ArrayList<UserData>();
+    private List<UserCache> users = new ArrayList<UserCache>();
 
     public LeaderboardTable(@Nonnull SlashCommandInteractionEvent event, LEADERBOARD leaderboard, ORDER order) {
         super(event, 2);
@@ -67,75 +68,66 @@ public class LeaderboardTable extends SimplePageTable {
     public void getLeaderboardData(LEADERBOARD leaderboard, ORDER order) {
 
         switch (leaderboard) {
-            case ALL:
-                jda.getGuilds().forEach(guild -> {
-                    String guildId = guild.getId();
-                    MongoCollection<UserData> collection = DatabaseHandler.getCollection(DATABASE.USER, guildId,
-                            UserData.class);
-                    try {
-                        FindIterable<UserData> data = collection.find();
-                        data.forEach(d -> users.add(d));
-                    } catch (Exception e) {
-
-                    }
-                });
-                break;
-
-            case GUILD:
-                Guild guild = getEvent().getGuild();
-                if (guild == null)
-                    throw new IllegalStateException("Guild not found");
+        case ALL:
+            jda.getGuilds().forEach(guild -> {
                 String guildId = guild.getId();
-                MongoCollection<UserData> collection = DatabaseHandler.getCollection(DATABASE.USER, guildId,
-                        UserData.class);
-
+                MongoCollection<UserCache> collection = DatabaseHandler.getCollection(Database.USER, guildId,
+                        UserCache.class);
                 try {
-                    FindIterable<UserData> data = collection.find();
+                    FindIterable<UserCache> data = collection.find();
                     data.forEach(d -> users.add(d));
                 } catch (Exception e) {
 
                 }
-                break;
+            });
+            break;
 
-            case ONLINE:
-                users.addAll(UserHandler.getCachedUser());
+        case GUILD:
+            Guild guild = getEvent().getGuild();
+            if (guild == null)
+                throw new IllegalStateException("Guild not found");
+            String guildId = guild.getId();
+            MongoCollection<UserCache> collection = DatabaseHandler.getCollection(Database.USER, guildId,
+                    UserCache.class);
+
+            try {
+                FindIterable<UserCache> data = collection.find();
+                data.forEach(d -> users.add(d));
+            } catch (Exception e) {
+
+            }
+            break;
+
+        case ONLINE:
+            users.addAll(UserHandler.getCachedUser());
         }
         switch (order) {
-            case LEVEL:
-                users.sort(new Comparator<UserData>() {
-                    @Override
-                    public int compare(UserData a, UserData b) {
-                        return b._getTotalPoint() - a._getTotalPoint();
-                    }
-                });
-                break;
+        case MONEY:
+            users.sort(new Comparator<UserCache>() {
+                @Override
+                public int compare(UserCache a, UserCache b) {
+                    return b.getPoint(PointType.MONEY) - a.getPoint(PointType.MONEY);
+                }
+            });
+            break;
 
-            case MONEY:
-                users.sort(new Comparator<UserData>() {
-                    @Override
-                    public int compare(UserData a, UserData b) {
-                        return b.money - a.money;
-                    }
-                });
-                break;
+        case PVP_POINT:
+            users.sort(new Comparator<UserCache>() {
+                @Override
+                public int compare(UserCache a, UserCache b) {
+                    return b.getPoint(PointType.PVP_POINT) - a.getPoint(PointType.PVP_POINT);
+                }
+            });
+            break;
 
-            case PVP_POINT:
-                users.sort(new Comparator<UserData>() {
-                    @Override
-                    public int compare(UserData a, UserData b) {
-                        return b.pvpPoint - a.point;
-                    }
-                });
-                break;
-
-            default:
-                users.sort(new Comparator<UserData>() {
-                    @Override
-                    public int compare(UserData a, UserData b) {
-                        return b._getTotalPoint() - a._getTotalPoint();
-                    }
-                });
-                break;
+        default:
+            users.sort(new Comparator<UserCache>() {
+                @Override
+                public int compare(UserCache a, UserCache b) {
+                    return b.getTotalPoint() - a.getTotalPoint();
+                }
+            });
+            break;
         }
     }
 
@@ -148,7 +140,7 @@ public class LeaderboardTable extends SimplePageTable {
         EmbedBuilder builder = new EmbedBuilder();
         builder.setTitle("BẢNG XẾP HẠNG (" + leaderboard + ")");
 
-        UserData user = UserHandler.getUserNoCache(member);
+        UserCache user = UserHandler.getUserNoCache(member);
         int position = users.indexOf(user);
 
         int length = Math.min((pageNumber + 1) * MAX_DISPLAY, users.size());
@@ -164,22 +156,25 @@ public class LeaderboardTable extends SimplePageTable {
         return builder;
     }
 
-    public String getUserInformation(UserData user, ORDER order) {
+    public String getUserInformation(UserCache user, ORDER order) {
         try {
-            String data = "";
-            data += user._getName() + ":               ";
+            String data = user.getData().getName() + ": ";
 
             switch (order) {
-                case LEVEL:
-                    data += "cấp " + user.getLevel() + " (" + user._getTotalPoint() + " kinh nghiệm)";
-                    break;
-                case MONEY:
-                    data += user.money + " Alpha";
-                    break;
-                case PVP_POINT:
-                    data += user.pvpPoint + " điểm";
+
+            case MONEY:
+                data += user.getPoint(PointType.MONEY) + " Alpha";
+                break;
+
+            case PVP_POINT:
+                data += user.getPoint(PointType.PVP_POINT) + " điểm";
+                break;
+
+            default:
+                data += "cấp " + user.getPoint(PointType.LEVEL) + " (" + user.getPoint(PointType.EXP) + " kinh nghiệm)";
+                break;
             }
-            data += "\nMáy chủ:           " + user._getGuild().getName();
+            data += "\nMáy chủ: " + user.getGuild().getName();
             return data;
 
         } catch (Exception e) {

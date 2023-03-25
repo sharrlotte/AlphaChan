@@ -5,7 +5,7 @@ import java.util.List;
 
 import AlphaChan.main.command.SimpleBotSubcommand;
 import AlphaChan.main.command.SimplePageTable;
-import AlphaChan.main.data.user.GuildData;
+import AlphaChan.main.data.user.GuildCache;
 import AlphaChan.main.handler.GuildHandler;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
@@ -74,7 +74,7 @@ public class GuildCommand extends SimpleBotSubcommand {
             if (guild == null)
                 return;
 
-            GuildData guildData = GuildHandler.getGuild(guild);
+            GuildCache guildData = GuildHandler.getGuild(guild);
             EmbedBuilder builder = new EmbedBuilder();
             StringBuilder field = new StringBuilder();
 
@@ -91,15 +91,18 @@ public class GuildCommand extends SimpleBotSubcommand {
             builder.setDescription("Link: " + guild.getTextChannels().get(0).createInvite().complete().getUrl());
 
             String roleString = "";
-            for (String roleId : guildData.levelRoleId.keySet()) {
+            for (String roleId : guildData.getData().getLevelRoleId().keySet()) {
                 if (roleId == null)
                     return;
+
                 Role role = guild.getRoleById(roleId);
                 if (role != null)
-                    roleString += role.getName() + ": " + guildData.levelRoleId.get(roleId) + "\n";
+                    roleString += role.getAsMention() + ", ";
             }
+
             if (!roleString.isEmpty())
                 field.append("\n" + roleString.substring(0, roleString.length() - 2));
+
             builder.addField("Thông tin cơ bản:", field.toString(), false);
             replyEmbed(event, builder, 30);
         }

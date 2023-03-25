@@ -13,7 +13,7 @@ import com.mongodb.client.model.ReplaceOptions;
 import AlphaChan.BotConfig;
 import AlphaChan.BotConfig.Config;
 import AlphaChan.main.handler.DatabaseHandler;
-import AlphaChan.main.handler.DatabaseHandler.DATABASE;
+import AlphaChan.main.handler.DatabaseHandler.Database;
 
 public class SchematicInfo {
 
@@ -32,7 +32,6 @@ public class SchematicInfo {
         this.authorId = authorId;
         this.tag = tag;
     }
-
 
     public void setId(String id) {
         this.id = id;
@@ -62,18 +61,18 @@ public class SchematicInfo {
         if (star != -1)
             return star;
         // Create collection if it's not exist
-        if (!DatabaseHandler.collectionExists(DATABASE.STAR, this.id)) {
+        if (!DatabaseHandler.collectionExists(Database.STAR, this.id)) {
             star = 0;
             return 0;
         }
-        MongoCollection<StarData> collection = DatabaseHandler.getDatabase(DATABASE.STAR)
-                .getCollection(this.id, StarData.class);
+        MongoCollection<StarData> collection = DatabaseHandler.getDatabase(Database.STAR).getCollection(this.id,
+                StarData.class);
 
         return collection.countDocuments();
     }
 
     public boolean addStar(@Nonnull String userId) {
-        MongoCollection<StarData> collection = DatabaseHandler.getCollection(DATABASE.STAR, this.id, StarData.class);
+        MongoCollection<StarData> collection = DatabaseHandler.getCollection(Database.STAR, this.id, StarData.class);
 
         Document filter = new Document().append("userId", userId);
         if (collection.find(filter).first() != null)
@@ -88,12 +87,12 @@ public class SchematicInfo {
         if (penguin != -1)
             return penguin;
         // Create collection if it's not exist
-        if (!DatabaseHandler.collectionExists(DATABASE.PENGUIN, this.id)) {
+        if (!DatabaseHandler.collectionExists(Database.PENGUIN, this.id)) {
             penguin = 0;
             return 0;
         }
-        MongoCollection<PenguinData> collection = DatabaseHandler.getDatabase(DATABASE.PENGUIN)
-                .getCollection(this.id, PenguinData.class);
+        MongoCollection<PenguinData> collection = DatabaseHandler.getDatabase(Database.PENGUIN).getCollection(this.id,
+                PenguinData.class);
 
         return collection.countDocuments();
 
@@ -101,7 +100,7 @@ public class SchematicInfo {
 
     public boolean addPenguin(@Nonnull String userId) {
 
-        MongoCollection<PenguinData> collection = DatabaseHandler.getCollection(DATABASE.PENGUIN, this.id,
+        MongoCollection<PenguinData> collection = DatabaseHandler.getCollection(Database.PENGUIN, this.id,
                 PenguinData.class);
 
         Document filter = new Document().append("userId", userId);
@@ -118,7 +117,7 @@ public class SchematicInfo {
             return;
         String schematicInfoCollectionName = BotConfig.readString(Config.SCHEMATIC_INFO_COLLECTION, null);
 
-        MongoCollection<SchematicInfo> collection = DatabaseHandler.getCollection(DATABASE.MINDUSTRY,
+        MongoCollection<SchematicInfo> collection = DatabaseHandler.getCollection(Database.MINDUSTRY,
                 schematicInfoCollectionName, SchematicInfo.class);
 
         Document filter = new Document().append("_id", this.id);
@@ -129,7 +128,7 @@ public class SchematicInfo {
         // Create collection if it's not exist
         String schematicInfoCollectionName = BotConfig.readString(Config.SCHEMATIC_INFO_COLLECTION, null);
 
-        MongoCollection<SchematicInfo> collection = DatabaseHandler.getCollection(DATABASE.MINDUSTRY,
+        MongoCollection<SchematicInfo> collection = DatabaseHandler.getCollection(Database.MINDUSTRY,
                 schematicInfoCollectionName, SchematicInfo.class);
 
         Document filter = new Document().append("_id", this.id);

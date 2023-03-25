@@ -2,7 +2,7 @@ package AlphaChan.main.command.console;
 
 import AlphaChan.main.command.ConsoleCommandEvent;
 import AlphaChan.main.command.SimpleConsoleCommand;
-import AlphaChan.main.data.user.GuildData;
+import AlphaChan.main.data.user.GuildCache;
 import AlphaChan.main.handler.GuildHandler;
 import AlphaChan.main.util.Log;
 
@@ -18,8 +18,8 @@ public class ShowGuildConsole extends SimpleConsoleCommand {
 
         if (command.getArgumentCount() == 0) {
             Log.info("GUILD STATUS", "Guild counts: " + GuildHandler.getActiveGuildCount());
-            for (GuildData gd : GuildHandler.getGuildCache()) {
-                Log.info("GUILD STATUS", gd.toDocument().toJson().toString());
+            for (GuildCache gd : GuildHandler.getGuildCache()) {
+                Log.info("GUILD STATUS", gd.getData().toDocument().toJson().toString());
             }
         } else if (command.getArgumentCount() == 1) {
             String guildId = command.nextString();
@@ -28,9 +28,9 @@ public class ShowGuildConsole extends SimpleConsoleCommand {
                 if (guildId == null)
                     throw new IllegalArgumentException();
 
-                GuildData gd = GuildHandler.getGuild(guildId);
+                GuildCache gd = GuildHandler.getGuild(guildId);
                 Log.info("GUILD STATUS", "Guild id: " + guildId + //
-                        "\n" + gd.toDocument().toString());
+                        "\n" + gd.getData().toDocument().toString());
             } catch (Exception e) {
                 Log.warning("Guild with id " + guildId + " not found");
             }

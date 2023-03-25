@@ -10,7 +10,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import java.util.HashMap;
 
 import AlphaChan.main.command.SimpleBotSubcommand;
-import AlphaChan.main.data.user.GuildData;
+import AlphaChan.main.data.user.GuildCache;
 import AlphaChan.main.handler.GuildHandler;
 
 public class SetLevelRoleCommand extends SimpleBotSubcommand {
@@ -41,16 +41,17 @@ public class SetLevelRoleCommand extends SimpleBotSubcommand {
             throw new IllegalStateException("Invalid option");
 
         int level = levelOption.getAsInt();
-        GuildData guildData = GuildHandler.getGuild(guild);
+        GuildCache guildData = GuildHandler.getGuild(guild);
         if (guildData == null)
             throw new IllegalStateException("No guild data found");
+
         if (level <= -1) {
-            if (guildData._removeRole(roleId))
+            if (guildData.removeLevelRole(roleId))
                 reply(event, "Xóa vai trò thành công", 30);
             else
                 reply(event, "Xóa vai trò thất bại", 30);
         } else {
-            if (guildData._addRole(roleId, level))
+            if (guildData.addLevelRole(roleId, level))
                 reply(event, "Thêm vai trò thành công", 30);
             else
                 reply(event, "Thêm vai trò thất bại", 30);
@@ -65,15 +66,15 @@ public class SetLevelRoleCommand extends SimpleBotSubcommand {
             if (guild == null)
                 return;
 
-            GuildData guildData = GuildHandler.getGuild(guild);
+            GuildCache guildData = GuildHandler.getGuild(guild);
             HashMap<String, String> options = new HashMap<String, String>();
-            guildData.levelRoleId.keySet().forEach(t -> {
+            guildData.getData().getLevelRoleId().keySet().forEach(t -> {
                 if (t == null)
                     return;
                 Role role = guild.getRoleById(t);
                 if (role == null)
                     return;
-                options.put(role.getName() + "     lv" + guildData.levelRoleId.get(t), t);
+                options.put(role.getName() + " lv" + guildData.getData().getLevelRoleId().get(t), t);
             });
             sendAutoComplete(event, options);
         }

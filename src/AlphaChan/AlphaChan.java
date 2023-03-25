@@ -1,6 +1,5 @@
 package AlphaChan;
 
-import AlphaChan.main.gui.Console;
 import AlphaChan.main.handler.CommandHandler;
 import AlphaChan.main.handler.ContentHandler;
 import AlphaChan.main.handler.DatabaseHandler;
@@ -25,6 +24,7 @@ public class AlphaChan {
 
     public AlphaChan() {
         try {
+
             BotConfig.load();
 
             Log.system("Connecting to discord");
@@ -36,13 +36,10 @@ public class AlphaChan {
                     GatewayIntent.GUILD_MESSAGE_REACTIONS, GatewayIntent.GUILD_VOICE_STATES,
                     GatewayIntent.GUILD_MODERATION, GatewayIntent.GUILD_INVITES)
 
-                    .enableCache(CacheFlag.VOICE_STATE)
-                    .setMemberCachePolicy(MemberCachePolicy.ALL).build();
+                    .enableCache(CacheFlag.VOICE_STATE).setMemberCachePolicy(MemberCachePolicy.ALL).build();
             jda.awaitReady();
 
             Log.system("Ping: " + jda.getGatewayPing());
-
-            // Console console = new Console();
 
             ContentHandler.getInstance();
             GuildHandler.getInstance();

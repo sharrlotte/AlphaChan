@@ -1,7 +1,8 @@
 package AlphaChan.main.command.slash.subcommands.user;
 
 import AlphaChan.main.command.SimpleBotSubcommand;
-import AlphaChan.main.data.user.UserData;
+import AlphaChan.main.data.user.UserCache;
+import AlphaChan.main.data.user.UserCache.PointType;
 import AlphaChan.main.handler.UserHandler;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
@@ -14,10 +15,6 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import java.util.HashMap;
 
 public class TransferCommand extends SimpleBotSubcommand {
-
-    enum TYPE {
-        PVP_POINT, MONEY
-    }
 
     public TransferCommand() {
         super("transfer", "Chuyển chỉ số cho người khác", true, false);
@@ -46,41 +43,45 @@ public class TransferCommand extends SimpleBotSubcommand {
         if (pointOption == null)
             return;
 
-        String type = typeOption.getAsString();
-        User user = userOption.getAsUser();
-        int point = pointOption.getAsInt();
-        Member sender = event.getMember();
-        Member receiver = guild.getMember(user);
+        try {
 
-        if (receiver == null || sender == null) {
-            reply(event, "Người nhận không hợp lệ", 30);
-            return;
-        }
-        UserData senderData = UserHandler.getUserAwait(sender);
-        UserData receiverData = UserHandler.getUserNoCache(receiver);
-        String result;
+            User user = userOption.getAsUser();
+            int point = pointOption.getAsInt();
+            Member s = event.getMember();
+            Member r = guild.getMember(user);
 
-        switch (TYPE.valueOf(type)) {
-            case MONEY:
-                if (senderData.money - point >= 0) {
-                    senderData._addMoney(-point);
-                    receiverData._addMoney(point);
-                    result = "Đã chuyển " + point + " điểm Alpha cho " + receiverData._getName();
-                } else
-                    result = "Không đủ điểm để chuyển";
+            if (r == null || s == null) {
+                reply(event, "Người nhận không hợp lệ", 30);
+                return;
+            }
+            PointType type = PointType.valueOf(typeOption.getAsString());
+
+            UserCache sender = UserHandler.getUserAwait(s);
+            UserCache receiver = UserHandler.getUserNoCache(s);
+            String result = "Loại điểm muốn chuyển không hợp lệ";
+
+            switch (type) {
+            case LEVEL:
+            case EXP:
                 break;
-            case PVP_POINT:
-                if (senderData.pvpPoint - point >= 0) {
-                    senderData._addPVPPoint(point);
-                    receiverData._addPVPPoint(point);
-                    result = "Đã chuyển " + point + " điểm PVP cho " + receiverData._getName();
-                } else
-                    result = "Không đủ điểm để chuyển";
-                break;
+
             default:
-                result = "Giá trị <type> không hợp lệ: ";
+                if (sender.getPoint(type) - point >= 0) {
+                    sender.addPoint(type, -point);
+                    receiver.addPoint(type, point);
+                    result = "Đã chuyển " + point + " điểm PVP cho " + receiver.getData().getName();
+
+                } else {
+                    result = "Không đủ điểm để chuyển";
+                    break;
+                }
+
+            }
+
+            reply(event, result, 30);
+        } catch (Exception e) {
+            reply(event, "Loại điểm muốn chuyển không hợp lệ", 10);
         }
-        reply(event, result, 30);
 
     }
 
@@ -89,8 +90,11 @@ public class TransferCommand extends SimpleBotSubcommand {
         String focus = event.getFocusedOption().getName();
         if (focus.equals("type")) {
             HashMap<String, String> options = new HashMap<String, String>();
-            for (TYPE t : TYPE.values())
-                options.put(t.name(), t.name());
+            PointType[] type = PointType.values();
+
+            for (int i = 2; i < type.length; i++)
+                options.put(type[i].name(), type[i].name());
+
             sendAutoComplete(event, options);
         }
     }
