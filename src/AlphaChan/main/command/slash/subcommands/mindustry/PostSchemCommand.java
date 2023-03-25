@@ -24,8 +24,10 @@ import com.mongodb.client.MongoCollection;
 import AlphaChan.BotConfig;
 import AlphaChan.BotConfig.Config;
 import AlphaChan.main.command.SimpleBotSubcommand;
+import AlphaChan.main.data.mindustry.SchematicCache;
 import AlphaChan.main.data.mindustry.SchematicData;
 import AlphaChan.main.data.mindustry.SchematicInfo;
+import AlphaChan.main.data.mindustry.SchematicInfoCache;
 import AlphaChan.main.data.mindustry.SchematicTag;
 import AlphaChan.main.handler.DatabaseHandler;
 import AlphaChan.main.handler.MessageHandler;
@@ -94,8 +96,8 @@ public class PostSchemCommand extends SimpleBotSubcommand {
                     return;
                 }
 
-                MongoCollection<SchematicData> collection = DatabaseHandler.getCollection(Database.MINDUSTRY,
-                        schematicDataCollectionName, SchematicData.class);
+                MongoCollection<SchematicData> collection = DatabaseHandler.getCollection(Database.MINDUSTRY, schematicDataCollectionName,
+                        SchematicData.class);
 
                 Bson filter = new Document().append("data", data);
                 FindIterable<SchematicData> result = collection.find(filter);
@@ -106,8 +108,8 @@ public class PostSchemCommand extends SimpleBotSubcommand {
                 }
 
                 String uuid = UUID.randomUUID().toString();
-                new SchematicData(uuid, data).update();
-                new SchematicInfo(uuid, member.getId(), tag).update();
+                new SchematicCache(new SchematicData(uuid, data)).update();
+                new SchematicInfoCache(new SchematicInfo(uuid, member.getId(), tag)).update();
 
                 if (previewOption != null && previewOption.getAsBoolean() == true)
                     MessageHandler.sendSchematicPreview(event);
@@ -128,8 +130,8 @@ public class PostSchemCommand extends SimpleBotSubcommand {
                     return;
                 }
 
-                MongoCollection<SchematicData> collection = DatabaseHandler.getCollection(Database.MINDUSTRY,
-                        schematicDataCollectionName, SchematicData.class);
+                MongoCollection<SchematicData> collection = DatabaseHandler.getCollection(Database.MINDUSTRY, schematicDataCollectionName,
+                        SchematicData.class);
 
                 Bson filter = new Document().append("data", data);
                 FindIterable<SchematicData> result = collection.find(filter);
@@ -140,8 +142,8 @@ public class PostSchemCommand extends SimpleBotSubcommand {
                 }
 
                 String uuid = UUID.randomUUID().toString();
-                new SchematicData(uuid, data).update();
-                new SchematicInfo(uuid, member.getId(), tag).update();
+                new SchematicCache(new SchematicData(uuid, data)).update();
+                new SchematicInfoCache(new SchematicInfo(uuid, member.getId(), tag)).update();
 
                 if (previewOption != null && previewOption.getAsBoolean() == true)
                     MessageHandler.sendSchematicPreview(event);

@@ -47,7 +47,7 @@ public class LeaderboardTable extends SimplePageTable {
     }
 
     @Override
-    public @Nonnull MessageEmbed getCurrentPage() {
+    public MessageEmbed getCurrentPage() {
         if (users.size() <= 0)
             getLeaderboardData(this.leaderboard, this.order);
 
@@ -71,8 +71,7 @@ public class LeaderboardTable extends SimplePageTable {
         case ALL:
             jda.getGuilds().forEach(guild -> {
                 String guildId = guild.getId();
-                MongoCollection<UserCache> collection = DatabaseHandler.getCollection(Database.USER, guildId,
-                        UserCache.class);
+                MongoCollection<UserCache> collection = DatabaseHandler.getCollection(Database.USER, guildId, UserCache.class);
                 try {
                     FindIterable<UserCache> data = collection.find();
                     data.forEach(d -> users.add(d));
@@ -87,8 +86,7 @@ public class LeaderboardTable extends SimplePageTable {
             if (guild == null)
                 throw new IllegalStateException("Guild not found");
             String guildId = guild.getId();
-            MongoCollection<UserCache> collection = DatabaseHandler.getCollection(Database.USER, guildId,
-                    UserCache.class);
+            MongoCollection<UserCache> collection = DatabaseHandler.getCollection(Database.USER, guildId, UserCache.class);
 
             try {
                 FindIterable<UserCache> data = collection.find();

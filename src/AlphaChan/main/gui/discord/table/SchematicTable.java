@@ -16,8 +16,10 @@ import com.mongodb.client.model.Filters;
 import AlphaChan.BotConfig;
 import AlphaChan.BotConfig.Config;
 import AlphaChan.main.command.SimplePageTable;
+import AlphaChan.main.data.mindustry.SchematicCache;
 import AlphaChan.main.data.mindustry.SchematicData;
 import AlphaChan.main.data.mindustry.SchematicInfo;
+import AlphaChan.main.data.mindustry.SchematicInfoCache;
 import AlphaChan.main.handler.ContentHandler;
 import AlphaChan.main.handler.DatabaseHandler;
 import AlphaChan.main.handler.UserHandler;
@@ -40,10 +42,11 @@ import static AlphaChan.AlphaChan.*;
 
 public class SchematicTable extends SimplePageTable {
 
-    private List<SchematicInfo> schematicInfoList = new ArrayList<SchematicInfo>();
+    private List<SchematicInfoCache> schematicInfoList = new ArrayList<>();
+
     private MongoCollection<SchematicData> collection;
-    private SchematicInfo currentInfo;
-    private SchematicData currentData;
+    private SchematicInfoCache currentInfo;
+    private SchematicCache currentData;
     private Message currentCode;
 
     public SchematicTable(@Nonnull SlashCommandInteractionEvent event, FindIterable<SchematicInfo> schematicInfo) {
@@ -51,13 +54,12 @@ public class SchematicTable extends SimplePageTable {
 
         MongoCursor<SchematicInfo> cursor = schematicInfo.cursor();
         while (cursor.hasNext()) {
-            schematicInfoList.add(cursor.next());
+            schematicInfoList.add(new SchematicInfoCache(cursor.next()));
         }
 
         String schematicDataCollectionName = BotConfig.readString(Config.SCHEMATIC_DATA_COLLECTION, null);
 
-        collection = DatabaseHandler.getCollection(Database.MINDUSTRY, schematicDataCollectionName,
-                SchematicData.class);
+        collection = DatabaseHandler.getCollection(Database.MINDUSTRY, schematicDataCollectionName, SchematicData.class);
 
         addButton(primary("<", () -> this.previousPage()));
         addButton(deny("X", () -> this.deleteTable()));
@@ -144,7 +146,8 @@ public class SchematicTable extends SimplePageTable {
         if (currentData == null)
             return;
 
-        String data = currentData.data;
+        // BRUH
+        String data = currentData.getData().getData();
         if (data == null)
             return;
 
@@ -184,21 +187,23 @@ public class SchematicTable extends SimplePageTable {
             deleteSChematicCodeMessage();
 
             currentInfo = schematicInfoList.get(pageNumber);
-            currentData = collection.find(Filters.eq("_id", currentInfo.id)).limit(1).first();
+            SchematicData schematicData = collection.find(Filters.eq("_id", currentInfo.getData().getId())).limit(1).first();
 
             if (currentData == null) {
-                getMessage().editMessage("Không có dữ liệu về bản thiết kế với id:" + currentInfo.id).queue();
+                getMessage().editMessage("Không có dữ liệu về bản thiết kế với id:" + currentInfo.getData().getId()).queue();
                 return;
             }
 
-            Schematic schem = ContentHandler.parseSchematic(currentData.getData());
+            currentData = new SchematicCache(schematicData);
+
+            Schematic schem = ContentHandler.parseSchematic(currentData.getData().getData());
             File previewFile = ContentHandler.getSchematicPreviewFile(schem);
             EmbedBuilder builder = ContentHandler.getSchematicEmbedBuilder(schem, previewFile, getEvent().getMember());
             StringBuilder field = new StringBuilder();
 
             addPageFooter(builder);
 
-            String authorId = currentInfo.authorId;
+            String authorId = currentInfo.getData().getAuthorId();
             if (authorId != null) {
                 User user = jda.getUserById(authorId);
                 if (user != null)
@@ -207,19 +212,18 @@ public class SchematicTable extends SimplePageTable {
 
             field.append("- Nhãn: ");
 
-            for (int i = 0; i < currentInfo.tag.size() - 1; i++)
-                field.append(StringUtils.capitalize(currentInfo.tag.get(i).replace("_", " ").toLowerCase() + ", "));
+            for (int i = 0; i < currentInfo.getData().getTag().size() - 1; i++)
+                field.append(StringUtils.capitalize(currentInfo.getData().getTag().get(i).replace("_", " ").toLowerCase() + ", "));
 
             field.append(StringUtils.capitalize(
-                    currentInfo.tag.get(currentInfo.tag.size() - 1).replace("_", " ").toLowerCase() + "\n"));
+                    currentInfo.getData().getTag().get(currentInfo.getData().getTag().size() - 1).replace("_", " ").toLowerCase() + "\n"));
 
             field.append("- Sao: " + currentInfo.getStar() + "\n");
             field.append("- Cánh cụt: " + currentInfo.getPenguin() + "\n");
 
             builder.addField("Thông tin", field.toString(), false);
 
-            MessageEditAction action = getMessage().editMessageEmbeds(builder.build())
-                    .setFiles(FileUpload.fromData(previewFile));
+            MessageEditAction action = getMessage().editMessageEmbeds(builder.build()).setFiles(FileUpload.fromData(previewFile));
 
             Collection<LayoutComponent> row = getButtons();
             if (row.size() > 0)

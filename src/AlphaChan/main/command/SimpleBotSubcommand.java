@@ -20,12 +20,11 @@ public abstract class SimpleBotSubcommand extends SubcommandData {
     private boolean isThreaded = false;
     private boolean updateMessage = false;
 
-    public SimpleBotSubcommand(@Nonnull String name, @Nonnull String description) {
+    public SimpleBotSubcommand(@Nonnull String name, String description) {
         super(name, description);
     }
 
-    public SimpleBotSubcommand(@Nonnull String name, @Nonnull String description, boolean isThreaded,
-            boolean updateMessage) {
+    public SimpleBotSubcommand(@Nonnull String name, String description, boolean isThreaded, boolean updateMessage) {
         super(name, description);
         this.isThreaded = isThreaded;
         this.updateMessage = updateMessage;
@@ -84,12 +83,11 @@ public abstract class SimpleBotSubcommand extends SubcommandData {
         event.replyChoices(options).queue();
     }
 
-    public void sendAutoComplete(@Nonnull CommandAutoCompleteInteractionEvent event, @Nonnull String value) {
+    public void sendAutoComplete(@Nonnull CommandAutoCompleteInteractionEvent event, String value) {
         sendAutoComplete(event, value, value);
     }
 
-    public void sendAutoComplete(@Nonnull CommandAutoCompleteInteractionEvent event, @Nonnull String name,
-            @Nonnull String value) {
+    public void sendAutoComplete(@Nonnull CommandAutoCompleteInteractionEvent event, String name, String value) {
         if (value.isBlank())
             event.replyChoice("Không tìm thấy kết quả khớp", "Không tìm thấy kết quả khớp").queue();
         else
@@ -97,8 +95,7 @@ public abstract class SimpleBotSubcommand extends SubcommandData {
     }
 
     public void replyEmbed(SlashCommandInteractionEvent event, EmbedBuilder builder, int deleteAfter) {
-        event.getHook().sendMessageEmbeds(builder.build())
-                .queue(_message -> _message.delete().queueAfter(deleteAfter, TimeUnit.SECONDS));
+        event.getHook().sendMessageEmbeds(builder.build()).queue(_message -> _message.delete().queueAfter(deleteAfter, TimeUnit.SECONDS));
     }
 
     public void replyEmbed(SlashCommandInteractionEvent event, String content, int deleteAfter) {
@@ -109,8 +106,7 @@ public abstract class SimpleBotSubcommand extends SubcommandData {
     }
 
     public void reply(SlashCommandInteractionEvent event, String content, int deleteAfter) {
-        event.getHook().sendMessage("```" + content + "```")
-                .queue(_message -> _message.delete().queueAfter(deleteAfter, TimeUnit.SECONDS));
+        event.getHook().sendMessage("```" + content + "```").queue(_message -> _message.delete().queueAfter(deleteAfter, TimeUnit.SECONDS));
     }
 
     public void delete(SlashCommandInteractionEvent event) {

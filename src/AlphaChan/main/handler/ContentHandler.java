@@ -35,7 +35,6 @@ import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.Message.Attachment;
 import net.dv8tion.jda.api.entities.emoji.RichCustomEmoji;
 
-import javax.annotation.Nonnull;
 import javax.imageio.*;
 
 import AlphaChan.main.util.Log;
@@ -94,9 +93,8 @@ public class ContentHandler {
 
             Vars.state = new GameState();
 
-            TextureAtlasData data = new TextureAtlasData(
-                    new Fi(assets + "assets/sprites/sprites.aatls"),
-                    new Fi(assets + "assets/sprites"), false);
+            TextureAtlasData data = new TextureAtlasData(new Fi(assets + "assets/sprites/sprites.aatls"), new Fi(assets + "assets/sprites"),
+                    false);
             Core.atlas = new TextureAtlas();
 
             new Fi(assets + "assets-raw/sprites_out").walk(f -> {
@@ -111,8 +109,8 @@ public class ContentHandler {
                 page.texture.height = page.height;
             });
 
-            data.getRegions().each(reg -> Core.atlas.addRegion(reg.name,
-                    new AtlasRegion(reg.page.texture, reg.left, reg.top, reg.width, reg.height) {
+            data.getRegions().each(
+                    reg -> Core.atlas.addRegion(reg.name, new AtlasRegion(reg.page.texture, reg.left, reg.top, reg.width, reg.height) {
                         {
                             name = reg.name;
                             texture = reg.page.texture;
@@ -124,8 +122,8 @@ public class ContentHandler {
             Draw.scl = 1f / 4f;
             Core.batch = new SpriteBatch(0) {
                 @Override
-                protected void draw(TextureRegion region, float x, float y, float originX, float originY, float width,
-                        float height, float rotation) {
+                protected void draw(TextureRegion region, float x, float y, float originX, float originY, float width, float height,
+                        float rotation) {
                     x += 4;
                     y += 4;
 
@@ -166,8 +164,7 @@ public class ContentHandler {
             }
 
             try {
-                BufferedImage image = ImageIO
-                        .read(new File(assets + "assets/sprites/block_colors.png"));
+                BufferedImage image = ImageIO.read(new File(assets + "assets/sprites/block_colors.png"));
 
                 for (Block block : Vars.content.blocks()) {
                     block.mapColor.argb8888(image.getRGB(block.id, 0));
@@ -427,9 +424,7 @@ public class ContentHandler {
             builder.setFooter(schem.description());
 
         // Schem heigh, width
-        builder.addField("Kích thước",
-                "- Rộng: " + String.valueOf(schem.width) + " Cao: " + String.valueOf(schem.height),
-                true);
+        builder.addField("Kích thước", "- Rộng: " + String.valueOf(schem.width) + " Cao: " + String.valueOf(schem.height), true);
 
         StringBuilder requirement = new StringBuilder();
 
@@ -494,7 +489,7 @@ public class ContentHandler {
 
     }
 
-    public static @Nonnull File getSchematicFile(Schematic schem) throws IOException {
+    public static File getSchematicFile(Schematic schem) throws IOException {
         String sname = schem.name().replace("/", "_").replace(" ", "_").replace(":", "_");
         new File("cache").mkdir();
         if (sname.isEmpty())
@@ -504,7 +499,7 @@ public class ContentHandler {
         return schemFile;
     }
 
-    public static @Nonnull File getSchematicPreviewFile(Schematic schem) throws Exception {
+    public static File getSchematicPreviewFile(Schematic schem) throws Exception {
 
         BufferedImage preview = ContentHandler.previewSchematic(schem);
         new File("cache").mkdir();
@@ -650,8 +645,7 @@ public class ContentHandler {
     public static EmbedBuilder getMapEmbedBuilder(Map map, File mapFile, File imageFile, Member member) {
 
         EmbedBuilder builder = new EmbedBuilder().setImage("attachment://" + imageFile.getName())
-                .setAuthor(member.getEffectiveName(), member.getEffectiveAvatarUrl(),
-                        member.getEffectiveAvatarUrl())
+                .setAuthor(member.getEffectiveName(), member.getEffectiveAvatarUrl(), member.getEffectiveAvatarUrl())
                 .setTitle(map.name == null ? "OH NO" : map.name);
         builder.addField("Size: ", "- " + map.image.getWidth() + "x" + map.image.getHeight(), false);
         if (map.description != null)

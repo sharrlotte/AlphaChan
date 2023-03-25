@@ -9,9 +9,6 @@ import java.util.List;
 import org.bson.Document;
 import org.bson.conversions.Bson;
 
-import com.mongodb.client.MongoCollection;
-import com.mongodb.client.model.ReplaceOptions;
-
 import AlphaChan.BotConfig;
 import AlphaChan.BotConfig.Config;
 import AlphaChan.main.handler.DatabaseHandler;
@@ -106,31 +103,21 @@ public class GuildCache extends TimeObject implements DatabaseObject {
     // Update guild on Database
     @Override
     public void update() {
-        // If this guild is deleted. don't save
-        if (isAlive())
-            return;
-        // Create collection if it's not exist
-        String guildCollectionName = BotConfig.readString(Config.GUILD_COLLECTION, null);
-        MongoCollection<GuildData> collection = DatabaseHandler.getCollection(Database.GUILD, guildCollectionName,
-                GuildData.class);
-
-        // Filter for guild id, guild id is unique for each collection
-        Bson filter = new Document().append("guildId", data.getGuildId());
-        collection.replaceOne(filter, data, new ReplaceOptions().upsert(true));
+        if (isAlive()) {
+            String guildCollectionName = BotConfig.readString(Config.GUILD_COLLECTION, null);
+            Bson filter = new Document().append("guildId", data.getGuildId());
+            DatabaseHandler.update(Database.GUILD, guildCollectionName, GuildData.class, filter, data);
+        }
     }
 
     @Override
     public void delete() {
-        String guildCollectionName = BotConfig.readString(Config.GUILD_COLLECTION, null);
-
-        MongoCollection<GuildData> collection = DatabaseHandler.getCollection(Database.GUILD, guildCollectionName,
-                GuildData.class);
-
-        // Filter for guild id, guild id is unique for each collection
-        Bson filter = new Document().append("guildId", data.getGuildId());
-        collection.deleteOne(filter);
-
-        DatabaseHandler.log(LogType.Database, new Document().append("DELETE GUILD", data.toDocument()));
-        killTimer();
+        if (isAlive()) {
+            String guildCollectionName = BotConfig.readString(Config.GUILD_COLLECTION, null);
+            Bson filter = new Document().append("guildId", data.getGuildId());
+            DatabaseHandler.delete(Database.GUILD, guildCollectionName, GuildData.class, filter);
+            DatabaseHandler.log(LogType.Database, new Document().append("DELETE GUILD", data.toDocument()));
+            killTimer();
+        }
     }
 }

@@ -9,9 +9,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.bson.Document;
 import org.bson.conversions.Bson;
 
-import com.mongodb.client.MongoCollection;
-import com.mongodb.client.model.ReplaceOptions;
-
 import AlphaChan.main.handler.DatabaseHandler;
 import AlphaChan.main.handler.GuildHandler;
 import AlphaChan.main.handler.DatabaseHandler.Database;
@@ -50,8 +47,8 @@ public class UserCache extends TimeObject implements DatabaseObject {
     }
 
     public Integer getTotalPoint() {
-        return ((getPoint(PointType.LEVEL) - 1) * getPoint(PointType.LEVEL) * (2 * (getPoint(PointType.LEVEL) - 1) + 1)
-                / 6) + getPoint(PointType.EXP);
+        return ((getPoint(PointType.LEVEL) - 1) * getPoint(PointType.LEVEL) * (2 * (getPoint(PointType.LEVEL) - 1) + 1) / 6)
+                + getPoint(PointType.EXP);
     }
 
     public Member getMember() {
@@ -117,8 +114,7 @@ public class UserCache extends TimeObject implements DatabaseObject {
 
     // Add role to member when data.getLevel() is satisfied
     public void checkLevelRole() {
-        ConcurrentHashMap<String, Integer> levelRoleId = GuildHandler.getGuild(data.getGuildId()).getData()
-                .getLevelRoleId();
+        ConcurrentHashMap<String, Integer> levelRoleId = GuildHandler.getGuild(data.getGuildId()).getData().getLevelRoleId();
 
         Guild guild = getGuild();
         Member bot = guild.getSelfMember();
@@ -156,25 +152,18 @@ public class UserCache extends TimeObject implements DatabaseObject {
 
     // Update user on Database
     public void update() {
-        // If this user is deleted, don't save
-        if (isAlive())
-            return;
-
-        MongoCollection<UserData> collection = DatabaseHandler.getCollection(Database.USER, data.getGuildId(),
-                UserData.class);
-
-        // Filter for user id, user id is unique for each collection
-        Bson filter = new Document().append("userId", data.getUserId());
-        collection.replaceOne(filter, data, new ReplaceOptions().upsert(true));
+        if (isAlive()) {
+            Bson filter = new Document().append("userId", data.getUserId());
+            DatabaseHandler.update(Database.USER, data.getGuildId(), UserData.class, filter, data);
+        }
     }
 
     public void delete() {
-        MongoCollection<UserData> collection = DatabaseHandler.getCollection(Database.USER, data.getGuildId(),
-                UserData.class);
-        // Filter for user id, user id is unique for each collection
-        Bson filter = new Document().append("userId", data.getGuildId());
-        collection.deleteOne(filter);
-        DatabaseHandler.log(LogType.Database, new Document().append("DELETE USER", data.toDocument()));
-        killTimer();
+        if (isAlive()) {
+            Bson filter = new Document().append("userId", data.getGuildId());
+            DatabaseHandler.delete(Database.USER, data.getGuildId(), UserData.class, filter);
+            DatabaseHandler.log(LogType.Database, new Document().append("DELETE USER", data.toDocument()));
+            killTimer();
+        }
     }
 }

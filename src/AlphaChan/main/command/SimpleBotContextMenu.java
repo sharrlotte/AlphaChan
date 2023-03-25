@@ -12,7 +12,7 @@ import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 public abstract class SimpleBotContextMenu {
 
     private String name;
-    @Nonnull
+
     public CommandData command;
 
     public SimpleBotContextMenu(@Nonnull String name) {
@@ -31,13 +31,11 @@ public abstract class SimpleBotContextMenu {
     public abstract void runCommand(MessageContextInteractionEvent event);
 
     protected void replyEmbed(MessageContextInteractionEvent event, EmbedBuilder builder, int deleteAfter) {
-        event.getHook().sendMessageEmbeds(builder.build())
-                .queue(_message -> _message.delete().queueAfter(deleteAfter, TimeUnit.SECONDS));
+        event.getHook().sendMessageEmbeds(builder.build()).queue(_message -> _message.delete().queueAfter(deleteAfter, TimeUnit.SECONDS));
     }
 
     protected void reply(MessageContextInteractionEvent event, String content, int deleteAfter) {
-        event.getHook().sendMessage("```" + content + "```")
-                .queue(_message -> _message.delete().queueAfter(deleteAfter, TimeUnit.SECONDS));
+        event.getHook().sendMessage("```" + content + "```").queue(_message -> _message.delete().queueAfter(deleteAfter, TimeUnit.SECONDS));
     }
 
 }

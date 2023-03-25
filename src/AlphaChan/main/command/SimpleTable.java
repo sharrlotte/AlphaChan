@@ -107,14 +107,14 @@ public abstract class SimpleTable extends TimeObject {
             message.delete().queue();
     }
 
-    public @Nonnull Guild getEventGuild() {
+    public Guild getEventGuild() {
         Guild guild = event.getGuild();
         if (guild == null)
             throw new IllegalStateException("GUILD IS NOT EXISTS");
         return guild;
     }
 
-    public @Nonnull Member getEventMember() {
+    public Member getEventMember() {
         Member member = event.getMember();
         if (member == null)
             throw new IllegalStateException("MEMBER IS NOT EXISTS");
@@ -129,14 +129,14 @@ public abstract class SimpleTable extends TimeObject {
         return event.getId();
     }
 
-    public @Nonnull Guild getTriggerGuild() {
+    public Guild getTriggerGuild() {
         Guild guild = interaction.getGuild();
         if (guild == null)
             throw new IllegalStateException("GUILD IS NOT EXISTS");
         return guild;
     }
 
-    public @Nonnull Member getTriggerMember() {
+    public Member getTriggerMember() {
         Member member = interaction.getMember();
         if (member == null)
             throw new IllegalStateException("MEMBER IS NOT EXISTS");
@@ -149,7 +149,7 @@ public abstract class SimpleTable extends TimeObject {
         return interaction.getMessage();
     }
 
-    public @Nonnull MessageChannelUnion getTriggerTextChannel() {
+    public MessageChannelUnion getTriggerTextChannel() {
         return interaction.getChannel();
     }
 
@@ -159,55 +159,55 @@ public abstract class SimpleTable extends TimeObject {
         return interaction.getComponentId();
     }
 
-    public CallbackButton primary(@Nonnull String buttonName, @Nonnull Runnable runnable) {
+    public CallbackButton primary(@Nonnull String buttonName, Runnable runnable) {
         Button button = Button.primary(getId() + SEPARATOR + buttonName, buttonName);
         CallbackButton tableButton = new CallbackButton(button, runnable);
 
         return tableButton;
     }
 
-    public CallbackButton primary(@Nonnull String buttonId, @Nonnull String buttonName, @Nonnull Runnable runnable) {
+    public CallbackButton primary(@Nonnull String buttonId, String buttonName, Runnable runnable) {
         Button button = Button.primary(getId() + SEPARATOR + buttonId, buttonName);
         CallbackButton tableButton = new CallbackButton(button, runnable);
         return tableButton;
     }
 
-    public CallbackButton primary(@Nonnull String buttonId, @Nonnull Emoji emo, @Nonnull Runnable runnable) {
+    public CallbackButton primary(@Nonnull String buttonId, Emoji emo, Runnable runnable) {
         Button button = Button.primary(getId() + SEPARATOR + buttonId, emo);
         CallbackButton tableButton = new CallbackButton(button, runnable);
 
         return tableButton;
     }
 
-    public CallbackButton success(@Nonnull String buttonName, @Nonnull Emoji emo, @Nonnull Runnable runnable) {
+    public CallbackButton success(@Nonnull String buttonName, Emoji emo, Runnable runnable) {
         Button button = Button.success(getId() + SEPARATOR + buttonName, emo);
         CallbackButton tableButton = new CallbackButton(button, runnable);
 
         return tableButton;
     }
 
-    public CallbackButton success(@Nonnull String buttonId, @Nonnull String buttonName, @Nonnull Runnable runnable) {
+    public CallbackButton success(@Nonnull String buttonId, String buttonName, Runnable runnable) {
         Button button = Button.success(getId() + SEPARATOR + buttonId, buttonName);
         CallbackButton tableButton = new CallbackButton(button, runnable);
 
         return tableButton;
     }
 
-    public CallbackButton deny(@Nonnull String buttonName, @Nonnull Runnable runnable) {
+    public CallbackButton deny(@Nonnull String buttonName, Runnable runnable) {
         Button button = Button.danger(getId() + SEPARATOR + buttonName, buttonName);
         CallbackButton tableButton = new CallbackButton(button, runnable);
 
         return tableButton;
     }
 
-    public CallbackButton deny(@Nonnull String buttonName, @Nonnull Emoji emo, @Nonnull Runnable runnable) {
+    public CallbackButton deny(@Nonnull String buttonName, Emoji emo, Runnable runnable) {
         Button button = Button.danger(getId() + SEPARATOR + buttonName, emo);
         CallbackButton tableButton = new CallbackButton(button, runnable);
 
         return tableButton;
     }
 
-    public CallbackButton deny(@Nonnull String buttonId, @Nonnull String buttonName, @Nonnull Runnable runnable) {
+    public CallbackButton deny(@Nonnull String buttonId, String buttonName, Runnable runnable) {
         Button button = Button.danger(getId() + SEPARATOR + buttonId, buttonName);
         CallbackButton tableButton = new CallbackButton(button, runnable);
 
@@ -242,7 +242,7 @@ public abstract class SimpleTable extends TimeObject {
         return action;
     }
 
-    public @Nonnull Collection<LayoutComponent> getButtons() {
+    public Collection<LayoutComponent> getButtons() {
         Collection<LayoutComponent> row = new ArrayList<>();
         if (buttons.size() == 0)
             return row;
@@ -277,8 +277,7 @@ public abstract class SimpleTable extends TimeObject {
     public void sendMessage(String content, int deleteAfter) {
         if (interaction == null)
             return;
-        interaction.getHook().sendMessage("```" + content + "```")
-                .queue(m -> m.delete().queueAfter(deleteAfter, TimeUnit.SECONDS));
+        interaction.getHook().sendMessage("```" + content + "```").queue(m -> m.delete().queueAfter(deleteAfter, TimeUnit.SECONDS));
     }
 
     public void sendMessage(String content, boolean ephemeral) {
@@ -291,7 +290,7 @@ public abstract class SimpleTable extends TimeObject {
         private final Runnable runnable;
         private final Button button;
 
-        public CallbackButton(@Nonnull Button button, @Nonnull Runnable runnable) {
+        public CallbackButton(@Nonnull Button button, Runnable runnable) {
             this.runnable = runnable;
             this.button = button;
         }

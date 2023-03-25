@@ -172,7 +172,7 @@ public final class MessageHandler extends ListenerAdapter {
         log(event.getGuild(), event.getMember().getEffectiveName() + " tham gia máy chủ");
     }
 
-    public static void log(Guild guild, @Nonnull String content) {
+    public static void log(Guild guild, String content) {
         GuildCache guildData = GuildHandler.getGuild(guild);
         if (guildData == null)
             throw new IllegalStateException("No guild data found");

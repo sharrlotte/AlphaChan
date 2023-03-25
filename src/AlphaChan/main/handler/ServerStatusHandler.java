@@ -5,8 +5,6 @@ import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 
-import javax.annotation.Nonnull;
-
 import mindustry.net.*;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
@@ -53,8 +51,7 @@ public final class ServerStatusHandler {
     }
 
     public static void displayServerStatus(Guild guild, MessageChannel channel, String ip) {
-        UpdatableHandler.run("AUTO REFRESH SERVER", 0l, SERVER_RELOAD_PEROID,
-                () -> sendServerStatus(guild, channel, ip));
+        UpdatableHandler.run("AUTO REFRESH SERVER", 0l, SERVER_RELOAD_PEROID, () -> sendServerStatus(guild, channel, ip));
     }
 
     public static void refreshServerStat(Guild guild, MessageChannel channel) {
@@ -81,7 +78,7 @@ public final class ServerStatusHandler {
         });
     }
 
-    public static void reloadServer(Guild guild, @Nonnull MessageChannel channel) {
+    public static void reloadServer(Guild guild, MessageChannel channel) {
 
         MessageHistory history = MessageHistory.getHistoryFromBeginning(channel).complete();
 
@@ -105,14 +102,12 @@ public final class ServerStatusHandler {
 
         if (result.name != null || result.mapname != null) {
             field.append("Tên máy chủ: " + Strings.stripColors(result.name) + "\nNgười chơi: " + result.players
-                    + (result.playerLimit == 0 ? "" : " \\ " + result.playerLimit) + "\nBản đồ: "
-                    + Strings.stripColors(result.mapname) + "\nChế độ: "
-                    + (result.modeName == null ? StringUtils.capitalize(result.mode.name())
-                            : StringUtils.capitalize(result.modeName))
+                    + (result.playerLimit == 0 ? "" : " \\ " + result.playerLimit) + "\nBản đồ: " + Strings.stripColors(result.mapname)
+                    + "\nChế độ: "
+                    + (result.modeName == null ? StringUtils.capitalize(result.mode.name()) : StringUtils.capitalize(result.modeName))
                     + "\nĐợt: " + result.wave
-                    + (result.description.length() == 0 ? "" : "\nMô tả: " + Strings.stripColors(result.description))
-                    + "\nPhiên bản: " + result.version
-                    + "\nPing: " + result.ping + "ms\n");
+                    + (result.description.length() == 0 ? "" : "\nMô tả: " + Strings.stripColors(result.description)) + "\nPhiên bản: "
+                    + result.version + "\nPing: " + result.ping + "ms\n");
 
         } else {
             field.append("Máy chủ không tồn tại hoặc ngoại tuyến\n");

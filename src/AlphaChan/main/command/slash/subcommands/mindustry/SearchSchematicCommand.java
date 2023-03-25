@@ -67,15 +67,17 @@ public class SearchSchematicCommand extends SimpleBotSubcommand {
                 filter.append("authorId", member.getId());
         }
 
-        MongoCollection<SchematicInfo> collection = DatabaseHandler.getCollection(Database.MINDUSTRY,
-                BotConfig.readString(Config.SCHEMATIC_INFO_COLLECTION, null), SchematicInfo.class);
+        String schematicCollectionName = BotConfig.readString(Config.SCHEMATIC_INFO_COLLECTION, null);
+
+        MongoCollection<SchematicInfo> collection = DatabaseHandler.getCollection(Database.MINDUSTRY, schematicCollectionName,
+                SchematicInfo.class);
 
         FindIterable<SchematicInfo> schematicInfo;
         if (tags.length <= 0) {
             schematicInfo = collection.find(filter, SchematicInfo.class).sort(descending("star"));
+
         } else {
-            schematicInfo = collection.find(Filters.and(Filters.all("tag", tags), filter), SchematicInfo.class)
-                    .sort(descending("star"));
+            schematicInfo = collection.find(Filters.and(Filters.all("tag", tags), filter), SchematicInfo.class).sort(descending("star"));
         }
 
         if (schematicInfo.first() == null) {

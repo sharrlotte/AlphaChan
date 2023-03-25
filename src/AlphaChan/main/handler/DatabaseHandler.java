@@ -11,6 +11,7 @@ import org.bson.Document;
 import org.bson.codecs.configuration.CodecProvider;
 import org.bson.codecs.configuration.CodecRegistry;
 import org.bson.codecs.pojo.PojoCodecProvider;
+import org.bson.conversions.Bson;
 
 import com.mongodb.ConnectionString;
 import com.mongodb.MongoClientSettings;
@@ -21,6 +22,7 @@ import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoCursor;
 import com.mongodb.client.MongoDatabase;
+import com.mongodb.client.model.ReplaceOptions;
 
 import AlphaChan.BotConfig;
 import AlphaChan.BotConfig.Config;
@@ -46,8 +48,7 @@ public final class DatabaseHandler {
     private static MongoClient mongoClient = MongoClients.create(settings);
 
     private static CodecProvider pojoCodecProvider = PojoCodecProvider.builder().automatic(true).build();
-    private static CodecRegistry pojoCodecRegistry = fromRegistries(getDefaultCodecRegistry(),
-            fromProviders(pojoCodecProvider));
+    private static CodecRegistry pojoCodecRegistry = fromRegistries(getDefaultCodecRegistry(), fromProviders(pojoCodecProvider));
 
     private static ConcurrentHashMap<String, MongoDatabase> database = new ConcurrentHashMap<String, MongoDatabase>();
 
@@ -73,13 +74,46 @@ public final class DatabaseHandler {
         return db;
     }
 
-    public static <T> MongoCollection<T> getCollection(Database databaseName, final String collectionName,
-            Class<T> type) {
-        if (!DatabaseHandler.collectionExists(databaseName, collectionName)) {
-            DatabaseHandler.createCollection(databaseName, collectionName);
+    public static <T> void insert(Database databaseName, final String collectionName, Class<T> type, T value) {
+        MongoCollection<T> collection = getDatabase(Database.MINDUSTRY).getCollection(collectionName, type);
+        collection.insertOne(value);
+    }
+
+    public static <T> boolean insertIfNotFound(Database databaseName, final String collectionName, Class<T> type, Bson filter, T value) {
+        MongoCollection<T> collection = getCollection(databaseName, collectionName, type);
+
+        if (collection.find(filter).first() != null)
+            return false;
+
+        collection.insertOne(value);
+        return true;
+    }
+
+    public static <T> void update(Database databaseName, final String collectionName, Class<T> type, Bson filter, T value) {
+        MongoCollection<T> collection = getCollection(databaseName, collectionName, type);
+        collection.replaceOne(filter, value, new ReplaceOptions().upsert(true));
+    }
+
+    public static <T> void delete(Database databaseName, final String collectionName, Class<T> type, Bson filter) {
+        MongoCollection<T> collection = getCollection(databaseName, collectionName, type);
+        collection.deleteOne(filter);
+    }
+
+    public static <T> long count(Database databaseName, final String collectionName, Class<T> type, Bson filter) {
+        MongoCollection<T> collection = getCollection(databaseName, collectionName, type);
+
+        if (filter == null)
+            return collection.countDocuments();
+
+        return collection.countDocuments(filter);
+    }
+
+    public static <T> MongoCollection<T> getCollection(Database databaseName, final String collectionName, Class<T> type) {
+        if (!collectionExists(databaseName, collectionName)) {
+            createCollection(databaseName, collectionName);
         }
 
-        return DatabaseHandler.getDatabase(databaseName).getCollection(collectionName, type);
+        return getDatabase(databaseName).getCollection(collectionName, type);
     }
 
     // Check if collection exists
@@ -127,8 +161,8 @@ public final class DatabaseHandler {
             }
         }
         // Insert log message
-        collection.insertOne(content.append(BotConfig.readString(Config.TIME_INSERT, "_timeInsert"),
-                new BsonDateTime(System.currentTimeMillis())));
+        collection.insertOne(
+                content.append(BotConfig.readString(Config.TIME_INSERT, "_timeInsert"), new BsonDateTime(System.currentTimeMillis())));
 
     }
 }
