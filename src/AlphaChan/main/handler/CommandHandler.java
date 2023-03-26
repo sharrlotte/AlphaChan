@@ -4,7 +4,7 @@ import org.jetbrains.annotations.NotNull;
 
 import AlphaChan.main.command.ConsoleCommandEvent;
 import AlphaChan.main.command.SlashCommand;
-import AlphaChan.main.command.ContextMenu;
+import AlphaChan.main.command.ContextMenuCommand;
 import AlphaChan.main.command.ConsoleCommand;
 import AlphaChan.main.command.console.HelpConsole;
 import AlphaChan.main.command.console.ReloadConfigConsole;
@@ -229,7 +229,7 @@ public class CommandHandler {
             isRunning = false;
         }
 
-        private static void runCommand(String command) {
+        public static void runCommand(String command) {
 
             if (command == null)
                 return;
@@ -264,7 +264,7 @@ public class CommandHandler {
 
     public final class ContextMenuHandler extends ListenerAdapter {
 
-        private static HashMap<String, ContextMenu> contextCommands;
+        private static HashMap<String, ContextMenuCommand> contextCommands;
 
         private void init() {
 
@@ -278,11 +278,11 @@ public class CommandHandler {
 
         }
 
-        public static Collection<ContextMenu> getCommands() {
+        public static Collection<ContextMenuCommand> getCommands() {
             return contextCommands.values();
         }
 
-        public static void addCommand(ContextMenu command) {
+        public static void addCommand(ContextMenuCommand command) {
             contextCommands.put(command.getName(), command);
         }
 

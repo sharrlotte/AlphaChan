@@ -5,7 +5,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import javax.annotation.Nonnull;
 
-import AlphaChan.main.command.Table;
+import AlphaChan.main.gui.discord.Table;
 import AlphaChan.main.util.Log;
 
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
@@ -30,11 +30,15 @@ public final class TableHandler extends ListenerAdapter implements Updatable {
         return instance;
     }
 
-    public static void add(Table table) {
+    public static void addTable(Table table) {
         if (tableCache.containsKey(table.getId()))
             tableCache.get(table.getId()).deleteTable();
 
         tableCache.put(table.getId(), table);
+    }
+
+    public static Table getTable(String tableId) {
+        return tableCache.get(tableId);
     }
 
     @Override

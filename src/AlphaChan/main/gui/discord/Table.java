@@ -1,4 +1,4 @@
-package AlphaChan.main.command;
+package AlphaChan.main.gui.discord;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -9,6 +9,7 @@ import java.util.concurrent.TimeUnit;
 import javax.annotation.Nonnull;
 
 import AlphaChan.main.data.user.TimeObject;
+import AlphaChan.main.event.Signal;
 import AlphaChan.main.handler.TableHandler;
 import AlphaChan.main.util.Log;
 import net.dv8tion.jda.api.entities.Guild;
@@ -32,6 +33,7 @@ public abstract class Table extends TimeObject {
     private String requestor;
 
     private Message message;
+    protected Signal<MessageEditAction> onPrepareTable = new Signal<>();
 
     private final SlashCommandInteractionEvent event;
 
@@ -46,7 +48,7 @@ public abstract class Table extends TimeObject {
 
         event.getHook().deleteOriginal().queue();
 
-        TableHandler.add(this);
+        TableHandler.addTable(this);
     }
 
     public SlashCommandInteractionEvent getEvent() {
@@ -57,12 +59,13 @@ public abstract class Table extends TimeObject {
         return message;
     }
 
-    public void setRequestor(String userId) {
+    public void setRequester(String userId) {
         this.requestor = userId;
     }
 
-    public void update() {
-
+    public void setRequester(Member member) {
+        if (member != null)
+            setRequester(member.getId());
     }
 
     public void onCommand(@Nonnull ButtonInteractionEvent event) {
@@ -90,14 +93,26 @@ public abstract class Table extends TimeObject {
         }
     }
 
-    public final void sendTable() {
-        event.getChannel().sendMessage("PlaceHolder").queue(m -> {
-            message = m;
-            updateTable();
-        });
+    public final Table sendTable() {
+        message = event.getChannel().sendMessage("\t").complete();
+        updateTable();
+        return this;
     }
 
-    public abstract void updateTable();
+    public void updateTable() {
+
+        if (message == null)
+            message = event.getChannel().sendMessage("\t").complete();
+
+        MessageEditAction action = message.editMessage("\t");
+
+        onPrepareTable.emit(action);
+
+        resetTimer();
+        setButtons(action);
+
+        action.queue();
+    }
 
     public void deleteTable() {
         if (interaction != null)

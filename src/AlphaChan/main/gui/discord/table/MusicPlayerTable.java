@@ -1,13 +1,13 @@
 package AlphaChan.main.gui.discord.table;
 
 import AlphaChan.BotConfig;
-import AlphaChan.main.command.PageTable;
+import AlphaChan.main.gui.discord.Table;
 import AlphaChan.main.music.MusicPlayer;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.requests.restaction.MessageEditAction;
 
-public class MusicPlayerTable extends PageTable {
+public class MusicPlayerTable extends Table {
 
     private final MusicPlayer player;
 
@@ -22,18 +22,11 @@ public class MusicPlayerTable extends PageTable {
 
         player.setTable(this);
         onTimeOut.connect((n) -> player.setTable(null));
+        onPrepareTable.connect(this::onPrepareTable);
+
     }
 
-    @Override
-    public void updateTable() {
-
-        resetTimer();
+    public void onPrepareTable(MessageEditAction action) {
         setButton(primary("play", Emoji.fromUnicode(player.getTrackStatus()), () -> player.play()));
-
-        MessageEditAction action = getMessage().editMessageEmbeds(player.getEmbedBuilder().build());
-
-        setButtons(action);
-
-        action.queue();
     }
 }

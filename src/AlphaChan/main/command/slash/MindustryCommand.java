@@ -2,6 +2,7 @@ package AlphaChan.main.command.slash;
 
 import AlphaChan.main.command.SlashCommand;
 import AlphaChan.main.command.slash.subcommands.mindustry.CalculatorCommand;
+import AlphaChan.main.command.slash.subcommands.mindustry.CalculatorSetBlockCommand;
 import AlphaChan.main.command.slash.subcommands.mindustry.PingCommand;
 import AlphaChan.main.command.slash.subcommands.mindustry.PostSchemCommand;
 import AlphaChan.main.command.slash.subcommands.mindustry.RefreshServerCommand;
@@ -15,5 +16,6 @@ public class MindustryCommand extends SlashCommand {
         addSubcommands(new RefreshServerCommand());
         addSubcommands(new SearchSchematicCommand());
         addSubcommands(new CalculatorCommand());
+        addSubcommands(new CalculatorSetBlockCommand());
     }
 }

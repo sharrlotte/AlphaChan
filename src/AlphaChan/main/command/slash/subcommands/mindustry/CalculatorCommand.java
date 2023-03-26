@@ -13,7 +13,7 @@ public class CalculatorCommand extends SlashSubcommand {
     @Override
     public void runCommand(SlashCommandInteractionEvent command) {
         SchematicCalculatorTable table = new SchematicCalculatorTable(command);
-        table.sendTable();
+        
+        table.sendTable().setRequester(command.getMember());
     }
-
 }

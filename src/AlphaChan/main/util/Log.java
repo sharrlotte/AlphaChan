@@ -30,7 +30,7 @@ public class Log {
 
     private static String logHeader = new String();
 
-    private static void print(TextColor color, String logHeader, String content) {
+    private static void print(TextColor color, String logHeader, Object content) {
         if (!logHeader.equals(Log.logHeader)) {
             Log.logHeader = logHeader;
             System.out.println();
@@ -50,7 +50,7 @@ public class Log {
         print(color, logHeader, builder.toString());
     }
 
-    public static void error(String content) {
+    public static void error(Object content) {
         print(TextColor.RED, "ERROR", content);
     }
 
@@ -58,19 +58,19 @@ public class Log {
         print(TextColor.RED, "ERROR", e);
     }
 
-    public static void warning(String content) {
+    public static void warning(Object content) {
         print(TextColor.YELLOW, "WARNING", content);
     }
 
-    public static void system(String content) {
+    public static void system(Object content) {
         print(TextColor.BLUE, "SYSTEM", content);
     }
 
-    public static void info(String logHeader, String content) {
+    public static void info(String logHeader, Object content) {
         print(TextColor.GREEN, logHeader, content);
     }
 
-    public static void print(String logHeader, String content) {
+    public static void print(String logHeader, Object content) {
         print(TextColor.RESET, logHeader, content);
     }
 }

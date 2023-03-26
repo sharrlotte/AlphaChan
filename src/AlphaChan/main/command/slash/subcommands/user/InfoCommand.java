@@ -83,8 +83,8 @@ public class InfoCommand extends SlashSubcommand {
                         "\nTổng kinh nghiệm: " + user.getTotalPoint(),
                 false);
 
-        builder.addField("Điểm",
-                "Tổng điểm cống hiến: " + user.getPoint(PointType.MONEY) + "\nTổng điểm pvp: " + user.getPoint(PointType.PVP_POINT), false);
+        builder.addField("Điểm", "Tổng exp: " + user.getPoint(PointType.MONEY) + "\nTổng điểm pvp: " + user.getPoint(PointType.PVP_POINT),
+                false);
 
         builder.setColor(Color.BLUE);
 

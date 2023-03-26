@@ -1,4 +1,4 @@
-package AlphaChan.main.command;
+package AlphaChan.main.gui.discord;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,6 +16,8 @@ public class PageTable extends Table {
 
     public PageTable(SlashCommandInteractionEvent event, int aliveLimit) {
         super(event, aliveLimit);
+
+        onPrepareTable.connect(this::onPrepareTable);
     }
 
     public boolean addPage(EmbedBuilder value) {
@@ -37,7 +39,7 @@ public class PageTable extends Table {
 
     public void setPageNumber(int pageNumber) {
         this.pageNumber = pageNumber;
-        update();
+        updateTable();
     }
 
     public int getMaxPage() {
@@ -67,22 +69,13 @@ public class PageTable extends Table {
         updateTable();
     }
 
-    public void updateTable() {
-        resetTimer();
-        if (getMaxPage() <= 0) {
-            getMessage().editMessage("```Không có dữ liệu```").queue();
-            return;
-        }
-        MessageEmbed message = getCurrentPage().build();
-        if (message == null) {
-            getMessage().editMessage("```Đã hết dữ liệu```").queue();
+    public void onPrepareTable(MessageEditAction action) {
+        MessageEmbed page = getCurrentPage().build();
+        if (getMaxPage() <= 0 || page == null) {
+            reply("```Không có dữ liệu```");
             return;
         }
 
-        MessageEditAction action = getMessage().editMessageEmbeds(message);
-
-        setButtons(action);
-
-        action.queue();
+        action.setEmbeds(page);
     }
 }

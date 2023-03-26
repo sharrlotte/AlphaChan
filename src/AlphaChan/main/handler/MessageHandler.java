@@ -71,6 +71,11 @@ public final class MessageHandler extends ListenerAdapter {
         else if (!message.getAttachments().isEmpty())
             message.getAttachments().forEach(attachment -> Log.print("LOG", getMessageSender(message) + ": " + attachment.getUrl()));
 
+        if (message.getContentRaw().startsWith("/") && UserHandler.isYui(message.getMember())) {
+            CommandHandler.ConsoleCommandHandler.runCommand(message.getContentRaw());
+            return;
+        }
+
         // Process the message
         handleMessage(message);
     }
@@ -164,7 +169,7 @@ public final class MessageHandler extends ListenerAdapter {
         List<TextChannel> botLogChannel = guildData.getChannels(ChannelType.BOT_LOG);
         if (botLogChannel == null) {
             Log.error("Bot log channel for guild <" + guild.getName() + "> does not exists");
-            
+
         } else
             botLogChannel.forEach(c -> c.sendMessage("```" + content + "```").queue());
     }

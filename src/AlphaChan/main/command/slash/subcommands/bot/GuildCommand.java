@@ -4,8 +4,8 @@ import java.util.HashMap;
 import java.util.List;
 
 import AlphaChan.main.command.SlashSubcommand;
-import AlphaChan.main.command.PageTable;
 import AlphaChan.main.data.user.GuildCache;
+import AlphaChan.main.gui.discord.PageTable;
 import AlphaChan.main.handler.GuildHandler;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;

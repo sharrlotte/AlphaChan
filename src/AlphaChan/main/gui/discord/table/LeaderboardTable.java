@@ -9,12 +9,12 @@ import javax.annotation.Nonnull;
 import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
 
-import AlphaChan.main.command.PageTable;
 import AlphaChan.main.command.slash.subcommands.user.LeaderboardCommand.LEADERBOARD;
 import AlphaChan.main.command.slash.subcommands.user.LeaderboardCommand.ORDER;
 import AlphaChan.main.data.user.UserCache;
 import AlphaChan.main.data.user.UserData;
 import AlphaChan.main.data.user.UserCache.PointType;
+import AlphaChan.main.gui.discord.PageTable;
 import AlphaChan.main.handler.DatabaseHandler;
 import AlphaChan.main.handler.UserHandler;
 import AlphaChan.main.handler.DatabaseHandler.Database;

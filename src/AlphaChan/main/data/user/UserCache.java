@@ -13,6 +13,7 @@ import AlphaChan.main.handler.DatabaseHandler;
 import AlphaChan.main.handler.GuildHandler;
 import AlphaChan.main.handler.DatabaseHandler.Database;
 import AlphaChan.main.handler.DatabaseHandler.LogCollection;
+import AlphaChan.main.util.Log;
 
 import static AlphaChan.AlphaChan.*;
 
@@ -130,7 +131,7 @@ public class UserCache extends TimeObject implements DatabaseObject {
         Member bot = guild.getSelfMember();
         Member member = getMember();
         if (bot == null || member == null)
-            return;
+            throw new IllegalStateException("Member is not exists");
 
         // If bot has a higher role position
         if (!bot.canInteract(member))
@@ -143,7 +144,9 @@ public class UserCache extends TimeObject implements DatabaseObject {
                 Role role = guild.getRoleById(key);
                 if (role == null)
                     return;
+
                 guild.addRoleToMember(member, role);
+                Log.info("AUTO-ROLE", "Đã thêm vai trò " + role.getName() + " cho " + member.getEffectiveName());
             }
         }
     }

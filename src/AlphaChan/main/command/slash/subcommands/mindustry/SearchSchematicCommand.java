@@ -97,7 +97,7 @@ public class SearchSchematicCommand extends SlashSubcommand {
             SchematicTable table = new SchematicTable(event, schematicInfo);
             table.sendTable();
             if (own == true)
-                table.setRequestor(event.getMember().getId());
+                table.setRequester(event.getMember().getId());
         }
     }
 

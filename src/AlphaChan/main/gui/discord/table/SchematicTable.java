@@ -15,11 +15,11 @@ import com.mongodb.client.model.Filters;
 
 import AlphaChan.BotConfig;
 import AlphaChan.BotConfig.Config;
-import AlphaChan.main.command.PageTable;
 import AlphaChan.main.data.mindustry.SchematicCache;
 import AlphaChan.main.data.mindustry.SchematicData;
 import AlphaChan.main.data.mindustry.SchematicInfo;
 import AlphaChan.main.data.mindustry.SchematicInfoCache;
+import AlphaChan.main.gui.discord.PageTable;
 import AlphaChan.main.handler.ContentHandler;
 import AlphaChan.main.handler.DatabaseHandler;
 import AlphaChan.main.handler.UserHandler;

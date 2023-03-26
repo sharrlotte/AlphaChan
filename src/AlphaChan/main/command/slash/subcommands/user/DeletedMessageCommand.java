@@ -9,7 +9,7 @@ import com.mongodb.client.MongoCursor;
 import AlphaChan.BotConfig;
 import AlphaChan.BotConfig.Config;
 import AlphaChan.main.command.SlashSubcommand;
-import AlphaChan.main.command.PageTable;
+import AlphaChan.main.gui.discord.PageTable;
 import AlphaChan.main.handler.DatabaseHandler;
 import AlphaChan.main.handler.DatabaseHandler.Database;
 import AlphaChan.main.handler.DatabaseHandler.LogCollection;

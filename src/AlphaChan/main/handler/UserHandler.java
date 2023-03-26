@@ -102,9 +102,10 @@ public final class UserHandler implements Updatable {
         UserCache user = getUserAwait(member);
 
         user.resetTimer();
-
         user.addPoint(PointType.MONEY, 1);
-        user.addExp(1);
+
+        if (user.addExp(1))
+            user.checkLevelRole();
     }
 
     public static boolean isYui(Member member) {

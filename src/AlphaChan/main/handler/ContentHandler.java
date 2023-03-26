@@ -232,10 +232,10 @@ public class ContentHandler {
         try (DataInputStream stream = new DataInputStream(new InflaterInputStream(input))) {
             short width = stream.readShort(), height = stream.readShort();
 
-            StringMap map = new StringMap();
-            byte tags = stream.readByte();
-            for (int i = 0; i < tags; i++) {
-                map.put(stream.readUTF(), stream.readUTF());
+            StringMap tags = new StringMap();
+            byte tagLength = stream.readByte();
+            for (int i = 0; i < tagLength; i++) {
+                tags.put(stream.readUTF(), stream.readUTF());
             }
 
             IntMap<Block> blocks = new IntMap<>();
@@ -258,7 +258,7 @@ public class ContentHandler {
                 }
             }
 
-            return new Schematic(tiles, map, width, height);
+            return new Schematic(tiles, tags, width, height);
         }
     }
 

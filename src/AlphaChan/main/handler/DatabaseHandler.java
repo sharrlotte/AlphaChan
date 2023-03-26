@@ -181,7 +181,7 @@ public final class DatabaseHandler {
                     logCollection.deleteOne(new Document());
                     count--;
                 }
-                Log.system("Delete collection: " + count);
+                Log.system("Deleted log for collection " + collection.name() + ": " + count);
             }
 
             // Insert collection message
