@@ -21,6 +21,9 @@ public final class TableHandler extends ListenerAdapter implements Updatable {
     private TableHandler() {
         jda.addEventListener(this);
         UpdatableHandler.addListener(this);
+
+        onShutDown.connect((code) -> delete());
+
         Log.system("Table handler up");
     }
 
@@ -62,6 +65,16 @@ public final class TableHandler extends ListenerAdapter implements Updatable {
             if (!table.isAlive(1)) {
                 iterator.remove();
             }
+        }
+    }
+
+    public void delete() {
+        Iterator<Table> iterator = tableCache.values().iterator();
+        while (iterator.hasNext()) {
+            Table table = iterator.next();
+            table.deleteTable();
+            iterator.remove();
+
         }
     }
 }

@@ -26,18 +26,17 @@ import net.dv8tion.jda.api.requests.restaction.MessageEditAction;
 
 public abstract class Table extends TimeObject {
 
-    private List<CallbackButton> buttons = new ArrayList<CallbackButton>();
-    private List<Integer> rows = new ArrayList<Integer>(Arrays.asList(0));
-
-    private ButtonInteractionEvent interaction;
-    private String requestor;
-
-    private Message message;
-    protected Signal<MessageEditAction> onPrepareTable = new Signal<>();
+    private static final String SEPARATOR = ":";
 
     private final SlashCommandInteractionEvent event;
 
-    private static final String SEPARATOR = ":";
+    private List<CallbackButton> buttons = new ArrayList<CallbackButton>();
+    private List<Integer> rows = new ArrayList<Integer>(Arrays.asList(0));
+    private ButtonInteractionEvent interaction;
+    private String requestor;
+    private Message message;
+
+    public Signal<MessageEditAction> onPrepareTable = new Signal<>();
 
     public Table(SlashCommandInteractionEvent event, int aliveLimit) {
         super(aliveLimit);
@@ -94,17 +93,17 @@ public abstract class Table extends TimeObject {
     }
 
     public final Table sendTable() {
-        message = event.getChannel().sendMessage("\t").complete();
+        message = event.getChannel().sendMessage("PLACE HOLDER").complete();
         updateTable();
         return this;
     }
 
-    public void updateTable() {
+    public final void updateTable() {
 
         if (message == null)
-            message = event.getChannel().sendMessage("\t").complete();
+            message = event.getChannel().sendMessage("PLACE HOLDER").complete();
 
-        MessageEditAction action = message.editMessage("\t");
+        MessageEditAction action = message.editMessage("PLACE HOLDER");
 
         onPrepareTable.emit(action);
 
@@ -282,11 +281,11 @@ public abstract class Table extends TimeObject {
     }
 
     public void reply(String content) {
-        event.getHook().editOriginal("```" + content + "```").queue();
+        event.getHook().sendMessage("```" + content + "```").queue();
     }
 
     public void reply(String content, int deleteAfter) {
-        event.getHook().editOriginal("```" + content + "```").queue();
+        event.getHook().sendMessage("```" + content + "```").queue();
     }
 
     public void sendMessage(String content, int deleteAfter) {

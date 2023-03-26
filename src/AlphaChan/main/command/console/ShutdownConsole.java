@@ -1,6 +1,7 @@
 package AlphaChan.main.command.console;
 
 import AlphaChan.main.command.ConsoleCommandEvent;
+import AlphaChan.AlphaChan;
 import AlphaChan.main.command.ConsoleCommand;
 
 public class ShutdownConsole extends ConsoleCommand {
@@ -11,6 +12,7 @@ public class ShutdownConsole extends ConsoleCommand {
 
     @Override
     public void runCommand(ConsoleCommandEvent command) {
+        AlphaChan.onShutDown.emit(0);
         System.exit(0);
     }
 

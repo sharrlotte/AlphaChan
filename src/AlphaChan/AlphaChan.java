@@ -23,7 +23,7 @@ public class AlphaChan {
 
     public static JDA jda;
 
-    public static Signal<Integer> onShutDown = new Signal<>();
+    public static final Signal<Integer> onShutDown = new Signal<>();
 
     public AlphaChan() {
         try {
@@ -57,22 +57,10 @@ public class AlphaChan {
             TableHandler.getInstance();
             UpdatableHandler.getInstance();
 
-            Runtime.getRuntime().addShutdownHook(new ShutdownHook());
-
             Log.system("Bot online");
 
         } catch (Exception e) {
             Log.error(e);
-        }
-    }
-
-    private class ShutdownHook extends Thread {
-
-        @Override
-        public void run() {
-            Log.system("Bot shutting down");
-            onShutDown.emit(0);
-            Log.system("Bot shutdown");
         }
     }
 

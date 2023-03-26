@@ -3,7 +3,6 @@ package AlphaChan.main.gui.discord.table;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 import javax.annotation.Nonnull;
@@ -30,13 +29,12 @@ import AlphaChan.main.util.StringUtils;
 import mindustry.game.Schematic;
 
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
-import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import net.dv8tion.jda.api.interactions.components.LayoutComponent;
-import net.dv8tion.jda.api.requests.restaction.MessageEditAction;
 import net.dv8tion.jda.api.utils.FileUpload;
+import net.dv8tion.jda.api.requests.restaction.MessageEditAction;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 
 import static AlphaChan.AlphaChan.*;
 
@@ -181,7 +179,7 @@ public class SchematicTable extends PageTable {
     }
 
     @Override
-    public void updateTable() {
+    public void onPrepareTable(MessageEditAction action) {
         try {
 
             deleteSChematicCodeMessage();
@@ -189,8 +187,8 @@ public class SchematicTable extends PageTable {
             currentInfo = schematicInfoList.get(pageNumber);
             SchematicData schematicData = collection.find(Filters.eq("_id", currentInfo.getData().getId())).limit(1).first();
 
-            if (currentData == null) {
-                getMessage().editMessage("Không có dữ liệu về bản thiết kế với id:" + currentInfo.getData().getId()).queue();
+            if (schematicData == null) {
+                reply("Không có dữ liệu về bản thiết kế với id:" + currentInfo.getData().getId(), 10);
                 return;
             }
 
@@ -223,13 +221,7 @@ public class SchematicTable extends PageTable {
 
             builder.addField("Thông tin", field.toString(), false);
 
-            MessageEditAction action = getMessage().editMessageEmbeds(builder.build()).setFiles(FileUpload.fromData(previewFile));
-
-            Collection<LayoutComponent> row = getButtons();
-            if (row.size() > 0)
-                action.setComponents(row);
-
-            action.queue();
+            action.setEmbeds(builder.build()).setFiles(FileUpload.fromData(previewFile));
 
         } catch (Exception e) {
             Log.error(e);

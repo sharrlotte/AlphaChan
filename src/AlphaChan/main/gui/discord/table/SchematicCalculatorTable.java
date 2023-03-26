@@ -10,7 +10,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import AlphaChan.main.gui.discord.Table;
 import AlphaChan.main.handler.ContentHandler;
-
+import arc.util.Strings;
 import mindustry.Vars;
 import mindustry.type.ItemStack;
 import mindustry.type.LiquidStack;
@@ -341,25 +341,27 @@ public class SchematicCalculatorTable extends Table {
         field = new StringBuilder();
 
         for (String key : resource.keySet()) {
-            field.append(key + ": " + resource.get(key) + "\n");
+            field.append(key + ": " + Strings.fixed(resource.get(key), 2) + "\n");
         }
 
         builder.addField("Resource", field.toString(), false);
         field = new StringBuilder();
 
         for (String key : finalInput.keySet()) {
-            field.append(key + ": " + finalInput.get(key) + "\n");
+            field.append(key + ": " + Strings.fixed(finalInput.get(key), 2) + "\n");
         }
 
         builder.addField("Final input", field.toString(), false);
         field = new StringBuilder();
 
         for (String key : finalOutput.keySet()) {
-            field.append(key + ": " + finalOutput.get(key) + "\n");
+            field.append(key + ": " + Strings.fixed(finalOutput.get(key), 2) + "\n");
         }
 
         builder.addField("Final output", field.toString(), false);
         field = new StringBuilder();
+
+        action.setEmbeds(builder.build());
     }
 
     private static class BlockRatio {

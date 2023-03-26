@@ -9,6 +9,7 @@ import arc.graphics.g2d.TextureAtlas.*;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
+import arc.util.Strings;
 import arc.util.io.*;
 import arc.util.serialization.*;
 import mindustry.*;
@@ -431,14 +432,10 @@ public class ContentHandler {
         // Item requirements
         for (ItemStack stack : schem.requirements()) {
             List<RichCustomEmoji> emotes = member.getGuild().getEmojisByName(stack.item.name.replace("-", ""), true);
-
-            if (!emotes.isEmpty())
-                requirement.append(emotes.get(0).getAsMention()).append(stack.amount).append("  ");
-            else
-                requirement.append(stack.item.name + ": " + stack.amount + " ");
+            requirement.append("-" + (emotes.isEmpty() ? stack.item.name : emotes.get(0).getAsMention()) + ": " + stack.amount + "\n");
         }
 
-        builder.addField("Tài nguyên cần", "- " + requirement.toString(), false);
+        builder.addField("Tài nguyên cần", requirement.toString(), false);
 
         // Power input/output
 
@@ -466,7 +463,7 @@ public class ContentHandler {
             List<RichCustomEmoji> emotes = member.getGuild().getEmojisByName(key.replace("-", ""), true);
 
             inputString.append(emotes.isEmpty() ? key + ": " : emotes.get(0).getAsMention());
-            inputString.append(" " + input.get(key) + "/s ");
+            inputString.append("-" + Strings.fixed(input.get(key), 2) + "/s\n");
         }
 
         StringBuilder outputString = new StringBuilder();
@@ -476,14 +473,14 @@ public class ContentHandler {
             List<RichCustomEmoji> emotes = member.getGuild().getEmojisByName(key.replace("-", ""), true);
 
             outputString.append(emotes.isEmpty() ? key + ": " : emotes.get(0).getAsMention());
-            outputString.append(" " + output.get(key) + "/s ");
+            outputString.append("-" + Strings.fixed(output.get(key), 2) + "/s\n");
         }
 
         if (inputString.length() != 0)
-            builder.addField("Tổng đầu vào", "- " + inputString.toString(), false);
+            builder.addField("Tổng đầu vào", inputString.toString(), false);
 
         if (outputString.length() != 0)
-            builder.addField("Tổng đầu ra", "- " + outputString.toString(), false);
+            builder.addField("Tổng đầu ra", outputString.toString(), false);
 
         return builder;
     }
