@@ -8,8 +8,8 @@ public class SchematicInfo {
     private String id;
     private String authorId;
     private List<String> tag = new ArrayList<String>();
-    private int star = -1;
-    private int penguin = -1;
+    private int like = -1;
+    private int dislike = -1;
 
     public SchematicInfo() {
     }
@@ -44,20 +44,20 @@ public class SchematicInfo {
         this.tag = tag;
     }
 
-    public int getStar() {
-        return star;
+    public int getLike() {
+        return like;
     }
 
-    public void setStar(int star) {
-        this.star = star;
+    public void setLike(int like) {
+        this.like = like;
     }
 
-    public int getPenguin() {
-        return penguin;
+    public int getDislike() {
+        return dislike;
     }
 
-    public void setPenguin(int penguin) {
-        this.penguin = penguin;
+    public void setDislike(int dislike) {
+        this.dislike = dislike;
     }
 
 }

@@ -27,7 +27,7 @@ import AlphaChan.main.data.user.GuildCache;
 
 import AlphaChan.main.data.user.GuildCache.ChannelType;
 import AlphaChan.main.handler.ContentHandler.Map;
-import AlphaChan.main.handler.DatabaseHandler.LogType;
+import AlphaChan.main.handler.DatabaseHandler.LogCollection;
 import AlphaChan.main.util.Log;
 
 import java.io.*;
@@ -57,29 +57,20 @@ public final class MessageHandler extends ListenerAdapter {
         return instance;
     }
 
-    private static String getMessageSender(Guild guild, Category category, Channel channel, Member member) {
-        String guildName = guild == null ? "Unknown" : guild.getName();
-        String categoryName = category == null ? "Unknown" : category.getName();
-        String channelName = channel == null ? "Unknown" : channel.getName();
-        String memberName = member == null ? "Unknown" : member.getEffectiveName();
-
-        return "[" + guildName + "] " + "<" + categoryName + ":" + channelName + "> " + memberName;
-
-    }
-
-    public static String getMessageSender(Message message) {
-        return getMessageSender(message.getGuild(), message.getCategory(), message.getChannel(), message.getMember());
-    }
-
-    public static String getMessageSender(@Nonnull SlashCommandInteractionEvent event) {
-        return getMessageSender(event.getGuild(), null, event.getChannel(), event.getMember());
-    }
-
     @Override
     public void onMessageReceived(@Nonnull MessageReceivedEvent event) {
         Message message = event.getMessage();
+
         if (message.getAuthor().isBot())
             return;
+
+        // Log member message/file/image url to terminals
+        if (!message.getContentRaw().isEmpty())
+            Log.print("LOG", getMessageSender(message) + ": " + message.getContentDisplay());
+
+        else if (!message.getAttachments().isEmpty())
+            message.getAttachments().forEach(attachment -> Log.print("LOG", getMessageSender(message) + ": " + attachment.getUrl()));
+
         // Process the message
         handleMessage(message);
     }
@@ -103,33 +94,28 @@ public final class MessageHandler extends ListenerAdapter {
 
             // Delete in channel that it should not be
             GuildCache guildData = GuildHandler.getGuild(message.getGuild());
-
             guildData.resetTimer();
-            if (guildData.hasChannel(ChannelType.SCHEMATIC, message.getChannel().getId()) ||
-                    guildData.hasChannel(ChannelType.MAP, message.getChannel().getId())) {
 
-                if (!(ContentHandler.isSchematicText(message) && attachments.isEmpty()) || ContentHandler.isSchematicFile(attachments)) {
-                    message.delete().queue();
-                    replyMessage(message, "Vui lòng không gửi tin nhắn vào kênh này!", 30);
-                }
+            boolean isSchematicChannel = guildData.hasChannel(ChannelType.SCHEMATIC, message.getChannel().getId());
+            boolean isMapChannel = guildData.hasChannel(ChannelType.MAP, message.getChannel().getId());
+
+            boolean isSchematicMessage = ContentHandler.isSchematicText(message) || ContentHandler.isSchematicFile(attachments);
+            boolean isMapMessage = ContentHandler.isMapFile(attachments);
+
+            if ((isMapChannel && !isMapMessage) || (isSchematicChannel && !isSchematicMessage)) {
+                message.delete().queue();
+                replyMessage(message, "Vui lòng không gửi tin nhắn vào kênh này!", 30);
+
+            } else {
+                // Update level, money on message sent
+                UserHandler.onMessage(message);
             }
 
-            // Update exp on message sent
-            UserHandler.onMessage(message);
-            DatabaseHandler.log(LogType.MESSAGE, new Document()//
+            DatabaseHandler.log(LogCollection.MESSAGE, new Document()//
                     .append("message", getMessageSender(message) + ": " + message.getContentDisplay())//
                     .append("messageId", message.getId())//
                     .append("userId", member == null ? null : member.getId())//
                     .append("guildId", message.getGuild().getId()));
-
-            // Log member message/file/image url to terminals
-            if (!message.getContentRaw().isEmpty())
-                Log.print("LOG", getMessageSender(message) + ": " + message.getContentDisplay());
-
-            else if (!message.getAttachments().isEmpty())
-                message.getAttachments().forEach(attachment -> {
-                    Log.print("LOG", getMessageSender(message) + ": " + attachment.getUrl());
-                });
 
         } catch (Exception e) {
             Log.error(e);
@@ -151,7 +137,7 @@ public final class MessageHandler extends ListenerAdapter {
 
     @Override
     public void onMessageDelete(@Nonnull MessageDeleteEvent event) {
-        DatabaseHandler.log(LogType.MESSAGE_DELETED, new Document("messageId", event.getMessageId()));
+        DatabaseHandler.log(LogCollection.MESSAGE_DELETED, "messageId", event.getMessageId());
     }
 
     @Override
@@ -174,14 +160,31 @@ public final class MessageHandler extends ListenerAdapter {
 
     public static void log(Guild guild, String content) {
         GuildCache guildData = GuildHandler.getGuild(guild);
-        if (guildData == null)
-            throw new IllegalStateException("No guild data found");
 
         List<TextChannel> botLogChannel = guildData.getChannels(ChannelType.BOT_LOG);
         if (botLogChannel == null) {
             Log.error("Bot log channel for guild <" + guild.getName() + "> does not exists");
+            
         } else
             botLogChannel.forEach(c -> c.sendMessage("```" + content + "```").queue());
+    }
+
+    private static String getMessageSender(Guild guild, Category category, Channel channel, Member member) {
+        String guildName = guild == null ? "Unknown" : guild.getName();
+        String categoryName = category == null ? "Unknown" : category.getName();
+        String channelName = channel == null ? "Unknown" : channel.getName();
+        String memberName = member == null ? "Unknown" : member.getEffectiveName();
+
+        return "[" + guildName + "] " + "<" + categoryName + ":" + channelName + "> " + memberName;
+
+    }
+
+    public static String getMessageSender(Message message) {
+        return getMessageSender(message.getGuild(), message.getCategory(), message.getChannel(), message.getMember());
+    }
+
+    public static String getMessageSender(@Nonnull SlashCommandInteractionEvent event) {
+        return getMessageSender(event.getGuild(), null, event.getChannel(), event.getMember());
     }
 
     public static void sendMapPreview(Attachment attachment, Member member, MessageChannel channel) {

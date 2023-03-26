@@ -13,7 +13,7 @@ import AlphaChan.BotConfig;
 import AlphaChan.BotConfig.Config;
 import AlphaChan.main.handler.DatabaseHandler;
 import AlphaChan.main.handler.DatabaseHandler.Database;
-import AlphaChan.main.handler.DatabaseHandler.LogType;
+import AlphaChan.main.handler.DatabaseHandler.LogCollection;
 
 import static AlphaChan.AlphaChan.*;
 
@@ -116,7 +116,7 @@ public class GuildCache extends TimeObject implements DatabaseObject {
             String guildCollectionName = BotConfig.readString(Config.GUILD_COLLECTION, null);
             Bson filter = new Document().append("guildId", data.getGuildId());
             DatabaseHandler.delete(Database.GUILD, guildCollectionName, GuildData.class, filter);
-            DatabaseHandler.log(LogType.Database, new Document().append("DELETE GUILD", data.toDocument()));
+            DatabaseHandler.log(LogCollection.DATABASE, new Document().append("DELETE GUILD", data.toDocument()));
             killTimer();
         }
     }

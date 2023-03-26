@@ -12,7 +12,7 @@ import AlphaChan.main.command.SlashSubcommand;
 import AlphaChan.main.command.PageTable;
 import AlphaChan.main.handler.DatabaseHandler;
 import AlphaChan.main.handler.DatabaseHandler.Database;
-import AlphaChan.main.handler.DatabaseHandler.LogType;
+import AlphaChan.main.handler.DatabaseHandler.LogCollection;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
@@ -57,13 +57,11 @@ public class DeletedMessageCommand extends SlashSubcommand {
         else
             amount = Math.min(amountOption.getAsInt(), MAX_RETRIEVE);
 
-        MongoCollection<Document> deletedCollection = DatabaseHandler.getDatabase(Database.LOG)
-                .getCollection(LogType.MESSAGE_DELETED.name());
+        MongoCollection<Document> messageCollection = DatabaseHandler.getCollection(Database.LOG, LogCollection.MESSAGE.name(),
+                Document.class);
 
-        MongoCollection<Document> messageCollection = DatabaseHandler.getDatabase(Database.LOG)
-                .getCollection(LogType.MESSAGE.name());
-
-        FindIterable<Document> data = deletedCollection.find()
+        FindIterable<Document> data = DatabaseHandler
+                .find(Database.LOG, LogCollection.MESSAGE_DELETED.name(), Document.class, new Document())
                 .sort(new Document().append(BotConfig.readString(Config.TIME_INSERT, "_timeInsert"), -1));
 
         Document messageData;
@@ -87,10 +85,16 @@ public class DeletedMessageCommand extends SlashSubcommand {
                 String guildId = getGuildId(message);
                 if (!guild.getId().equals(guildId))
                     continue;
+
                 String content = getMessage(message);
                 if (content == null)
                     continue;
+
+                if (content.length() > 1000)
+                    content = content.substring(0, 999);
+
                 field.append(content + "\n");
+
                 if (i % MAX_DISPLAY == MAX_DISPLAY - 1) {
                     builder.addField("Tin nhắn đã xóa", field.toString(), false);
                     table.addPage(builder);

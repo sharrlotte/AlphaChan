@@ -21,40 +21,41 @@ public class SchematicInfoCache extends TimeObject implements DatabaseObject {
         return data;
     }
 
-    public long getStar() {
-        if (data.getStar() != -1)
-            return data.getStar();
+    public long getLike() {
+        if (data.getLike() != -1)
+            return data.getLike();
         // Create collection if it's not exist
-        return DatabaseHandler.count(Database.STAR, data.getId(), StarData.class, null);
+        return DatabaseHandler.count(Database.STAR, data.getId(), DislikeData.class, null);
     }
 
-    public boolean addStar(String userId) {
+    public boolean addLike(String userId) {
 
         Document filter = new Document().append("userId", userId);
-        boolean result = DatabaseHandler.insertIfNotFound(Database.STAR, data.getId(), StarData.class, filter, new StarData(userId));
+        boolean result = DatabaseHandler.insertIfNotFound(Database.STAR, data.getId(), DislikeData.class, filter,
+                new DislikeData(userId, System.currentTimeMillis()));
 
         if (result == true)
-            data.setStar(data.getStar() + 1);
+            data.setLike(data.getLike() + 1);
 
         return result;
     }
 
-    public long getPenguin() {
-        if (data.getPenguin() != -1)
-            return data.getPenguin();
+    public long getDislike() {
+        if (data.getDislike() != -1)
+            return data.getDislike();
         // Create collection if it's not exist
 
-        return DatabaseHandler.count(Database.PENGUIN, data.getId(), PenguinData.class, null);
+        return DatabaseHandler.count(Database.PENGUIN, data.getId(), LikeData.class, null);
     }
 
-    public boolean addPenguin(String userId) {
+    public boolean addDislike(String userId) {
 
         Document filter = new Document().append("userId", userId);
-        boolean result = DatabaseHandler.insertIfNotFound(Database.PENGUIN, data.getId(), PenguinData.class, filter,
-                new PenguinData(userId));
+        boolean result = DatabaseHandler.insertIfNotFound(Database.PENGUIN, data.getId(), LikeData.class, filter,
+                new LikeData(userId, System.currentTimeMillis()));
 
         if (result == true)
-            data.setStar(data.getStar() + 1);
+            data.setLike(data.getLike() + 1);
 
         return result;
     }

@@ -5,6 +5,8 @@ import static org.bson.codecs.configuration.CodecRegistries.fromProviders;
 import static org.bson.codecs.configuration.CodecRegistries.fromRegistries;
 
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import org.bson.BsonDateTime;
 import org.bson.Document;
@@ -17,6 +19,7 @@ import com.mongodb.ConnectionString;
 import com.mongodb.MongoClientSettings;
 import com.mongodb.ServerApi;
 import com.mongodb.ServerApiVersion;
+import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoCollection;
@@ -34,8 +37,8 @@ public final class DatabaseHandler {
         USER, GUILD, LOG, DAILY, MINDUSTRY, STAR, PENGUIN
     }
 
-    public static enum LogType {
-        MESSAGE, Database, USER, MESSAGE_DELETED
+    public static enum LogCollection {
+        MESSAGE, DATABASE, MESSAGE_DELETED
     }
 
     private static final String DATABASE_URL = System.getenv("DATABASE_URL");
@@ -51,6 +54,8 @@ public final class DatabaseHandler {
     private static CodecRegistry pojoCodecRegistry = fromRegistries(getDefaultCodecRegistry(), fromProviders(pojoCodecProvider));
 
     private static ConcurrentHashMap<String, MongoDatabase> database = new ConcurrentHashMap<String, MongoDatabase>();
+
+    private static ExecutorService loggerPool = Executors.newSingleThreadExecutor();
 
     private DatabaseHandler() {
 
@@ -70,6 +75,11 @@ public final class DatabaseHandler {
         MongoDatabase db = mongoClient.getDatabase(name.name()).withCodecRegistry(pojoCodecRegistry);
         database.put(name.name(), db);
         return db;
+    }
+
+    public static <T> FindIterable<T> find(Database databaseName, final String collectionName, Class<T> type, Bson filter) {
+        MongoCollection<T> collection = getDatabase(Database.MINDUSTRY).getCollection(collectionName, type);
+        return collection.find(filter);
     }
 
     public static <T> void insert(Database databaseName, final String collectionName, Class<T> type, T value) {
@@ -138,29 +148,45 @@ public final class DatabaseHandler {
 
     public static void createCollection(Database databaseName, final String collectionName) {
         getDatabase(databaseName).createCollection(collectionName);
-        log(LogType.Database, new Document().append("CREATE GUILD", collectionName));
+
+        log(LogCollection.DATABASE, "CREATE GUILD", collectionName);
     }
 
-    public static void log(LogType log, Document content) {
-        // Create collection if it doesn't exist
-        MongoDatabase logDatabase = getDatabase(Database.LOG);
-        if (!collectionExists(logDatabase, log.name()))
-            logDatabase.createCollection(log.name());
+    public static void log(LogCollection collection, String task, String content) {
+        log(collection, new Document(task, content));
+    }
 
-        MongoCollection<Document> collection = logDatabase.getCollection(log.name(), Document.class);
-        long count = collection.estimatedDocumentCount();
-        int maxLogCount = BotConfig.readInt(Config.MAX_LOG_COUNT, 10000);
+    public static void log(LogCollection collection, Document content) {
+        loggerPool.execute(new Logger(collection, content));
+    }
 
-        if (count > maxLogCount) {
-            while (count > maxLogCount - 1000) {
-                collection.deleteOne(new Document());
-                count--;
-                Log.system("Delete log: " + count);
-            }
+    public static class Logger implements Runnable {
+
+        private final LogCollection collection;
+        private final Document content;
+
+        public Logger(LogCollection collection, Document content) {
+            this.collection = collection;
+            this.content = content;
         }
-        // Insert log message
-        collection.insertOne(
-                content.append(BotConfig.readString(Config.TIME_INSERT, "_timeInsert"), new BsonDateTime(System.currentTimeMillis())));
 
+        @Override
+        public void run() {
+            MongoCollection<Document> logCollection = getCollection(Database.LOG, collection.name(), Document.class);
+            int maxLogCount = BotConfig.readInt(Config.MAX_LOG_COUNT, 10000);
+            long count = logCollection.estimatedDocumentCount();
+
+            if (count > maxLogCount) {
+                while (count > maxLogCount - 1000) {
+                    logCollection.deleteOne(new Document());
+                    count--;
+                }
+                Log.system("Delete collection: " + count);
+            }
+
+            // Insert collection message
+            logCollection.insertOne(
+                    content.append(BotConfig.readString(Config.TIME_INSERT, "_timeInsert"), new BsonDateTime(System.currentTimeMillis())));
+        }
     }
 }

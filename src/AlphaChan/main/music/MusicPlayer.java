@@ -186,16 +186,13 @@ public class MusicPlayer extends AudioEventAdapter implements AudioSendHandler {
                     builder.setImage(url);
                 }
 
-                builder.addField("Now playing",
-                        "Tác giả: " + playing.getInfo().author + //
-                                "\nVideo: [" + playing.getInfo().title + "](" + playing.getInfo().uri + ")" + //
-                                "\nThời lượng: " + TimeFormat.RELATIVE.now().minus(playing.getPosition()) + "/"
-                                + StringUtils.toTime(playing.getDuration()) + //
+                builder.addField("Now playing", "Tác giả: " + playing.getInfo().author + //
+                        "\nVideo: [" + playing.getInfo().title + "](" + playing.getInfo().uri + ")" + //
+                        "\nThời lượng: " + TimeFormat.RELATIVE.now().minus(playing.getPosition()) + "/"
+                        + StringUtils.toTime(playing.getDuration()) + //
 
-                                "\nNgười yêu cầu: " + playing.getUserData(RequestMetadata.class).getRequester() +
-                                "\nÂm lượng: "
-                                + StringUtils.getProgressBar(audioPlayer.getVolume() / 100d, 20, "||", "|", "|")
-                                + audioPlayer.getVolume() + "%",
+                        "\nNgười yêu cầu: " + playing.getUserData(RequestMetadata.class).getRequester() + "\nÂm lượng: "
+                        + StringUtils.getProgressBar(audioPlayer.getVolume() / 100d, 20, "||", "|", "|") + audioPlayer.getVolume() + "%",
 
                         false);
             }

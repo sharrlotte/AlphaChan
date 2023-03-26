@@ -74,10 +74,10 @@ public class SearchSchematicCommand extends SlashSubcommand {
 
         FindIterable<SchematicInfo> schematicInfo;
         if (tags.length <= 0) {
-            schematicInfo = collection.find(filter, SchematicInfo.class).sort(descending("star"));
+            schematicInfo = collection.find(filter, SchematicInfo.class).sort(descending("like"));
 
         } else {
-            schematicInfo = collection.find(Filters.and(Filters.all("tag", tags), filter), SchematicInfo.class).sort(descending("star"));
+            schematicInfo = collection.find(Filters.and(Filters.all("tag", tags), filter), SchematicInfo.class).sort(descending("like"));
         }
 
         if (schematicInfo.first() == null) {

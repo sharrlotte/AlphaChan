@@ -21,7 +21,6 @@ import AlphaChan.main.data.user.UserCache;
 import AlphaChan.main.data.user.UserData;
 import AlphaChan.main.data.user.UserCache.PointType;
 import AlphaChan.main.handler.DatabaseHandler.Database;
-import AlphaChan.main.handler.DatabaseHandler.LogType;
 import AlphaChan.main.util.Log;
 
 import net.dv8tion.jda.api.entities.Member;
@@ -72,6 +71,8 @@ public final class UserHandler implements Updatable {
     }
 
     public void save() {
+        Log.system("Saving user data");
+
         Iterator<UserCache> iterator = userCache.values().iterator();
         while (iterator.hasNext()) {
             UserCache user = iterator.next();
@@ -191,14 +192,8 @@ public final class UserHandler implements Updatable {
     }
 
     public static UserCache getUserFromDatabase(@Nonnull String guildId, String userId) {
-        // User from a new guild
-        if (!DatabaseHandler.collectionExists(Database.USER, guildId)) {
-            DatabaseHandler.getDatabase(Database.USER).createCollection(guildId);
-            DatabaseHandler.log(LogType.Database, new Document().append("NEW GUILD", guildId));
-            return new UserCache(guildId, userId);
 
-        }
-        MongoCollection<UserData> collection = DatabaseHandler.getDatabase(Database.USER).getCollection(guildId, UserData.class);
+        MongoCollection<UserData> collection = DatabaseHandler.getCollection(Database.USER, guildId, UserData.class);
 
         // Get user from Database
         Bson filter = new Document().append("userId", userId);

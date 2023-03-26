@@ -66,8 +66,8 @@ public class SchematicTable extends PageTable {
         addButton(primary(">", () -> this.nextPage()));
         addRow();
         addButton(primary("data", Emoji.fromUnicode(BotConfig.FILE_EMOJI), () -> this.sendSchematicCodeMessage()));
-        addButton(primary("star", Emoji.fromUnicode(BotConfig.STAR_EMOJI), () -> this.addStar()));
-        addButton(primary("penguin", Emoji.fromUnicode(BotConfig.PENGUIN_EMOJI), () -> this.addPenguin()));
+        addButton(primary("like", Emoji.fromUnicode(BotConfig.STAR_EMOJI), () -> this.addLike()));
+        addButton(primary("dislike", Emoji.fromUnicode(BotConfig.PENGUIN_EMOJI), () -> this.addDislike()));
         addRow();
         addButton(primary("delete", Emoji.fromUnicode(BotConfig.PUT_LITTER_EMOJI), () -> this.deleteSchematic()));
 
@@ -94,21 +94,21 @@ public class SchematicTable extends PageTable {
         }
     }
 
-    private void addStar() {
+    private void addLike() {
         if (currentInfo == null)
             return;
 
-        if (currentInfo.addStar(getTriggerMember().getId()))
+        if (currentInfo.addLike(getTriggerMember().getId()))
             updateTable();
         else
             sendMessage("Bạn đã like bản thiết kế này", showPageNumber);
     }
 
-    private void addPenguin() {
+    private void addDislike() {
         if (currentInfo == null)
             return;
 
-        if (currentInfo.addPenguin(getTriggerMember().getId()))
+        if (currentInfo.addDislike(getTriggerMember().getId()))
             updateTable();
         else
             sendMessage("Bạn đã dislike bản thiết kế này", showPageNumber);
@@ -218,8 +218,8 @@ public class SchematicTable extends PageTable {
             field.append(StringUtils.capitalize(
                     currentInfo.getData().getTag().get(currentInfo.getData().getTag().size() - 1).replace("_", " ").toLowerCase() + "\n"));
 
-            field.append("- Sao: " + currentInfo.getStar() + "\n");
-            field.append("- Cánh cụt: " + currentInfo.getPenguin() + "\n");
+            field.append("- Sao: " + currentInfo.getLike() + "\n");
+            field.append("- Cánh cụt: " + currentInfo.getDislike() + "\n");
 
             builder.addField("Thông tin", field.toString(), false);
 

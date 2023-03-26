@@ -64,6 +64,8 @@ public class GuildHandler implements Updatable {
     }
 
     public void save() {
+        Log.system("Saving guild data");
+
         Iterator<GuildCache> iterator = guildCaches.values().iterator();
         while (iterator.hasNext()) {
             GuildCache guild = iterator.next();
@@ -77,7 +79,8 @@ public class GuildHandler implements Updatable {
 
     public static GuildCache getGuild(Guild guild) {
         if (guild == null)
-            return null;
+            throw new IllegalStateException("Guild is not exists");
+
         return getGuild(guild.getId());
     }
 

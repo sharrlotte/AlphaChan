@@ -12,7 +12,7 @@ import org.bson.conversions.Bson;
 import AlphaChan.main.handler.DatabaseHandler;
 import AlphaChan.main.handler.GuildHandler;
 import AlphaChan.main.handler.DatabaseHandler.Database;
-import AlphaChan.main.handler.DatabaseHandler.LogType;
+import AlphaChan.main.handler.DatabaseHandler.LogCollection;
 
 import static AlphaChan.AlphaChan.*;
 
@@ -172,7 +172,7 @@ public class UserCache extends TimeObject implements DatabaseObject {
         if (isAlive()) {
             Bson filter = new Document().append("userId", data.getGuildId());
             DatabaseHandler.delete(Database.USER, data.getGuildId(), UserData.class, filter);
-            DatabaseHandler.log(LogType.Database, new Document().append("DELETE USER", data.toDocument()));
+            DatabaseHandler.log(LogCollection.DATABASE, "DELETE USER", data.toDocument().toString());
             killTimer();
         }
     }

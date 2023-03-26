@@ -57,9 +57,10 @@ public abstract class SlashSubcommand extends SubcommandData {
     // Auto complete handler
     public void sendAutoComplete(@Nonnull CommandAutoCompleteInteractionEvent event, HashMap<String, String> list) {
         if (list.isEmpty()) {
-            sendAutoComplete(event, "Không tìm thấy kết quả khớp");
+            sendAutoComplete(event, "");
             return;
         }
+
         String focusString = event.getFocusedOption().getValue().toLowerCase();
         List<Command.Choice> options = new ArrayList<Command.Choice>();
 
@@ -76,11 +77,10 @@ public abstract class SlashSubcommand extends SubcommandData {
             }
         }
 
-        if (options.isEmpty()) {
-            sendAutoComplete(event, "Không tìm thấy kết quả khớp");
-            return;
-        }
-        event.replyChoices(options).queue();
+        if (options.isEmpty())
+            sendAutoComplete(event, "");
+        else
+            event.replyChoices(options).queue();
     }
 
     public void sendAutoComplete(@Nonnull CommandAutoCompleteInteractionEvent event, String value) {
@@ -88,7 +88,7 @@ public abstract class SlashSubcommand extends SubcommandData {
     }
 
     public void sendAutoComplete(@Nonnull CommandAutoCompleteInteractionEvent event, String name, String value) {
-        if (value.isBlank())
+        if (value == null || value.isBlank())
             event.replyChoice("Không tìm thấy kết quả khớp", "Không tìm thấy kết quả khớp").queue();
         else
             event.replyChoice(name, value).queue();

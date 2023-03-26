@@ -16,11 +16,10 @@ public class AskCommand extends SlashSubcommand {
 
     private long lastTime = 0;
     private String chatGPTKey;
-    private int tries = 0;
+    private Boolean hasKey = false;
     private OpenAiService api;
 
-    private Boolean hasKey = false;
-
+    private int tries = 0;
     private int cooldown = 1000 * 60 * 2; // 2 min for every question
 
     public AskCommand() {

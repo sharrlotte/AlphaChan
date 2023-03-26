@@ -27,6 +27,8 @@ public class AlphaChan {
 
     public AlphaChan() {
         try {
+            Log.system("Bot awaking");
+
             BotConfig.load();
 
             Log.system("Connecting to discord");
@@ -68,6 +70,7 @@ public class AlphaChan {
 
         @Override
         public void run() {
+            Log.system("Bot shutting down");
             onShutDown.emit(0);
             Log.system("Bot shutdown");
         }
