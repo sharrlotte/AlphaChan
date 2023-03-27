@@ -5,6 +5,7 @@ import AlphaChan.main.command.ConsoleCommand;
 import AlphaChan.main.data.user.UserCache;
 import AlphaChan.main.handler.UserHandler;
 import AlphaChan.main.util.Log;
+import AlphaChan.main.util.StringUtils;
 
 public class ShowUserConsole extends ConsoleCommand {
 
@@ -19,8 +20,9 @@ public class ShowUserConsole extends ConsoleCommand {
         if (command.getArgumentCount() == 0) {
             Log.info("USER STATUS", "Users count: " + UserHandler.getActiveUserCount());
             for (UserCache ud : UserHandler.getUserCache()) {
-                Log.info("USER STATUS", ud.getData().toDocument().toString());
+                Log.info("USER STATUS", "\n" + StringUtils.mapToLines(ud.getData().toDocument()) + "\n");
             }
+
         } else if (command.getArgumentCount() == 2) {
             String guildId = command.nextString();
             String userId = command.nextString();
@@ -31,7 +33,7 @@ public class ShowUserConsole extends ConsoleCommand {
 
                 UserCache ud = UserHandler.getUserNoCache(guildId, userId);
                 Log.info("USER STATUS", "User id: " + userId + //
-                        "\n" + ud.getData().toDocument().toString());
+                        "\n" + StringUtils.mapToLines(ud.getData().toDocument()) + "\n");
             } catch (Exception e) {
                 Log.warning("User with id " + userId + " in guild " + guildId + " not found");
             }

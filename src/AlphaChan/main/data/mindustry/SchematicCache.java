@@ -36,7 +36,7 @@ public class SchematicCache extends TimeObject implements DatabaseObject {
             String schematicDataCollectionName = BotConfig.readString(Config.SCHEMATIC_DATA_COLLECTION, null);
             Document filter = new Document().append("_id", data.getId());
             DatabaseHandler.delete(null, schematicDataCollectionName, SchematicData.class, filter);
-            killTimer();
+            kill();
         }
     }
 }

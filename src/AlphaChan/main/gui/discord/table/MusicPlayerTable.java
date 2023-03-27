@@ -16,8 +16,8 @@ public class MusicPlayerTable extends Table {
         this.player = player;
 
         addButton(primary("play", Emoji.fromUnicode(player.getTrackStatus()), () -> player.play()));
-        addButton(primary("next", Emoji.fromUnicode(BotConfig.FORWARD_EMOJI), () -> player.playNext()));
-        addButton(primary("clear", Emoji.fromUnicode(BotConfig.CLEAR_EMOJI), () -> player.clear()));
+        addButton(primary("next", Emoji.fromUnicode(BotConfig.TEmoji.FORWARD.value), () -> player.playNext()));
+        addButton(primary("clear", Emoji.fromUnicode(BotConfig.TEmoji.CLEAR.value), () -> player.clear()));
         addButton(deny("X", () -> this.deleteTable()));
 
         player.setTable(this);

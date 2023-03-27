@@ -416,30 +416,20 @@ public class ContentHandler {
         return false;
     }
 
-    public static EmbedBuilder getSchematicEmbedBuilder(Schematic schem, File previewFile, Member member) {
-        EmbedBuilder builder = new EmbedBuilder().setImage("attachment://" + previewFile.getName())
-                .setAuthor(member.getEffectiveName(), member.getEffectiveAvatarUrl(), member.getEffectiveAvatarUrl())
-                .setTitle(schem.name());
+    public static EmbedBuilder getSchematicInfoEmbedBuilder(Schematic schem, Member member) {
+        EmbedBuilder builder = new EmbedBuilder();
 
         if (!schem.description().isEmpty())
             builder.setFooter(schem.description());
 
         // Schem heigh, width
-        builder.addField("Kích thước", "- Rộng: " + String.valueOf(schem.width) + " Cao: " + String.valueOf(schem.height), true);
+        StringBuilder sizeString = new StringBuilder();
+        sizeString.append("- Rộng: " + String.valueOf(schem.width) + "\n");
+        sizeString.append("- Cao: " + String.valueOf(schem.height) + "\n");
+        builder.addField("Kích thước", sizeString.toString(), true);
 
         StringBuilder requirement = new StringBuilder();
-
-        // Item requirements
-        for (ItemStack stack : schem.requirements()) {
-            List<RichCustomEmoji> emotes = member.getGuild().getEmojisByName(stack.item.name.replace("-", ""), true);
-            requirement.append("-" + (emotes.isEmpty() ? stack.item.name : emotes.get(0).getAsMention()) + ": " + stack.amount + "\n");
-        }
-
-        builder.addField("Tài nguyên cần", requirement.toString(), false);
-
         // Power input/output
-
-        requirement = new StringBuilder();
 
         int powerProduction = (int) Math.round(schem.powerProduction()) * 60;
         int powerConsumption = (int) Math.round(schem.powerConsumption()) * 60;
@@ -450,8 +440,23 @@ public class ContentHandler {
         if (powerProduction != 0)
             requirement.append("\n- Năng lượng tạo ra: " + String.valueOf(powerProduction) + "/s");
 
+        if (powerProduction != 0 && powerConsumption != 0) {
+            float powerLeft = powerProduction - powerConsumption;
+            requirement.append("\n- " + (powerLeft >= 0 ? "Năng lượng dư" : "Năng lượng cần"));
+            requirement.append(": " + String.valueOf(Math.abs(powerLeft)) + "/s");
+        }
+
         if (requirement.length() != 0)
-            builder.addField("Năng lượng", requirement.toString(), false);
+            builder.addField("Năng lượng", requirement.toString(), true);
+
+        // Item requirements
+        requirement = new StringBuilder();
+        for (ItemStack stack : schem.requirements()) {
+            List<RichCustomEmoji> emotes = member.getGuild().getEmojisByName(stack.item.name.replace("-", ""), true);
+            requirement.append("- " + (emotes.isEmpty() ? stack.item.name : emotes.get(0).getAsMention()) + ": " + stack.amount + "\n");
+        }
+
+        builder.addField("Tài nguyên cần", requirement.toString(), true);
 
         HashMap<String, Float> input = ContentHandler.getSchematicInput(schem);
         HashMap<String, Float> output = ContentHandler.getSchematicOutput(schem);
@@ -462,8 +467,8 @@ public class ContentHandler {
 
             List<RichCustomEmoji> emotes = member.getGuild().getEmojisByName(key.replace("-", ""), true);
 
-            inputString.append(emotes.isEmpty() ? key + ": " : emotes.get(0).getAsMention());
-            inputString.append("-" + Strings.fixed(input.get(key), 2) + "/s\n");
+            inputString.append("- " + (emotes.isEmpty() ? key + ": " : emotes.get(0).getAsMention()));
+            inputString.append(Strings.fixed(input.get(key), 2) + "/s\n");
         }
 
         StringBuilder outputString = new StringBuilder();
@@ -472,15 +477,15 @@ public class ContentHandler {
 
             List<RichCustomEmoji> emotes = member.getGuild().getEmojisByName(key.replace("-", ""), true);
 
-            outputString.append(emotes.isEmpty() ? key + ": " : emotes.get(0).getAsMention());
-            outputString.append("-" + Strings.fixed(output.get(key), 2) + "/s\n");
+            outputString.append("- " + (emotes.isEmpty() ? key + ": " : emotes.get(0).getAsMention()));
+            outputString.append(Strings.fixed(output.get(key), 2) + "/s\n");
         }
 
         if (inputString.length() != 0)
-            builder.addField("Tổng đầu vào", inputString.toString(), false);
+            builder.addField("Tổng đầu vào", inputString.toString(), true);
 
         if (outputString.length() != 0)
-            builder.addField("Tổng đầu ra", outputString.toString(), false);
+            builder.addField("Tổng đầu ra", outputString.toString(), true);
 
         return builder;
     }

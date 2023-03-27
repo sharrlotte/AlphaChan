@@ -12,6 +12,7 @@ import AlphaChan.main.data.user.TimeObject;
 import AlphaChan.main.event.Signal;
 import AlphaChan.main.handler.TableHandler;
 import AlphaChan.main.util.Log;
+import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
@@ -45,7 +46,7 @@ public abstract class Table extends TimeObject {
         onTimeOut.connect((n) -> deleteTable());
         onUpdate.connect((n) -> updateTable());
 
-        event.getHook().deleteOriginal().queue();
+        event.getInteraction().getHook().deleteOriginal().queue();
 
         TableHandler.addTable(this);
     }
@@ -78,7 +79,7 @@ public abstract class Table extends TimeObject {
 
         if (requestor != null) {
             if (!getTriggerMember().getId().equals(requestor)) {
-                sendMessage("Bạn không có quuyền tương tác với bảng này", true);
+                replyMessage(event, "Bạn không có quuyền tương tác với bảng này", 10);
                 return;
             }
         }
@@ -93,7 +94,7 @@ public abstract class Table extends TimeObject {
     }
 
     public final Table sendTable() {
-        message = event.getChannel().sendMessage("PLACE HOLDER").complete();
+        message = event.getChannel().sendMessage(EmbedBuilder.ZERO_WIDTH_SPACE).complete();
         updateTable();
         return this;
     }
@@ -101,9 +102,9 @@ public abstract class Table extends TimeObject {
     public final void updateTable() {
 
         if (message == null)
-            message = event.getChannel().sendMessage("PLACE HOLDER").complete();
+            message = event.getChannel().sendMessage(EmbedBuilder.ZERO_WIDTH_SPACE).complete();
 
-        MessageEditAction action = message.editMessage("PLACE HOLDER");
+        MessageEditAction action = message.editMessage(EmbedBuilder.ZERO_WIDTH_SPACE);
 
         onPrepareTable.emit(action);
 
@@ -114,11 +115,21 @@ public abstract class Table extends TimeObject {
     }
 
     public void deleteTable() {
-        if (interaction != null)
-            interaction.getHook().deleteOriginal().queue();
 
-        if (message != null)
-            message.delete().queue();
+        if (isAlive()) {
+
+            if (interaction != null) {
+                interaction.getHook().deleteOriginal().complete();
+                interaction = null;
+            }
+
+            if (message != null) {
+                message.delete().queue();
+                message = null;
+            }
+
+            kill();
+        }
     }
 
     public Guild getEventGuild() {
@@ -280,24 +291,21 @@ public abstract class Table extends TimeObject {
         buttons.clear();
     }
 
-    public void reply(String content) {
-        event.getHook().sendMessage("```" + content + "```").queue();
-    }
-
-    public void reply(String content, int deleteAfter) {
-        event.getHook().sendMessage("```" + content + "```").queue();
+    public void sendMessage(String content) {
+        event.getChannel().sendMessage("```" + content + "```").queue();
     }
 
     public void sendMessage(String content, int deleteAfter) {
-        if (interaction == null)
-            return;
-        interaction.getHook().sendMessage("```" + content + "```").queue(m -> m.delete().queueAfter(deleteAfter, TimeUnit.SECONDS));
+        event.getChannel().sendMessage("```" + content + "```")
+                .queue(_message -> _message.delete().queueAfter(deleteAfter, TimeUnit.SECONDS));
     }
 
-    public void sendMessage(String content, boolean ephemeral) {
-        if (interaction == null)
-            return;
-        interaction.getHook().sendMessage("```" + content + "```").setEphemeral(ephemeral).queue();
+    public void replyMessage(ButtonInteractionEvent event, String content) {
+        event.reply("```" + content + "```").queue();
+    }
+
+    public void replyMessage(ButtonInteractionEvent event, String content, int deleteAfter) {
+        event.reply("```" + content + "```").queue(_message -> _message.deleteOriginal().queueAfter(deleteAfter, TimeUnit.SECONDS));
     }
 
     private class CallbackButton {

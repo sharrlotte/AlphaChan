@@ -147,7 +147,8 @@ public class SchematicCalculatorTable extends Table {
                     }
 
                     for (UnitType[] type : constructor.upgrades) {
-                        blockRatio.addOutput(type[1].name, 1 / constructor.constructTime / 60);
+                        blockRatio.addInput(type[0].name, 1f / constructor.constructTime / 60);
+                        blockRatio.addOutput(type[1].name, 1f / constructor.constructTime / 60);
                     }
 
                 } else if (block instanceof UnitFactory) {
@@ -305,7 +306,8 @@ public class SchematicCalculatorTable extends Table {
                 if (need <= 0 || blockNeedCal.size() == 0)
                     continue;
 
-                int numbedNeed = (int) (need / blockNeedCal.get(0).getOutput().get(in)) + 1;
+                int numbedNeed = (int) (need / blockNeedCal.get(0).getOutput().get(in))
+                        + ((need / blockNeedCal.get(0).getOutput().get(in)) % 1) == 0 ? 0 : 1;
                 blocks.put(blockNeedCal.get(0), numbedNeed);
             }
 

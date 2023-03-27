@@ -30,6 +30,8 @@ import mindustry.game.Schematic;
 
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.entities.MessageEmbed.Field;
+import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.utils.FileUpload;
@@ -63,11 +65,11 @@ public class SchematicTable extends PageTable {
         addButton(deny("X", () -> this.deleteTable()));
         addButton(primary(">", () -> this.nextPage()));
         addRow();
-        addButton(primary("data", Emoji.fromUnicode(BotConfig.FILE_EMOJI), () -> this.sendSchematicCodeMessage()));
-        addButton(primary("like", Emoji.fromUnicode(BotConfig.STAR_EMOJI), () -> this.addLike()));
-        addButton(primary("dislike", Emoji.fromUnicode(BotConfig.PENGUIN_EMOJI), () -> this.addDislike()));
+        addButton(primary("like", Emoji.fromUnicode(BotConfig.TEmoji.LIKE.value), () -> this.addLike()));
+        addButton(primary("dislike", Emoji.fromUnicode(BotConfig.TEmoji.DISLIKE.value), () -> this.addDislike()));
+        addButton(primary("data", Emoji.fromUnicode(BotConfig.TEmoji.FILE.value), () -> this.sendSchematicCodeMessage()));
         addRow();
-        addButton(primary("delete", Emoji.fromUnicode(BotConfig.PUT_LITTER_EMOJI), () -> this.deleteSchematic()));
+        addButton(primary("delete", Emoji.fromUnicode(BotConfig.TEmoji.TRASH_CAN.value), () -> this.deleteSchematic()));
 
     }
 
@@ -80,12 +82,8 @@ public class SchematicTable extends PageTable {
     public void deleteTable() {
         try {
             super.deleteTable();
-            getEvent().getHook().deleteOriginal().queue();
-
-            this.killTimer();
-
-            if (currentCode != null)
-                currentCode.delete().queue();
+            this.kill();
+            this.deleteSChematicCodeMessage();
 
         } catch (Exception e) {
             Log.error(e);
@@ -99,7 +97,7 @@ public class SchematicTable extends PageTable {
         if (currentInfo.addLike(getTriggerMember().getId()))
             updateTable();
         else
-            sendMessage("Bạn đã like bản thiết kế này", showPageNumber);
+            sendMessage("Bạn đã like bản thiết kế này", 10);
     }
 
     private void addDislike() {
@@ -109,12 +107,12 @@ public class SchematicTable extends PageTable {
         if (currentInfo.addDislike(getTriggerMember().getId()))
             updateTable();
         else
-            sendMessage("Bạn đã dislike bản thiết kế này", showPageNumber);
+            sendMessage("Bạn đã dislike bản thiết kế này", 10);
     }
 
     private void deleteSchematic() {
         if (!UserHandler.isAdmin(getTriggerMember())) {
-            sendMessage("Bạn không có quyền xóa bản thiết kế", true);
+            sendMessage("Bạn không có quyền xóa bản thiết kế", 10);
             return;
         }
 
@@ -167,8 +165,7 @@ public class SchematicTable extends PageTable {
     }
 
     public void sendSchematicCodeData(@Nonnull String data) throws IOException {
-        // Can't send message that have more than 1024 letters
-        if (data.length() < 1024) {
+        if (data.length() < Message.MAX_CONTENT_LENGTH) {
             getMessage().reply(data).queue(message -> this.currentCode = message);
             return;
         }
@@ -188,7 +185,7 @@ public class SchematicTable extends PageTable {
             SchematicData schematicData = collection.find(Filters.eq("_id", currentInfo.getData().getId())).limit(1).first();
 
             if (schematicData == null) {
-                reply("Không có dữ liệu về bản thiết kế với id:" + currentInfo.getData().getId(), 10);
+                sendMessage("Không có dữ liệu về bản thiết kế với id:" + currentInfo.getData().getId(), 10);
                 return;
             }
 
@@ -196,7 +193,7 @@ public class SchematicTable extends PageTable {
 
             Schematic schem = ContentHandler.parseSchematic(currentData.getData().getData());
             File previewFile = ContentHandler.getSchematicPreviewFile(schem);
-            EmbedBuilder builder = ContentHandler.getSchematicEmbedBuilder(schem, previewFile, getEvent().getMember());
+            EmbedBuilder builder = new EmbedBuilder();
             StringBuilder field = new StringBuilder();
 
             addPageFooter(builder);
@@ -204,8 +201,16 @@ public class SchematicTable extends PageTable {
             String authorId = currentInfo.getData().getAuthorId();
             if (authorId != null) {
                 User user = jda.getUserById(authorId);
-                if (user != null)
+                Member member = getEventGuild().getMember(user);
+
+                if (member != null) {
+                    field.append("- Tác giả: " + member.getEffectiveName() + "\n");
+                    builder.setAuthor(member.getEffectiveName(), member.getEffectiveAvatarUrl(), member.getEffectiveAvatarUrl());
+
+                } else if (user != null) {
                     field.append("- Tác giả: " + user.getName() + "\n");
+                    builder.setAuthor(user.getName(), user.getEffectiveAvatarUrl(), user.getEffectiveAvatarUrl());
+                }
             }
 
             field.append("- Nhãn: ");
@@ -216,10 +221,16 @@ public class SchematicTable extends PageTable {
             field.append(StringUtils.capitalize(
                     currentInfo.getData().getTag().get(currentInfo.getData().getTag().size() - 1).replace("_", " ").toLowerCase() + "\n"));
 
-            field.append("- Sao: " + currentInfo.getLike() + "\n");
-            field.append("- Cánh cụt: " + currentInfo.getDislike() + "\n");
+            field.append("- Like: " + currentInfo.getLike() + "\n");
+            field.append("- Dislike: " + currentInfo.getDislike() + "\n");
 
-            builder.addField("Thông tin", field.toString(), false);
+            builder.addField("Thông tin", field.toString(), true);
+
+            for (Field f : ContentHandler.getSchematicInfoEmbedBuilder(schem, getEvent().getMember()).getFields()) {
+                builder.addField(f);
+            }
+
+            builder.setImage("attachment://" + previewFile.getName()).setTitle(schem.name());
 
             action.setEmbeds(builder.build()).setFiles(FileUpload.fromData(previewFile));
 

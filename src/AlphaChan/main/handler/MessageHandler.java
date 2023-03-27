@@ -5,6 +5,7 @@ import mindustry.game.*;
 import net.dv8tion.jda.api.*;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.entities.Message.Attachment;
+import net.dv8tion.jda.api.entities.MessageEmbed.Field;
 import net.dv8tion.jda.api.entities.channel.Channel;
 import net.dv8tion.jda.api.entities.channel.concrete.Category;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
@@ -151,7 +152,8 @@ public final class MessageHandler extends ListenerAdapter {
         User user = event.getUser();
         List<TextChannel> inviteChannels = event.getGuild().getTextChannels();
         if (!inviteChannels.isEmpty()) {
-            Invite invite = inviteChannels.get(0).createInvite().complete();
+            // Create a never expire, no uses limit invite
+            Invite invite = inviteChannels.get(0).createInvite().setMaxUses(0).setMaxAge(0).complete();
             user.openPrivateChannel().queue(channel -> channel.sendMessage(invite.getUrl()).queue());
         }
         log(event.getGuild(), user.getName() + " rời máy chủ");
@@ -278,7 +280,13 @@ public final class MessageHandler extends ListenerAdapter {
         try {
             File schemFile = ContentHandler.getSchematicFile(schem);
             File previewFile = ContentHandler.getSchematicPreviewFile(schem);
-            EmbedBuilder builder = ContentHandler.getSchematicEmbedBuilder(schem, previewFile, member);
+
+            EmbedBuilder builder = ContentHandler.getSchematicInfoEmbedBuilder(schem, member);
+            List<Field> fields = builder.getFields();
+            fields.add(2, new Field(EmbedBuilder.ZERO_WIDTH_SPACE, EmbedBuilder.ZERO_WIDTH_SPACE, false));
+
+            builder.setAuthor(member.getEffectiveName(), member.getEffectiveAvatarUrl(), member.getEffectiveAvatarUrl())
+                    .setTitle(schem.name()).setImage("attachment://" + previewFile.getName());
 
             channel.sendFiles(FileUpload.fromData(schemFile), FileUpload.fromData(previewFile)).setEmbeds(builder.build()).queue();
         } catch (Exception e) {

@@ -22,7 +22,7 @@ public final class TableHandler extends ListenerAdapter implements Updatable {
         jda.addEventListener(this);
         UpdatableHandler.addListener(this);
 
-        onShutDown.connect((code) -> delete());
+        onShutdown.connect((code) -> delete());
 
         Log.system("Table handler up");
     }
@@ -74,7 +74,6 @@ public final class TableHandler extends ListenerAdapter implements Updatable {
             Table table = iterator.next();
             table.deleteTable();
             iterator.remove();
-
         }
     }
 }

@@ -38,7 +38,7 @@ public final class UserHandler implements Updatable {
     private UserHandler() {
         UpdatableHandler.addListener(this);
 
-        onShutDown.connect((code) -> save());
+        onShutdown.connect((code) -> save());
 
         Log.system("User handler up");
     }
@@ -71,6 +71,9 @@ public final class UserHandler implements Updatable {
     }
 
     public void save() {
+        if (userCache.size() == 0)
+            return;
+
         Log.system("Saving user data");
 
         Iterator<UserCache> iterator = userCache.values().iterator();

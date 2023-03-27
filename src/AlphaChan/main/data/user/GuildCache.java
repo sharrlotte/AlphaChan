@@ -26,11 +26,12 @@ public class GuildCache extends TimeObject implements DatabaseObject {
     private final GuildData data;
 
     public GuildCache(String guildId) {
-        this.data = new GuildData();
+        this(new GuildData());
         this.data.setGuildId(guildId);
     }
 
     public GuildCache(GuildData data) {
+        super(BotConfig.readInt(Config.GUILD_ALIVE_TIME, 30));
         this.data = data;
     }
 
@@ -42,7 +43,7 @@ public class GuildCache extends TimeObject implements DatabaseObject {
         Guild guild = jda.getGuildById(data.getGuildId());
 
         if (guild == null) {
-            killTimer();
+            kill();
             throw new IllegalStateException("Guild not found with id <" + data.getGuildId() + ">");
         }
 
@@ -113,11 +114,11 @@ public class GuildCache extends TimeObject implements DatabaseObject {
     @Override
     public void delete() {
         if (isAlive()) {
+            kill();
             String guildCollectionName = BotConfig.readString(Config.GUILD_COLLECTION, null);
             Bson filter = new Document().append("guildId", data.getGuildId());
             DatabaseHandler.delete(Database.GUILD, guildCollectionName, GuildData.class, filter);
             DatabaseHandler.log(LogCollection.DATABASE, new Document().append("DELETE GUILD", data.toDocument()));
-            killTimer();
         }
     }
 }

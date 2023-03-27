@@ -7,10 +7,10 @@ import AlphaChan.BotConfig;
 import AlphaChan.BotConfig.Config;
 import AlphaChan.main.command.SlashSubcommand;
 import AlphaChan.main.handler.UpdatableHandler;
-import AlphaChan.main.util.StringUtils;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
+import net.dv8tion.jda.api.utils.TimeFormat;
 
 public class AskCommand extends SlashSubcommand {
 
@@ -48,7 +48,9 @@ public class AskCommand extends SlashSubcommand {
         }
 
         if (remain > 0) {
-            reply(command, "Vui lòng đợi " + StringUtils.toTime(remain) + " để sử dụng lệnh", 10);
+            reply(command,
+                    "Vui lòng đợi " + TimeFormat.RELATIVE.before(System.currentTimeMillis() + remain).toString() + " để sử dụng lệnh",
+                    (int) remain);
             return;
         }
 

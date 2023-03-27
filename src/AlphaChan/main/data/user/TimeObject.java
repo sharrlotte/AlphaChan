@@ -7,7 +7,7 @@ public abstract class TimeObject {
     private final int ALIVE_TIME;
 
     private int time = 0;
-    private boolean isDeleted = false;
+    private boolean isKilled = false;
 
     protected Signal<Integer> onTimeOut = new Signal<>();
     protected Signal<Integer> onUpdate = new Signal<>();
@@ -22,14 +22,14 @@ public abstract class TimeObject {
     }
 
     public boolean isAlive() {
-        if (isDeleted == true)
+        if (isKilled == true)
             return false;
 
         if (time > 0)
             return true;
 
         onTimeOut.emit(0);
-        isDeleted = true;
+        isKilled = true;
         return false;
     }
 
@@ -42,9 +42,9 @@ public abstract class TimeObject {
         time = ALIVE_TIME;
     }
 
-    public void killTimer() {
+    public void kill() {
+        isKilled = true;
         time = 0;
-        isDeleted = true;
     }
 
     public int getTime() {

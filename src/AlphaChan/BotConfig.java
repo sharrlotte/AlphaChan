@@ -18,32 +18,55 @@ public final class BotConfig {
     private static Properties prop = new Properties();
 
     public static enum Config {
-        YUI_ID,
+        YUI_ID("719322804549320725"),
 
         // Cache
-        UPDATE_PERIOD, // Time between each update
-        UPDATE_LIMIT, GUILD_ALIVE_TIME, USER_ALIVE_TIME,
+        UPDATE_PERIOD(60 * 1000), // Time between each update
+        UPDATE_LIMIT(1), GUILD_ALIVE_TIME(30), USER_ALIVE_TIME(10),
 
         // Database
-        GUILD_COLLECTION, SCHEMATIC_INFO_COLLECTION, SCHEMATIC_DATA_COLLECTION, MAX_LOG_COUNT, // Max log that Database
-                                                                                               // can store for each
-                                                                                               // type
-        TIME_INSERT, // Time field name in Database
+        GUILD_COLLECTION("GUILD_DATA"), SCHEMATIC_INFO_COLLECTION("SCHEMATIC_INFO"), SCHEMATIC_DATA_COLLECTION("SCHEMATIC_DATA"),
+        MAX_LOG_COUNT(8000), // Max log messages that database can store for each type
+        TIME_INSERT("time"), // Time field name in Database
 
-        MAX_TRACK_LENGTH, // Max length for a youtube video track that can be played in second
+        MAX_TRACK_LENGTH(600), // Max length for a youtube video track that can be played in second
 
-        CHAT_GPT_TOKEN;
+        CHAT_GPT_TOKEN("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");
+
+        public final String value;
+
+        Config(Object value) {
+            this.value = value.toString();
+        }
+
+        @Override
+        public String toString() {
+            return value;
+        }
     }
 
-    public static final String PLAY_EMOJI = "▶️";
-    public static final String PAUSE_EMOJI = "⏸";
-    public static final String STOP_EMOJI = "⏹";
-    public static final String CLEAR_EMOJI = "⏯️";
-    public static final String FORWARD_EMOJI = "⏩";
-    public static final String FILE_EMOJI = "📁";
-    public static final String STAR_EMOJI = "⭐";
-    public static final String PENGUIN_EMOJI = "🐧";
-    public static final String PUT_LITTER_EMOJI = "🚮";
+    public static enum TEmoji {
+        PLAY("▶️"), //
+        PAUSE("⏸"), //
+        STOP("⏹"), //
+        CLEAR("⏯️"), //
+        FORWARD("⏩"), //
+        FILE("📁"), //
+        LIKE("👍"), //
+        DISLIKE("👎"), //
+        TRASH_CAN("🚮");
+
+        public final String value;
+
+        TEmoji(String value) {
+            this.value = value;
+        }
+
+        @Override
+        public String toString() {
+            return value;
+        }
+    }
 
     public static Properties getProperties() {
         if (prop == null || prop.isEmpty())
@@ -71,9 +94,9 @@ public final class BotConfig {
                 input.close();
                 makeDefault();
 
-            } else {
-                Log.system("Config loaded");
             }
+
+            Log.system("Config loaded");
 
         } catch (IOException io) {
             Log.error(io);
@@ -81,7 +104,7 @@ public final class BotConfig {
     }
 
     public static void save() {
-        try (OutputStream output = new FileOutputStream(DEFAULT)) {
+        try (OutputStream output = new FileOutputStream(CONFIG_PATH)) {
 
             prop.store(output, null);
 
@@ -95,23 +118,12 @@ public final class BotConfig {
 
             prop = new Properties();
 
-            setProperty("Default", 1);
-            setProperty(Config.YUI_ID, "719322804549320725");
-
-            setProperty(Config.UPDATE_PERIOD, 60 * 1000);
-            setProperty(Config.GUILD_ALIVE_TIME, 20);
-            setProperty(Config.USER_ALIVE_TIME, 10);
-            setProperty(Config.GUILD_COLLECTION, "GUILD_DATA");
-            setProperty(Config.SCHEMATIC_INFO_COLLECTION, "SCHEMATIC_INFO");
-            setProperty(Config.SCHEMATIC_DATA_COLLECTION, "SCHEMATIC_DATA");
-            setProperty(Config.MAX_LOG_COUNT, 8000);
-            setProperty(Config.TIME_INSERT, "_timeInserted");
-            setProperty(Config.MAX_TRACK_LENGTH, "600");
-            setProperty(Config.CHAT_GPT_TOKEN, "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");
+            for (Config config : Config.values()) {
+                setProperty(config, config.value);
+            }
+            setProperty(DEFAULT, 1);
 
             prop.store(output, "DEFAULT");
-
-            Log.system("Config loaded");
 
         } catch (IOException io) {
             Log.error(io);
@@ -130,6 +142,21 @@ public final class BotConfig {
         setProperty(key.name(), String.valueOf(value));
     }
 
+    public static String getProperty(Config key, Object def) {
+
+        if (hasProperty(key.name()))
+            return getProperties().getProperty(key.name());
+
+        if (def == null)
+            return key.value;
+
+        return null;
+    }
+
+    public static String getProperty(String key, Object def) {
+        return getProperties().getProperty(key, def.toString());
+    }
+
     public static String readString(String key, String def) {
         return getProperties().getProperty(key, def);
     }
@@ -139,19 +166,19 @@ public final class BotConfig {
     }
 
     public static int readInt(String key, int def) {
-        return Integer.parseInt(getProperties().getProperty(key, String.valueOf(def)));
+        return Integer.parseInt(getProperty(key, key));
     }
 
     public static int readInt(Config key, int def) {
-        return Integer.parseInt(getProperties().getProperty(key.name(), String.valueOf(def)));
+        return Integer.parseInt(getProperty(key, def));
     }
 
     public static float readFloat(String key, float def) {
-        return Float.parseFloat(getProperties().getProperty(key, String.valueOf(def)));
+        return Float.parseFloat(getProperty(key, def));
     }
 
     public static float readFloat(Config key, float def) {
-        return Float.parseFloat(getProperties().getProperty(key.name(), String.valueOf(def)));
+        return Float.parseFloat(getProperty(key, def));
     }
 
 }

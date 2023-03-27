@@ -17,6 +17,7 @@ import AlphaChan.main.music.MusicTrack;
 import AlphaChan.main.util.Log;
 import net.dv8tion.jda.api.entities.GuildVoiceState;
 import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.channel.unions.AudioChannelUnion;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
@@ -55,9 +56,8 @@ public class PlayCommand extends SlashSubcommand {
 
                 MusicPlayerHandler.getInstance().loadItemOrdered(event.getGuild(), source, new ResultHandler(event));
 
-                if (!MusicPlayerHandler.getInstance().hasMusicPlayer(event.getGuild()) ) {
-                    new MusicPlayerTable(event, MusicPlayerHandler.getInstance().getMusicPlayer(event.getGuild()))
-                            .sendTable();
+                if (!MusicPlayerHandler.getInstance().hasMusicPlayer(event.getGuild())) {
+                    new MusicPlayerTable(event, MusicPlayerHandler.getInstance().getMusicPlayer(event.getGuild())).sendTable();
                 } else {
 
                     event.getHook().deleteOriginal().queue();
@@ -66,8 +66,7 @@ public class PlayCommand extends SlashSubcommand {
                 MusicPlayerHandler.getInstance().getMusicPlayer(event.getGuild()).start(channel);
             } else {
 
-                new MusicPlayerTable(event, MusicPlayerHandler.getInstance().getMusicPlayer(event.getGuild()))
-                        .sendTable();
+                new MusicPlayerTable(event, MusicPlayerHandler.getInstance().getMusicPlayer(event.getGuild())).sendTable();
             }
         } catch (Exception e) {
             Log.error(e);
@@ -103,14 +102,14 @@ public class PlayCommand extends SlashSubcommand {
 
             for (AudioTrack track : playlist.getTracks()) {
 
-                if (string.length() + track.getInfo().title.length() < 900)
+                if (string.length() + track.getInfo().title.length() < Message.MAX_CONTENT_LENGTH)
                     string.append(track.getInfo().title + "\n");
                 else
                     count += 1;
 
             }
-            MessageHandler.sendMessage(event.getChannel(), "Tải thành công: " +
-                    string.toString() + (count == 0 ? "" : "và " + count + " bài hát khác"), 10);
+            MessageHandler.sendMessage(event.getChannel(),
+                    "Tải thành công: " + string.toString() + (count == 0 ? "" : "và " + count + " bài hát khác"), 10);
         }
 
         @Override

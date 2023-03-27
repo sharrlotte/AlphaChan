@@ -9,6 +9,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.bson.Document;
 import org.bson.conversions.Bson;
 
+import AlphaChan.BotConfig;
+import AlphaChan.BotConfig.Config;
 import AlphaChan.main.handler.DatabaseHandler;
 import AlphaChan.main.handler.GuildHandler;
 import AlphaChan.main.handler.DatabaseHandler.Database;
@@ -26,12 +28,13 @@ public class UserCache extends TimeObject implements DatabaseObject {
     }
 
     public UserCache(String guildId, String userId) {
-        this.data = new UserData();
+        this(new UserData());
         this.data.setUserId(userId);
         this.data.setGuildId(guildId);
     }
 
     public UserCache(UserData data) {
+        super(BotConfig.readInt(Config.USER_ALIVE_TIME, 10));
         this.data = data;
     }
 
@@ -66,7 +69,7 @@ public class UserCache extends TimeObject implements DatabaseObject {
         Guild guild = getGuild();
         Member member = guild.getMemberById(data.getUserId());
         if (member == null) {
-            killTimer();
+            kill();
             throw new IllegalStateException("Member not found with id <" + data.getUserId() + ">");
         }
         return member;
@@ -75,7 +78,7 @@ public class UserCache extends TimeObject implements DatabaseObject {
     public Guild getGuild() {
         Guild guild = jda.getGuildById(data.getGuildId());
         if (guild == null) {
-            killTimer();
+            kill();
             throw new IllegalStateException("Guild not found with id + <" + data.getGuildId() + ">");
         }
         return guild;
@@ -176,7 +179,7 @@ public class UserCache extends TimeObject implements DatabaseObject {
             Bson filter = new Document().append("userId", data.getGuildId());
             DatabaseHandler.delete(Database.USER, data.getGuildId(), UserData.class, filter);
             DatabaseHandler.log(LogCollection.DATABASE, "DELETE USER", data.toDocument().toString());
-            killTimer();
+            kill();
         }
     }
 }

@@ -31,7 +31,7 @@ public class GuildHandler implements Updatable {
     private GuildHandler() {
         UpdatableHandler.addListener(this);
 
-        onShutDown.connect((code) -> save());
+        onShutdown.connect((code) -> save());
 
         Log.system("Guild handler up");
     }
@@ -64,6 +64,10 @@ public class GuildHandler implements Updatable {
     }
 
     public void save() {
+
+        if (guildCaches.size() == 0)
+            return;
+
         Log.system("Saving guild data");
 
         Iterator<GuildCache> iterator = guildCaches.values().iterator();

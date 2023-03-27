@@ -24,18 +24,25 @@ public class SchematicInfoCache extends TimeObject implements DatabaseObject {
     public long getLike() {
         if (data.getLike() != -1)
             return data.getLike();
+
+        long like = DatabaseHandler.count(Database.LIKE, data.getId(), DislikeData.class, null);
+        getData().setLike(like);
+        update();
+
         // Create collection if it's not exist
-        return DatabaseHandler.count(Database.STAR, data.getId(), DislikeData.class, null);
+        return DatabaseHandler.count(Database.LIKE, data.getId(), DislikeData.class, null);
     }
 
     public boolean addLike(String userId) {
 
         Document filter = new Document().append("userId", userId);
-        boolean result = DatabaseHandler.insertIfNotFound(Database.STAR, data.getId(), DislikeData.class, filter,
+        boolean result = DatabaseHandler.insertIfNotFound(Database.LIKE, data.getId(), DislikeData.class, filter,
                 new DislikeData(userId, System.currentTimeMillis()));
 
         if (result == true)
             data.setLike(data.getLike() + 1);
+
+        update();
 
         return result;
     }
@@ -45,17 +52,23 @@ public class SchematicInfoCache extends TimeObject implements DatabaseObject {
             return data.getDislike();
         // Create collection if it's not exist
 
-        return DatabaseHandler.count(Database.PENGUIN, data.getId(), LikeData.class, null);
+        long dislike = DatabaseHandler.count(Database.DISLIKE, data.getId(), LikeData.class, null);
+        getData().setDislike(dislike);
+        update();
+
+        return dislike;
     }
 
     public boolean addDislike(String userId) {
 
         Document filter = new Document().append("userId", userId);
-        boolean result = DatabaseHandler.insertIfNotFound(Database.PENGUIN, data.getId(), LikeData.class, filter,
+        boolean result = DatabaseHandler.insertIfNotFound(Database.DISLIKE, data.getId(), LikeData.class, filter,
                 new LikeData(userId, System.currentTimeMillis()));
 
         if (result == true)
             data.setLike(data.getLike() + 1);
+
+        update();
 
         return result;
     }
@@ -73,7 +86,7 @@ public class SchematicInfoCache extends TimeObject implements DatabaseObject {
             String schematicInfoCollectionName = BotConfig.readString(Config.SCHEMATIC_INFO_COLLECTION, null);
             Document filter = new Document().append("_id", data.getId());
             DatabaseHandler.delete(Database.MINDUSTRY, schematicInfoCollectionName, SchematicInfo.class, filter);
-            killTimer();
+            kill();
         }
     }
 

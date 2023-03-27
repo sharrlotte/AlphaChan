@@ -72,7 +72,7 @@ public class PageTable extends Table {
     public void onPrepareTable(MessageEditAction action) {
         MessageEmbed page = getCurrentPage().build();
         if (getMaxPage() <= 0 || page == null) {
-            reply("Không có dữ liệu", 10);
+            sendMessage("Không có dữ liệu", 10);
             return;
         }
 

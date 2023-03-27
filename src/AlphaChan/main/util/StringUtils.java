@@ -1,5 +1,7 @@
 package AlphaChan.main.util;
 
+import java.util.Iterator;
+import java.util.Map;
 import java.util.Set;
 
 public class StringUtils {
@@ -12,8 +14,7 @@ public class StringUtils {
         seconds %= 60 * 60;
         long minutes = seconds / 60;
         seconds %= 60;
-        return (hours > 0 ? hours + ":" : "") + (minutes < 10 ? "0" + minutes : minutes) + ":"
-                + (seconds < 10 ? "0" + seconds : seconds);
+        return (hours > 0 ? hours + ":" : "") + (minutes < 10 ? "0" + minutes : minutes) + ":" + (seconds < 10 ? "0" + seconds : seconds);
     }
 
     public static String getProgressBar(double percent, int barLength, String mark, String head, String tail) {
@@ -28,8 +29,7 @@ public class StringUtils {
     }
 
     public static String filter(String input) {
-        return input.replace("\u202E", "")
-                .replace("@everyone", "@\u0435veryone") // cyrillic letter e
+        return input.replace("\u202E", "").replace("@everyone", "@\u0435veryone") // cyrillic letter e
                 .replace("@here", "@h\u0435re") // cyrillic letter e
                 .trim();
     }
@@ -68,7 +68,28 @@ public class StringUtils {
 
         }
         return max > -diff ? estimate : null;
+    }
 
+    public static <T> String listToLines(Iterable<T> list) {
+        StringBuilder builder = new StringBuilder();
+
+        Iterator<T> itr = list.iterator();
+        T value;
+        while (itr.hasNext()) {
+            value = itr.next();
+            builder.append(value.toString() + "\n");
+        }
+
+        return builder.toString();
+    }
+
+    public static <K, V> String mapToLines(Map<K, V> map) {
+        StringBuilder builder = new StringBuilder();
+
+        for (K key : map.keySet())
+            builder.append(key + " = " + map.get(key).toString() + "\n");
+
+        return builder.toString();
     }
 
     public static String capitalize(String str) {

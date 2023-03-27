@@ -7,6 +7,7 @@ import static org.bson.codecs.configuration.CodecRegistries.fromRegistries;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 import org.bson.BsonDateTime;
 import org.bson.Document;
@@ -34,7 +35,7 @@ import AlphaChan.main.util.Log;
 public final class DatabaseHandler {
 
     public static enum Database {
-        USER, GUILD, LOG, DAILY, MINDUSTRY, STAR, PENGUIN
+        USER, GUILD, LOG, DAILY, MINDUSTRY, LIKE, DISLIKE
     }
 
     public static enum LogCollection {
@@ -55,11 +56,24 @@ public final class DatabaseHandler {
 
     private static ConcurrentHashMap<String, MongoDatabase> database = new ConcurrentHashMap<String, MongoDatabase>();
 
-    private static ExecutorService loggerPool = Executors.newSingleThreadExecutor();
+    private static ExecutorService logExecutor = Executors.newSingleThreadExecutor();
+    private static ExecutorService taskExecutor = Executors.newSingleThreadExecutor();
 
     private DatabaseHandler() {
-
         Log.system("Database handler up");
+    }
+
+    public static void shutdown() {
+        try {
+            taskExecutor.shutdown();
+            logExecutor.shutdown();
+
+            taskExecutor.awaitTermination(Long.MAX_VALUE, TimeUnit.SECONDS);
+            logExecutor.awaitTermination(Long.MAX_VALUE, TimeUnit.SECONDS);
+
+        } catch (InterruptedException e) {
+            Log.error(e);
+        }
     }
 
     public static DatabaseHandler getInstance() {
@@ -99,12 +113,12 @@ public final class DatabaseHandler {
 
     public static <T> void update(Database databaseName, final String collectionName, Class<T> type, Bson filter, T value) {
         MongoCollection<T> collection = getCollection(databaseName, collectionName, type);
-        collection.replaceOne(filter, value, new ReplaceOptions().upsert(true));
+        taskExecutor.submit(() -> collection.replaceOne(filter, value, new ReplaceOptions().upsert(true)));
     }
 
     public static <T> void delete(Database databaseName, final String collectionName, Class<T> type, Bson filter) {
         MongoCollection<T> collection = getCollection(databaseName, collectionName, type);
-        collection.deleteOne(filter);
+        taskExecutor.submit(() -> collection.deleteOne(filter));
     }
 
     public static <T> long count(Database databaseName, final String collectionName, Class<T> type, Bson filter) {
@@ -136,8 +150,10 @@ public final class DatabaseHandler {
                 }
             }
             return false;
+
         } catch (Exception e) {
             Log.error(e);
+
             return false;
         }
     }
@@ -157,7 +173,7 @@ public final class DatabaseHandler {
     }
 
     public static void log(LogCollection collection, Document content) {
-        loggerPool.execute(new Logger(collection, content));
+        logExecutor.submit(new Logger(collection, content));
     }
 
     public static class Logger implements Runnable {
@@ -173,11 +189,11 @@ public final class DatabaseHandler {
         @Override
         public void run() {
             MongoCollection<Document> logCollection = getCollection(Database.LOG, collection.name(), Document.class);
-            int maxLogCount = BotConfig.readInt(Config.MAX_LOG_COUNT, 10000);
+            int maxLogCount = BotConfig.readInt(Config.MAX_LOG_COUNT, 8000);
             long count = logCollection.estimatedDocumentCount();
 
             if (count > maxLogCount) {
-                while (count > maxLogCount - 1000) {
+                while (count > maxLogCount) {
                     logCollection.deleteOne(new Document());
                     count--;
                 }

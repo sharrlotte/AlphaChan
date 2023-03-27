@@ -24,6 +24,7 @@ import net.dv8tion.jda.api.audio.hooks.ConnectionStatus;
 import net.dv8tion.jda.api.entities.channel.middleman.AudioChannel;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.utils.TimeFormat;
 
@@ -209,8 +210,7 @@ public class MusicPlayer extends AudioEventAdapter implements AudioSendHandler {
         while (it.hasNext()) {
             current = it.next();
             count++;
-            // Max field string length is 1024
-            if (songList.length() + current.getTrack().getInfo().title.length() < 900) {
+            if (songList.length() + current.getTrack().getInfo().title.length() < MessageEmbed.TEXT_MAX_LENGTH) {
                 songList.append("\t" + count + ": " + current.getTrack().getInfo().title + "\n");
             } else
                 overload = true;
@@ -230,7 +230,7 @@ public class MusicPlayer extends AudioEventAdapter implements AudioSendHandler {
     }
 
     public String getTrackStatus() {
-        return audioPlayer.isPaused() ? BotConfig.PAUSE_EMOJI : BotConfig.PLAY_EMOJI;
+        return audioPlayer.isPaused() ? BotConfig.TEmoji.PAUSE.value : BotConfig.TEmoji.PLAY.value;
 
     }
 

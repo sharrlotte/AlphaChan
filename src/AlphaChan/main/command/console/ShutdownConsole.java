@@ -12,8 +12,6 @@ public class ShutdownConsole extends ConsoleCommand {
 
     @Override
     public void runCommand(ConsoleCommandEvent command) {
-        AlphaChan.onShutDown.emit(0);
-        System.exit(0);
+        AlphaChan.shutdown();
     }
-
 }
