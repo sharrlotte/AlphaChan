@@ -3,10 +3,12 @@ package AlphaChan.main.command.slash.subcommands.bot;
 import java.util.HashMap;
 import java.util.List;
 
+import AlphaChan.main.command.SlashCommand;
 import AlphaChan.main.command.SlashSubcommand;
 import AlphaChan.main.data.user.GuildCache;
 import AlphaChan.main.gui.discord.PageTable;
 import AlphaChan.main.handler.GuildHandler;
+import AlphaChan.main.handler.MessageHandler;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
@@ -23,13 +25,8 @@ public class GuildCommand extends SlashSubcommand {
     private final int MAX_DISPLAY = 7;
 
     public GuildCommand() {
-        super("guild", "Hiển thị thông tin của máy chủ discord", false, false);
-        this.addOption(OptionType.STRING, "guild", "Tên máy chủ", false, true);
-    }
-
-    @Override
-    public String getHelpString() {
-        return "Hiển thị thông tin của máy chủ discord mà bot đã gia nhập:\n\t<guild>: Tên máy chủ muốn xem, nếu không nhập guild thì sẽ hiện tất cả các máy chủ, ngược lại sẽ hiện thông tin máy chủ đã nhập";
+        super("guild", "<@command.command_guild>", false, false);
+        this.addOption(OptionType.STRING, "guild", "<@command.guild_name>", false, true);
     }
 
     @Override
@@ -104,7 +101,7 @@ public class GuildCommand extends SlashSubcommand {
                 field.append("\n" + roleString.substring(0, roleString.length() - 2));
 
             builder.addField("Thông tin cơ bản:", field.toString(), false);
-            replyEmbed(event, builder, 30);
+            MessageHandler.replyEmbed(event, builder, 30);
         }
     }
 
@@ -114,7 +111,7 @@ public class GuildCommand extends SlashSubcommand {
         if (focus.equals("guild")) {
             HashMap<String, String> options = new HashMap<String, String>();
             jda.getGuilds().forEach(t -> options.put(t.getName(), t.getId()));
-            sendAutoComplete(event, options);
+            SlashCommand.sendAutoComplete(event, options);
 
         }
     }

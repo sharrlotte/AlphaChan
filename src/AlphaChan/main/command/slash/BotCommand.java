@@ -9,7 +9,7 @@ import AlphaChan.main.command.slash.subcommands.bot.PingCommand;
 
 public class BotCommand extends SlashCommand {
     public BotCommand() {
-        super("bot", "Các lệnh liên quan đến bot");
+        super("bot", "<@command.command_bot>");
         addSubcommands(new InfoCommand());
         addSubcommands(new GuildCommand());
         addSubcommands(new HelpCommand());

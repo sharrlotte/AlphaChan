@@ -8,21 +8,18 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 
 import java.util.HashMap;
 
+import AlphaChan.main.command.SlashCommand;
 import AlphaChan.main.command.SlashSubcommand;
 import AlphaChan.main.data.user.GuildCache;
 import AlphaChan.main.data.user.GuildCache.ChannelType;
 import AlphaChan.main.handler.GuildHandler;
+import AlphaChan.main.handler.MessageHandler;
 
 public class SetChannelCommand extends SlashSubcommand {
 
     public SetChannelCommand() {
-        super("setchannel", "Cài đặt các kênh của máy chủ");
-        this.addOption(OptionType.STRING, "type", "Loại kênh muốn đặt", true, true);
-    }
-
-    @Override
-    public String getHelpString() {
-        return "Cài đặt các kênh của máy chủ:\n\t<type>: loại kênh muốn đặt\n\tThêm lần nữa để xóa";
+        super("setchannel", "<@command.command_set_channel>");
+        this.addOption(OptionType.STRING, "type", "<@command.channel_type>", true, true);
     }
 
     @Override
@@ -41,18 +38,18 @@ public class SetChannelCommand extends SlashSubcommand {
 
             if (guildData.hasChannel(type, channel.getId())) {
                 if (guildData.removeChannel(type, channel.getId()))
-                    reply(event, "Xóa kênh thành công", 30);
+                    MessageHandler.reply(event, "<@command.delete_failed>", 30);
                 else
-                    reply(event, "Xóa kênh không thành công", 30);
+                    MessageHandler.reply(event, "<@command.delete_successfully>", 30);
 
             } else {
                 if (guildData.addChannel(type, channel.getId()))
-                    reply(event, "Thêm kênh thành công", 30);
+                    MessageHandler.reply(event, "<@command.add_successfully>", 30);
                 else
-                    reply(event, "Thêm kênh không thành công", 30);
+                    MessageHandler.reply(event, "<@command.add_failed>", 30);
             }
         } catch (Exception e) {
-            reply(event, "Loại kênh không hợp lệ", 10);
+            MessageHandler.reply(event, "Loại kênh không hợp lệ", 10);
         }
     }
 
@@ -63,7 +60,7 @@ public class SetChannelCommand extends SlashSubcommand {
             HashMap<String, String> options = new HashMap<String, String>();
             for (ChannelType t : ChannelType.values())
                 options.put(t.name(), t.name());
-            sendAutoComplete(event, options);
+            SlashCommand.sendAutoComplete(event, options);
         }
     }
 

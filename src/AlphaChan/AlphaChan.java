@@ -5,6 +5,7 @@ import AlphaChan.main.handler.CommandHandler;
 import AlphaChan.main.handler.ContentHandler;
 import AlphaChan.main.handler.DatabaseHandler;
 import AlphaChan.main.handler.GuildHandler;
+import AlphaChan.main.handler.LocaleManager;
 import AlphaChan.main.handler.MessageHandler;
 import AlphaChan.main.handler.NetworkHandler;
 import AlphaChan.main.handler.ServerStatusHandler;
@@ -46,6 +47,7 @@ public class AlphaChan {
 
             Log.system("Ping: " + jda.getGatewayPing());
 
+            LocaleManager.getInstance();
             ContentHandler.getInstance();
             GuildHandler.getInstance();
             UserHandler.getInstance();
@@ -67,12 +69,13 @@ public class AlphaChan {
     public static void shutdown() {
         Log.system("Bot shutting down");
 
-        onShutdown.emit(0);
+        try {
+            onShutdown.emit(0);
 
-        DatabaseHandler.shutdown();
-        BotConfig.save();
-        Log.system("Bot shutdown");
-        System.exit(0);
+        } finally {
+            Log.system("Bot shutdown");
+            System.exit(0);
+        }
     }
 
     public static void main(String[] args) {

@@ -8,6 +8,7 @@ import AlphaChan.main.command.SlashSubcommand;
 import AlphaChan.main.data.user.UserCache;
 import AlphaChan.main.data.user.UserCache.PointType;
 import AlphaChan.main.handler.DatabaseHandler;
+import AlphaChan.main.handler.MessageHandler;
 import AlphaChan.main.handler.UserHandler;
 import AlphaChan.main.handler.DatabaseHandler.Database;
 
@@ -18,12 +19,7 @@ import com.mongodb.client.MongoCollection;
 
 public class DailyCommand extends SlashSubcommand {
     public DailyCommand() {
-        super("daily", "Điểm danh", true, false);
-    }
-
-    @Override
-    public String getHelpString() {
-        return "Điểm danh mỗi ngày";
+        super("daily", "<@command.command_daily>", true, false);
     }
 
     @Override
@@ -63,17 +59,14 @@ public class DailyCommand extends SlashSubcommand {
         }
 
         if (money > 0)
-            reply(event,
-                    "📝Điểm dành thanh công\n💰Điểm nhận được: " + money + " Alpha\n💰Điểm hiện tại: " + userData.getPoint(PointType.MONEY),
-                    30);
+            MessageHandler.reply(event, "📝<@command.daily_success>\n💰<@command.point_reward>: " + money + " Alpha" + //
+                    "\n💰<@command.current_point>: " + userData.getPoint(PointType.MONEY), 30);
         else {
             if (data != null) {
                 if (data.containsKey("time")) {
                     Long lastTime = (Long) data.get("time");
-                    replyEmbed(event,
-                            "📝Còn " + TimeFormat.RELATIVE.atTimestamp(lastTime).plus(24 * 60 * 60 * 1000)
-                                    + " nữa mới có thể điểm danh\n📝Lần điểm danh cuối: " + TimeFormat.DATE_TIME_SHORT.format(lastTime),
-                            30);
+                    MessageHandler.replyEmbed(event, "📝<@command.wait_to> " + TimeFormat.RELATIVE.atTimestamp(lastTime).plus(24 * 60 * 60 * 1000) //
+                            + "\n📝<@command.last_time>: " + TimeFormat.DATE_TIME_SHORT.format(lastTime), 30);
                 }
             }
         }

@@ -9,20 +9,17 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 
 import java.util.HashMap;
 
+import AlphaChan.main.command.SlashCommand;
 import AlphaChan.main.command.SlashSubcommand;
 import AlphaChan.main.data.user.GuildCache;
 import AlphaChan.main.handler.GuildHandler;
+import AlphaChan.main.handler.MessageHandler;
 
 public class SetLevelRoleCommand extends SlashSubcommand {
     public SetLevelRoleCommand() {
-        super("setlevelrole", "Cài đặt các vai trò của máy chủ");
-        addOption(OptionType.ROLE, "role", "Vai trò muốn gán", true);
-        addOption(OptionType.INTEGER, "level", "Cấp độ cần thiết để nhận vai trò", true);
-    }
-
-    @Override
-    public String getHelpString() {
-        return "Cài đặt các vai trò của máy chủ:\n\t<type>: loại vai trò muốn đặt\n\t<role>: vai trò muốn gán\n\t<level>: cấp độ cần thiết để có được vai trò(-1 để xóa)";
+        super("setlevelrole", "<@command.command_level_role>");
+        addOption(OptionType.ROLE, "role", "<@command.level_role>", true);
+        addOption(OptionType.INTEGER, "level", "<@command.required_level>", true);
     }
 
     @Override
@@ -47,14 +44,14 @@ public class SetLevelRoleCommand extends SlashSubcommand {
 
         if (level <= -1) {
             if (guildData.removeLevelRole(roleId))
-                reply(event, "Xóa vai trò thành công", 30);
+                MessageHandler.reply(event, "<@command.delete_successfully>", 30);
             else
-                reply(event, "Xóa vai trò thất bại", 30);
+                MessageHandler.reply(event, "<@command.delete_failed", 30);
         } else {
             if (guildData.addLevelRole(roleId, level))
-                reply(event, "Thêm vai trò thành công", 30);
+                MessageHandler.reply(event, "<@command.add_successfully>", 30);
             else
-                reply(event, "Thêm vai trò thất bại", 30);
+                MessageHandler.reply(event, "<@command.add_failed>", 30);
         }
     }
 
@@ -76,7 +73,7 @@ public class SetLevelRoleCommand extends SlashSubcommand {
                     return;
                 options.put(role.getName() + " lv" + guildData.getData().getLevelRoleId().get(t), t);
             });
-            sendAutoComplete(event, options);
+            SlashCommand.sendAutoComplete(event, options);
         }
     }
 

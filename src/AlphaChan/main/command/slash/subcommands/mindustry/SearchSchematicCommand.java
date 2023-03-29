@@ -17,6 +17,7 @@ import AlphaChan.main.data.mindustry.SchematicInfo;
 import AlphaChan.main.data.mindustry.SchematicTag;
 import AlphaChan.main.gui.discord.table.SchematicTable;
 import AlphaChan.main.handler.DatabaseHandler;
+import AlphaChan.main.handler.MessageHandler;
 import AlphaChan.main.handler.DatabaseHandler.Database;
 
 import net.dv8tion.jda.api.entities.Guild;
@@ -36,16 +37,11 @@ public class SearchSchematicCommand extends SlashSubcommand {
     private static List<String> tags = SchematicTag.getTags();
 
     public SearchSchematicCommand() {
-        super("searchschematic", "Tìm bản thiết kế dựa theo nhãn", true, false);
-        addOption(OptionType.STRING, "tag", "Nhãn để lọc bản thiết kế", false, true);
-        addOption(OptionType.USER, "user", "Tác giả của bản thiết kế");
-        addOption(OptionType.BOOLEAN, "own", "Ngăn chăn người khác tương tác với bảng");
+        super("searchschematic", "<@command.command_search_schematic>", true, false);
+        addOption(OptionType.STRING, "tag", "<@command.schematic_tag>", false, true);
+        addOption(OptionType.USER, "user", "<@command.schematic_author>");
+        addOption(OptionType.BOOLEAN, "own", "<@command.prevent_other_interact>");
 
-    }
-
-    @Override
-    public String getHelpString() {
-        return "Tìm bản thiết kế theo nhãn, tác giả\n\t<tag>: Nhãn muốn tìm, có thể dùng nhiều nhãn, cách nhau bởi dấu phẩy\n\t<user: Tác giả của bản thiết kế>\nCác nút:\n\t<: Trang trước\n\t>: Trang sau\n\tx: Xóa tin nhắn\n\t📁: Lấy bản thiết kế\n\t⭐: Thích bản thiết kế\n\t🐧: \"Cánh cụt\" bản thiết kế\n\t🚮: Xóa bản thiết kế (admin only)";
     }
 
     @Override
@@ -82,9 +78,9 @@ public class SearchSchematicCommand extends SlashSubcommand {
 
         if (schematicInfo.first() == null) {
             if (tagOption == null)
-                reply(event, "Không có dữ liệu về bản thiết kế", 30);
+                MessageHandler.reply(event, "<@command.no_schematic>", 30);
             else
-                reply(event, "Không có dữ liệu về bản thiết kế với nhãn: " + tagOption.getAsString().toLowerCase(), 30);
+                MessageHandler.reply(event, "<@command.command_search_schematic_with_tag>: " + tagOption.getAsString().toLowerCase(), 30);
 
         } else {
 

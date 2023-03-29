@@ -64,7 +64,7 @@ public class ContentHandler {
     private static ContentHandler instance = new ContentHandler();
     private String assets = "Mindustry/core/";
 
-    public static ContentHandler getInstance() {
+    public synchronized static ContentHandler getInstance() {
         return instance;
     }
 

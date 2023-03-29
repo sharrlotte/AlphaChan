@@ -10,9 +10,11 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 
 import java.util.HashMap;
 
+import AlphaChan.main.command.SlashCommand;
 import AlphaChan.main.command.SlashSubcommand;
 import AlphaChan.main.data.user.UserCache;
 import AlphaChan.main.data.user.UserCache.PointType;
+import AlphaChan.main.handler.MessageHandler;
 import AlphaChan.main.handler.UserHandler;
 
 public class AddCommand extends SlashSubcommand {
@@ -22,11 +24,6 @@ public class AddCommand extends SlashSubcommand {
         addOption(OptionType.STRING, "type", "Yui only", true, true);
         addOption(OptionType.USER, "user", "Yui only", true);
         addOption(OptionType.INTEGER, "point", "Yui only", true);
-    }
-
-    @Override
-    public String getHelpString() {
-        return "";
     }
 
     @Override
@@ -57,7 +54,7 @@ public class AddCommand extends SlashSubcommand {
 
             UserCache receiver = UserHandler.getUserNoCache(r);
 
-            String result = "Loại điểm muốn chuyển không hợp lệ";
+            String result = "<@command.invalid_point_type>";
 
             switch (type) {
             case LEVEL:
@@ -66,13 +63,13 @@ public class AddCommand extends SlashSubcommand {
 
             default:
                 receiver.addPoint(type, point);
-                result = "Đã thêm " + point + " điểm " + type.name() + " cho " + receiver.getName();
+                result = "<@command.add> " + point + " <@command.point> " + type.name() + " <@command.to> " + receiver.getName();
             }
 
-            reply(event, result, 30);
+            MessageHandler.reply(event, result, 30);
 
         } catch (Exception e) {
-            reply(event, "Loại điểm muốn chuyển không hợp lệ", 10);
+            MessageHandler.reply(event, "<@command.invalid_point_type>", 10);
         }
     }
 
@@ -86,7 +83,7 @@ public class AddCommand extends SlashSubcommand {
             for (int i = 2; i < type.length; i++)
                 options.put(type[i].name(), type[i].name());
 
-            sendAutoComplete(event, options);
+            SlashCommand.sendAutoComplete(event, options);
         }
     }
 }

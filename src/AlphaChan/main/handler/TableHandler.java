@@ -3,8 +3,6 @@ package AlphaChan.main.handler;
 import java.util.Iterator;
 import java.util.concurrent.ConcurrentHashMap;
 
-import javax.annotation.Nonnull;
-
 import AlphaChan.main.gui.discord.Table;
 import AlphaChan.main.util.Log;
 
@@ -27,7 +25,7 @@ public final class TableHandler extends ListenerAdapter implements Updatable {
         Log.system("Table handler up");
     }
 
-    public static TableHandler getInstance() {
+    public synchronized static TableHandler getInstance() {
         if (instance == null)
             instance = new TableHandler();
         return instance;
@@ -45,7 +43,7 @@ public final class TableHandler extends ListenerAdapter implements Updatable {
     }
 
     @Override
-    public void onButtonInteraction(@Nonnull ButtonInteractionEvent event) {
+    public void onButtonInteraction(ButtonInteractionEvent event) {
         event.deferEdit().queue();
         String component = event.getComponentId();
 

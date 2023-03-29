@@ -5,8 +5,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.annotation.Nonnull;
-
 import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoCursor;
@@ -21,6 +19,7 @@ import AlphaChan.main.data.mindustry.SchematicInfoCache;
 import AlphaChan.main.gui.discord.PageTable;
 import AlphaChan.main.handler.ContentHandler;
 import AlphaChan.main.handler.DatabaseHandler;
+import AlphaChan.main.handler.MessageHandler;
 import AlphaChan.main.handler.UserHandler;
 import AlphaChan.main.handler.DatabaseHandler.Database;
 import AlphaChan.main.util.Log;
@@ -49,7 +48,7 @@ public class SchematicTable extends PageTable {
     private SchematicCache currentData;
     private Message currentCode;
 
-    public SchematicTable(@Nonnull SlashCommandInteractionEvent event, FindIterable<SchematicInfo> schematicInfo) {
+    public SchematicTable(SlashCommandInteractionEvent event, FindIterable<SchematicInfo> schematicInfo) {
         super(event, 10);
 
         MongoCursor<SchematicInfo> cursor = schematicInfo.cursor();
@@ -97,7 +96,7 @@ public class SchematicTable extends PageTable {
         if (currentInfo.addLike(getTriggerMember().getId()))
             updateTable();
         else
-            sendMessage("Bạn đã like bản thiết kế này", 10);
+            MessageHandler.sendMessage(getEventTextChannel(), "<@command.already_like>", 10);
     }
 
     private void addDislike() {
@@ -107,12 +106,12 @@ public class SchematicTable extends PageTable {
         if (currentInfo.addDislike(getTriggerMember().getId()))
             updateTable();
         else
-            sendMessage("Bạn đã dislike bản thiết kế này", 10);
+            MessageHandler.sendMessage(getEventTextChannel(), "<@command.already_dislike>", 10);
     }
 
     private void deleteSchematic() {
         if (!UserHandler.isAdmin(getTriggerMember())) {
-            sendMessage("Bạn không có quyền xóa bản thiết kế", 10);
+            MessageHandler.sendMessage(getEventTextChannel(), "<@command.no_permission>", 10);
             return;
         }
 
@@ -124,7 +123,7 @@ public class SchematicTable extends PageTable {
             if (currentCode != null)
                 currentCode.delete();
 
-            sendMessage("Đã xóa bản thiết kế", 10);
+            MessageHandler.sendMessage(getEventTextChannel(), "<@command.schematic_deleted>", 10);
 
             if (schematicInfoList.size() == 0) {
                 deleteTable();
@@ -159,12 +158,12 @@ public class SchematicTable extends PageTable {
     // Delete old code message
     private void deleteSChematicCodeMessage() {
         if (currentCode != null) {
-            currentCode.delete().complete();
+            currentCode.delete().queue();
             currentCode = null;
         }
     }
 
-    public void sendSchematicCodeData(@Nonnull String data) throws IOException {
+    public void sendSchematicCodeData(String data) throws IOException {
         if (data.length() < Message.MAX_CONTENT_LENGTH) {
             getMessage().reply(data).queue(message -> this.currentCode = message);
             return;
@@ -185,7 +184,8 @@ public class SchematicTable extends PageTable {
             SchematicData schematicData = collection.find(Filters.eq("_id", currentInfo.getData().getId())).limit(1).first();
 
             if (schematicData == null) {
-                sendMessage("Không có dữ liệu về bản thiết kế với id:" + currentInfo.getData().getId(), 10);
+                MessageHandler.sendMessage(getEventTextChannel(),
+                        "<@command.no_schematic>:" + currentInfo.getData().getId(), 10);
                 return;
             }
 
@@ -204,16 +204,16 @@ public class SchematicTable extends PageTable {
                 Member member = getEventGuild().getMember(user);
 
                 if (member != null) {
-                    field.append("- Tác giả: " + member.getEffectiveName() + "\n");
+                    field.append("- <@command.author>: " + member.getEffectiveName() + "\n");
                     builder.setAuthor(member.getEffectiveName(), member.getEffectiveAvatarUrl(), member.getEffectiveAvatarUrl());
 
                 } else if (user != null) {
-                    field.append("- Tác giả: " + user.getName() + "\n");
+                    field.append("- <@command.author>: " + user.getName() + "\n");
                     builder.setAuthor(user.getName(), user.getEffectiveAvatarUrl(), user.getEffectiveAvatarUrl());
                 }
             }
 
-            field.append("- Nhãn: ");
+            field.append("- <@command.tag>: ");
 
             for (int i = 0; i < currentInfo.getData().getTag().size() - 1; i++)
                 field.append(StringUtils.capitalize(currentInfo.getData().getTag().get(i).replace("_", " ").toLowerCase() + ", "));
@@ -221,10 +221,10 @@ public class SchematicTable extends PageTable {
             field.append(StringUtils.capitalize(
                     currentInfo.getData().getTag().get(currentInfo.getData().getTag().size() - 1).replace("_", " ").toLowerCase() + "\n"));
 
-            field.append("- Like: " + currentInfo.getLike() + "\n");
-            field.append("- Dislike: " + currentInfo.getDislike() + "\n");
+            field.append("- <@command.like>: " + currentInfo.getLike() + "\n");
+            field.append("- <@command.dislike>: " + currentInfo.getDislike() + "\n");
 
-            builder.addField("Thông tin", field.toString(), true);
+            builder.addField("<@command.info>", field.toString(), true);
 
             for (Field f : ContentHandler.getSchematicInfoEmbedBuilder(schem, getEvent().getMember()).getFields()) {
                 builder.addField(f);

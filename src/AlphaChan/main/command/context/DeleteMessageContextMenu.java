@@ -1,6 +1,7 @@
 package AlphaChan.main.command.context;
 
 import AlphaChan.main.command.ContextMenuCommand;
+import AlphaChan.main.handler.MessageHandler;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.MessageEmbed.AuthorInfo;
@@ -33,14 +34,14 @@ public class DeleteMessageContextMenu extends ContextMenuCommand {
 
                 if (name.equals(trigger.getEffectiveName())) {
                     event.getTarget().delete().queue();
-                    reply(event, "Xóa thành công", 10);
+                    MessageHandler.reply(event, "Xóa thành công", 10);
                     return;
                 }
-                reply(event, "Không thể xóa tin nhắn của bot mà người khác đã yêu cầu", 10);
+                MessageHandler.reply(event, "Không thể xóa tin nhắn của bot mà người khác đã yêu cầu", 10);
 
             }
         } else {
-            reply(event, "Lệnh này chỉ có thể xóa tin nhắn của bot", 10);
+            MessageHandler.reply(event, "Lệnh này chỉ có thể xóa tin nhắn của bot", 10);
         }
     }
 }

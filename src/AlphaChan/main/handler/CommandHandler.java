@@ -1,10 +1,8 @@
 package AlphaChan.main.handler;
 
-import org.jetbrains.annotations.NotNull;
-
 import AlphaChan.main.command.ConsoleCommandEvent;
-import AlphaChan.main.command.SlashCommand;
 import AlphaChan.main.command.ContextMenuCommand;
+import AlphaChan.main.command.SlashCommand;
 import AlphaChan.main.command.ConsoleCommand;
 import AlphaChan.main.command.console.HelpConsole;
 import AlphaChan.main.command.console.ReloadConfigConsole;
@@ -27,7 +25,7 @@ import AlphaChan.main.command.slash.YuiCommand;
 
 import AlphaChan.main.util.Log;
 import AlphaChan.main.util.StringUtils;
-import net.dv8tion.jda.api.Permission;
+
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.events.interaction.command.CommandAutoCompleteInteractionEvent;
@@ -38,8 +36,6 @@ import net.dv8tion.jda.api.interactions.commands.Command;
 
 import java.util.Collection;
 import java.util.HashMap;
-
-import javax.annotation.Nonnull;
 
 import static AlphaChan.AlphaChan.*;
 
@@ -61,7 +57,7 @@ public class CommandHandler {
         contextMenuHandler.init();
     }
 
-    public static CommandHandler getInstance() {
+    public synchronized static CommandHandler getInstance() {
         if (instance == null)
             instance = new CommandHandler();
         return instance;
@@ -71,7 +67,7 @@ public class CommandHandler {
         jda.updateCommands().complete();
 
         SlashCommandHandler.getCommands().forEach(c -> {
-            jda.upsertCommand(c.command).complete();
+            jda.upsertCommand(c).complete();
             Log.system("Added command " + c.getName());
         });
 
@@ -113,7 +109,7 @@ public class CommandHandler {
 
         public static void registerCommand(Guild guild) {
             for (SlashCommand command : slashCommands.values()) {
-                guild.upsertCommand(command.command).queue();
+                guild.upsertCommand(command).queue();
             }
         }
 
@@ -126,24 +122,25 @@ public class CommandHandler {
         }
 
         @Override
-        public void onSlashCommandInteraction(@Nonnull SlashCommandInteractionEvent event) {
+        public void onSlashCommandInteraction(SlashCommandInteractionEvent event) {
             try {
                 event.deferReply().queue();
                 handleCommand(event);
+
             } catch (Exception e) {
                 Log.error(e);
             }
         }
 
         @Override
-        public void onCommandAutoCompleteInteraction(@Nonnull CommandAutoCompleteInteractionEvent event) {
+        public void onCommandAutoCompleteInteraction(CommandAutoCompleteInteractionEvent event) {
             String command = event.getName();
 
             if (slashCommands.containsKey(command))
                 slashCommands.get(command).onAutoComplete(event);
         }
 
-        public static void handleCommand(@NotNull SlashCommandInteractionEvent event) {
+        public static void handleCommand(SlashCommandInteractionEvent event) {
             try {
                 String command = event.getName();
 
@@ -167,8 +164,7 @@ public class CommandHandler {
                             + event.getSubcommandName() + " " + event.getOptions().toString());
                     // Send to discord log channel
                     if (!command.equals("yui")) {
-                        MessageHandler.log(guild,
-                                member.getEffectiveName() + " đã sử dụng " + command + " " + event.getSubcommandName());
+                        MessageHandler.log(guild, member.getEffectiveName() + " đã sử dụng " + command + " " + event.getSubcommandName());
                     }
                 }
 
@@ -251,11 +247,9 @@ public class CommandHandler {
                 String estimate = StringUtils.findBestMatch(command, consoleCommands.keySet());
 
                 if (estimate == null) {
-                    Log.info("COMMAND NOT FOUND",
-                            "[/" + command + "] doesn't exists, use [/help] to get all command");
+                    Log.info("COMMAND NOT FOUND", "[/" + command + "] doesn't exists, use [/help] to get all command");
                 } else {
-                    Log.info("COMMAND NOT FOUND",
-                            "[/" + command + "] doesn't exists, do you mean [/" + estimate + "]");
+                    Log.info("COMMAND NOT FOUND", "[/" + command + "] doesn't exists, do you mean [/" + estimate + "]");
                 }
             }
         }
@@ -287,7 +281,7 @@ public class CommandHandler {
         }
 
         @Override
-        public void onMessageContextInteraction(@Nonnull MessageContextInteractionEvent event) {
+        public void onMessageContextInteraction(MessageContextInteractionEvent event) {
             event.deferReply().queue();
             handleCommand(event);
         }
@@ -307,15 +301,10 @@ public class CommandHandler {
             if (member == null)
                 return;
 
-            if (!botMember.hasPermission(Permission.ADMINISTRATOR)) {
-                MessageHandler.sendMessage(event, "Vui lòng cho bot vai trò người quản lí để sử dụng bot", 30);
-                return;
-            }
 
             if (contextCommands.containsKey(command)) {
                 contextCommands.get(command).onCommand(event);
-                Log.info("INTERACTION",
-                        MessageHandler.getMessageSender(event.getTarget()) + ": used " + event.getName());
+                Log.info("INTERACTION", MessageHandler.getMessageSender(event.getTarget()) + ": used " + event.getName());
             }
 
         }

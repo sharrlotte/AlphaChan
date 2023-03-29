@@ -9,18 +9,19 @@ import net.dv8tion.jda.api.entities.MessageEmbed.Field;
 import net.dv8tion.jda.api.entities.channel.Channel;
 import net.dv8tion.jda.api.entities.channel.concrete.Category;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import net.dv8tion.jda.api.entities.channel.middleman.GuildMessageChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.message.*;
 import net.dv8tion.jda.api.hooks.*;
+import net.dv8tion.jda.api.interactions.DiscordLocale;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.utils.FileUpload;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberRemoveEvent;
 import net.dv8tion.jda.api.events.guild.member.update.GuildMemberUpdateNicknameEvent;
-import net.dv8tion.jda.api.events.interaction.command.MessageContextInteractionEvent;
+import net.dv8tion.jda.api.events.interaction.command.GenericCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-
-import javax.annotation.Nonnull;
+import net.dv8tion.jda.api.events.interaction.component.GenericComponentInteractionCreateEvent;
 
 import org.bson.Document;
 
@@ -52,14 +53,14 @@ public final class MessageHandler extends ListenerAdapter {
         Log.system("Message handler up");
     }
 
-    public static MessageHandler getInstance() {
+    public synchronized static MessageHandler getInstance() {
         if (instance == null)
             instance = new MessageHandler();
         return instance;
     }
 
     @Override
-    public void onMessageReceived(@Nonnull MessageReceivedEvent event) {
+    public void onMessageReceived(MessageReceivedEvent event) {
         Message message = event.getMessage();
 
         if (message.getAuthor().isBot())
@@ -110,7 +111,7 @@ public final class MessageHandler extends ListenerAdapter {
 
             if ((isMapChannel && !isMapMessage) || (isSchematicChannel && !isSchematicMessage)) {
                 message.delete().queue();
-                replyMessage(message, "Vui lòng không gửi tin nhắn vào kênh này!", 30);
+                replyMessage(message, "<@message.don't_send_message_here>", 30);
 
             } else {
                 // Update level, money on message sent
@@ -130,24 +131,24 @@ public final class MessageHandler extends ListenerAdapter {
     }
 
     @Override
-    public void onGuildMemberUpdateNickname(@Nonnull GuildMemberUpdateNicknameEvent event) {
+    public void onGuildMemberUpdateNickname(GuildMemberUpdateNicknameEvent event) {
         Member member = event.getMember();
         Member bot = event.getGuild().getSelfMember();
         if (member == bot)
             return;
 
         Member target = event.getEntity();
-        log(event.getGuild(), target.getUser().getName() + " đã đổi tên thành " + target.getEffectiveName());
+        log(event.getGuild(), target.getUser().getName() + " <@message.change_name_to> " + target.getEffectiveName());
 
     }
 
     @Override
-    public void onMessageDelete(@Nonnull MessageDeleteEvent event) {
+    public void onMessageDelete(MessageDeleteEvent event) {
         DatabaseHandler.log(LogCollection.MESSAGE_DELETED, "messageId", event.getMessageId());
     }
 
     @Override
-    public void onGuildMemberRemove(@Nonnull GuildMemberRemoveEvent event) {
+    public void onGuildMemberRemove(GuildMemberRemoveEvent event) {
         // Send invite link to member who left the guild
         User user = event.getUser();
         List<TextChannel> inviteChannels = event.getGuild().getTextChannels();
@@ -156,13 +157,13 @@ public final class MessageHandler extends ListenerAdapter {
             Invite invite = inviteChannels.get(0).createInvite().setMaxUses(0).setMaxAge(0).complete();
             user.openPrivateChannel().queue(channel -> channel.sendMessage(invite.getUrl()).queue());
         }
-        log(event.getGuild(), user.getName() + " rời máy chủ");
+        log(event.getGuild(), user.getName() + " <@message.leave_guild>");
     }
 
     @Override
-    public void onGuildMemberJoin(@Nonnull GuildMemberJoinEvent event) {
+    public void onGuildMemberJoin(GuildMemberJoinEvent event) {
         UserHandler.addUser(event.getMember());
-        log(event.getGuild(), event.getMember().getEffectiveName() + " tham gia máy chủ");
+        log(event.getGuild(), event.getMember().getEffectiveName() + " <@message.join_guild>");
     }
 
     public static void log(Guild guild, String content) {
@@ -190,7 +191,7 @@ public final class MessageHandler extends ListenerAdapter {
         return getMessageSender(message.getGuild(), message.getCategory(), message.getChannel(), message.getMember());
     }
 
-    public static String getMessageSender(@Nonnull SlashCommandInteractionEvent event) {
+    public static String getMessageSender(SlashCommandInteractionEvent event) {
         return getMessageSender(event.getGuild(), null, event.getChannel(), event.getMember());
     }
 
@@ -225,13 +226,13 @@ public final class MessageHandler extends ListenerAdapter {
         Attachment attachment = fileOption.getAsAttachment();
 
         if (!ContentHandler.isMapFile(attachment)) {
-            event.reply("File được chọn không phải là file bản đồ");
+            MessageHandler.reply(event, "<@message.not_map_file>", 10);
             return;
         }
 
         Member member = event.getMember();
         sendMapPreview(attachment, member, event.getChannel());
-        event.reply("Gửi thành công.");
+        MessageHandler.reply(event, "<@message.send_successfully>", 10);
     }
 
     public static void sendSchematicPreview(SlashCommandInteractionEvent event) {
@@ -241,12 +242,12 @@ public final class MessageHandler extends ListenerAdapter {
         Attachment attachment = fileOption.getAsAttachment();
 
         if (!ContentHandler.isSchematicFile(attachment)) {
-            event.reply("File được chọn không phải là file bản thiết kế");
+            MessageHandler.reply(event, "<@message.not_schematic_file>", 10);
             return;
         }
         Member member = event.getMember();
         try {
-            sendSchematicPreview(ContentHandler.parseSchematicURL(attachment.getUrl()), member, event.getChannel());
+            sendSchematicPreview(ContentHandler.parseSchematicURL(attachment.getUrl()), member, event.getGuildChannel());
         } catch (Exception e) {
             Log.error(e);
         }
@@ -273,10 +274,10 @@ public final class MessageHandler extends ListenerAdapter {
     }
 
     public static void sendSchematicPreview(Schematic schem, Message message) {
-        sendSchematicPreview(schem, message.getMember(), message.getChannel());
+        sendSchematicPreview(schem, message.getMember(), message.getGuildChannel());
     }
 
-    public static void sendSchematicPreview(Schematic schem, Member member, MessageChannel channel) {
+    public static void sendSchematicPreview(Schematic schem, Member member, GuildMessageChannel channel) {
         try {
             File schemFile = ContentHandler.getSchematicFile(schem);
             File previewFile = ContentHandler.getSchematicPreviewFile(schem);
@@ -290,37 +291,76 @@ public final class MessageHandler extends ListenerAdapter {
 
             channel.sendFiles(FileUpload.fromData(schemFile), FileUpload.fromData(previewFile)).setEmbeds(builder.build()).queue();
         } catch (Exception e) {
-            sendMessage(channel, "Lỗi: " + e.getMessage(), 30);
+            sendMessage(channel, "<@message.error>: " + e.getMessage(), 30);
         }
     }
 
     // Message send commands
-    public static void replyMessage(SlashCommandInteractionEvent event, String content, int deleteAfter) {
-        sendMessage(event.getChannel(), content, deleteAfter);
-    }
 
-    public static void sendMessage(MessageChannel channel, String content, int deleteAfter) {
-        if (channel != null)
-            channel.sendMessage("```" + content + "```").queue(m -> m.delete().queueAfter(deleteAfter, TimeUnit.SECONDS));
+    public static void sendMessage(GuildMessageChannel channel, String content, int deleteAfter) {
+        channel.sendMessage("```" + LocaleManager.format(channel.getGuild(), content) + "```")
+                .queue(m -> m.delete().queueAfter(deleteAfter, TimeUnit.SECONDS));
     }
 
     public static void replyMessage(Message message, String content, int deleteAfter) {
-        message.reply("```" + content + "```").queue(m -> m.delete().queueAfter(deleteAfter, TimeUnit.SECONDS));
+        message.reply("```" + LocaleManager.format(message.getGuild(), content) + "```")
+                .queue(m -> m.delete().queueAfter(deleteAfter, TimeUnit.SECONDS));
     }
 
     public static void replyMessage(Message message, String content) {
-        message.reply("```" + content + "```").queue();
+        message.reply("```" + LocaleManager.format(message.getGuild(), content) + "```").queue();
     }
 
-    public static void sendEmbed(SlashCommandInteractionEvent event, EmbedBuilder builder, int deleteAfter) {
+    public static void reply(GenericCommandInteractionEvent event, String content, int deleteAfter) {
+        event.getHook().sendMessage("```" + LocaleManager.format(event.getGuild(), content) + "```")
+                .queue(_message -> _message.delete().queueAfter(deleteAfter, TimeUnit.SECONDS));
+    }
+
+    public static void replyEmbed(GenericCommandInteractionEvent event, EmbedBuilder builder, int deleteAfter) {
+        event.getHook().sendMessageEmbeds(getFormatEmbedBuilder(event.getGuildLocale(), builder).build())
+                .queue(_message -> _message.delete().queueAfter(deleteAfter, TimeUnit.SECONDS));
+    }
+
+    public static void replyEmbed(GenericCommandInteractionEvent event, String content, int deleteAfter) {
+        EmbedBuilder builder = new EmbedBuilder();
+        builder.addField(EmbedBuilder.ZERO_WIDTH_SPACE, LocaleManager.format(event.getGuild(), content), false);
         event.getHook().sendMessageEmbeds(builder.build()).queue(_message -> _message.delete().queueAfter(deleteAfter, TimeUnit.SECONDS));
     }
 
-    public static void sendEmbed(MessageContextInteractionEvent event, EmbedBuilder builder, int deleteAfter) {
+    public static void delete(GenericCommandInteractionEvent event) {
+        event.getHook().deleteOriginal().queue();
+    }
+
+    public static void reply(GenericComponentInteractionCreateEvent event, String content, int deleteAfter) {
+        event.getHook().sendMessage("```" + LocaleManager.format(event.getGuild(), content) + "```")
+                .queue(_message -> _message.delete().queueAfter(deleteAfter, TimeUnit.SECONDS));
+    }
+
+    public static void replyEmbed(GenericComponentInteractionCreateEvent event, EmbedBuilder builder, int deleteAfter) {
+        event.getHook().sendMessageEmbeds(getFormatEmbedBuilder(event.getGuildLocale(), builder).build())
+                .queue(_message -> _message.delete().queueAfter(deleteAfter, TimeUnit.SECONDS));
+    }
+
+    public static void replyEmbed(GenericComponentInteractionCreateEvent event, String content, int deleteAfter) {
+        EmbedBuilder builder = new EmbedBuilder();
+        builder.addField(EmbedBuilder.ZERO_WIDTH_SPACE, LocaleManager.format(event.getGuild(), content), false);
         event.getHook().sendMessageEmbeds(builder.build()).queue(_message -> _message.delete().queueAfter(deleteAfter, TimeUnit.SECONDS));
     }
 
-    public static void sendMessage(MessageContextInteractionEvent event, String content, int deleteAfter) {
-        event.getHook().sendMessage("```" + content + "```").queue(_message -> _message.delete().queueAfter(deleteAfter, TimeUnit.SECONDS));
+    public static void delete(GenericComponentInteractionCreateEvent event) {
+        event.getHook().deleteOriginal().queue();
+    }
+
+    public static EmbedBuilder getFormatEmbedBuilder(DiscordLocale locale, EmbedBuilder builder) {
+        EmbedBuilder result = new EmbedBuilder();
+        result.setDescription(LocaleManager.format(locale, builder.getDescriptionBuilder().toString()));
+        for (Field field : builder.getFields()) {
+
+            String name = LocaleManager.format(locale, field.getName());
+            String value = LocaleManager.format(locale, field.getValue());
+
+            result.addField(name, value, field.isInline());
+        }
+        return result;
     }
 }

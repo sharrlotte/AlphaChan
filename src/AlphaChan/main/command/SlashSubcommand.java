@@ -1,17 +1,10 @@
 package AlphaChan.main.command;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.concurrent.TimeUnit;
-
-import javax.annotation.Nonnull;
-
+import AlphaChan.main.handler.MessageHandler;
 import AlphaChan.main.handler.UpdatableHandler;
-import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.interaction.command.CommandAutoCompleteInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import net.dv8tion.jda.api.interactions.commands.Command;
+import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
 
 public abstract class SlashSubcommand extends SubcommandData {
@@ -20,25 +13,30 @@ public abstract class SlashSubcommand extends SubcommandData {
     private boolean isThreaded = false;
     private boolean updateMessage = false;
 
-    public SlashSubcommand(@Nonnull String name, String description) {
+    public SlashSubcommand(String name, String description) {
         super(name, description);
     }
 
-    public SlashSubcommand(@Nonnull String name, String description, boolean isThreaded, boolean updateMessage) {
+    public SlashSubcommand(String name, String description, boolean isThreaded, boolean updateMessage) {
         super(name, description);
         this.isThreaded = isThreaded;
         this.updateMessage = updateMessage;
     }
 
-    // Override
     public String getHelpString() {
-        return getDescription();
+        StringBuilder builder = new StringBuilder();
+        builder.append("<@command.command>: " + getName());
+        for (OptionData option : getOptions()) {
+            builder.append(String.format("\n\t<%s>%s", option.getName(), option.getDescription()));
+        }
+
+        return builder.toString();
     }
 
     // Override
     public void onCommand(SlashCommandInteractionEvent event) {
         if (updateMessage)
-            reply(event, "Đang cập nhật", 60);
+            MessageHandler.reply(event, "<@command.updating>", 60);
 
         if (this.isThreaded)
             UpdatableHandler.run(name, 0, () -> runCommand(event));
@@ -52,68 +50,5 @@ public abstract class SlashSubcommand extends SubcommandData {
     // Override
     public void onAutoComplete(CommandAutoCompleteInteractionEvent event) {
 
-    }
-
-    // Auto complete handler
-    public void sendAutoComplete(@Nonnull CommandAutoCompleteInteractionEvent event, HashMap<String, String> list) {
-        if (list.isEmpty()) {
-            sendAutoComplete(event, "");
-            return;
-        }
-
-        String focusString = event.getFocusedOption().getValue().toLowerCase();
-        List<Command.Choice> options = new ArrayList<Command.Choice>();
-
-        int count = 0;
-        for (String name : list.keySet()) {
-            if (count > MAX_OPTIONS)
-                break;
-            if (name.toLowerCase().contains(focusString)) {
-                String value = list.get(name);
-                if (value == null)
-                    return;
-                options.add(new Command.Choice(name, value));
-                count++;
-            }
-        }
-
-        if (options.isEmpty())
-            sendAutoComplete(event, "");
-        else
-            event.replyChoices(options).queue();
-    }
-
-    public void sendAutoComplete(@Nonnull CommandAutoCompleteInteractionEvent event, String value) {
-        sendAutoComplete(event, value, value);
-    }
-
-    public void sendAutoComplete(@Nonnull CommandAutoCompleteInteractionEvent event, String name, String value) {
-        if (value == null || value.isBlank())
-            event.replyChoice("Không tìm thấy kết quả khớp", "Không tìm thấy kết quả khớp").queue();
-        else
-            event.replyChoice(name, value).queue();
-    }
-
-    public void replyEmbed(SlashCommandInteractionEvent event, EmbedBuilder builder, int deleteAfter) {
-        event.getHook().sendMessageEmbeds(builder.build()).queue(_message -> _message.delete().queueAfter(deleteAfter, TimeUnit.SECONDS));
-    }
-
-    public void replyEmbed(SlashCommandInteractionEvent event, String content, int deleteAfter) {
-
-        EmbedBuilder builder = new EmbedBuilder();
-        builder.addField("", content, false);
-        replyEmbed(event, builder, deleteAfter);
-    }
-
-    public void reply(SlashCommandInteractionEvent event, String content, int deleteAfter) {
-        event.getHook().sendMessage("```" + content + "```").queue(_message -> _message.delete().queueAfter(deleteAfter, TimeUnit.SECONDS));
-    }
-
-    public void reply(SlashCommandInteractionEvent event, String content) {
-        event.getHook().sendMessage("```" + content + "```").queue();
-    }
-
-    public void delete(SlashCommandInteractionEvent event) {
-        event.getHook().deleteOriginal().queue();
     }
 }

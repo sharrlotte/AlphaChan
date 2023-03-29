@@ -9,6 +9,7 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 
 import java.util.HashMap;
 
+import AlphaChan.main.command.SlashCommand;
 import AlphaChan.main.command.SlashSubcommand;
 import AlphaChan.main.gui.discord.table.LeaderboardTable;
 
@@ -23,14 +24,9 @@ public class LeaderboardCommand extends SlashSubcommand {
     }
 
     public LeaderboardCommand() {
-        super("leaderboard", "Hiện thị bản xếp hạng của người dùng", true, false);
-        addOptions(new OptionData(OptionType.STRING, "orderby", "Tên bảng xếp hạng", true, true));
-        addOptions(new OptionData(OptionType.STRING, "leaderboard", "Tên bảng xếp hạng", true, true));
-    }
-
-    @Override
-    public String getHelpString() {
-        return "Hiện thị bản xếp hạng của người dùng:\n\t<orderby>: Xếp theo:\n\t\t- MONEY: Xếp theo tiền\n\t\t- LEVEL: Xếp theo cấp\n\t\t- PVP_POINT: Xếp theo điểm pvp";
+        super("leaderboard", "<@command.command_leaderboard>", true, false);
+        addOptions(new OptionData(OptionType.STRING, "orderby", "<@command.order>", true, true));
+        addOptions(new OptionData(OptionType.STRING, "leaderboard", "<@command.name>", true, true));
     }
 
     @Override
@@ -65,13 +61,13 @@ public class LeaderboardCommand extends SlashSubcommand {
             HashMap<String, String> options = new HashMap<String, String>();
             for (ORDER t : ORDER.values())
                 options.put(t.name(), t.name());
-            sendAutoComplete(event, options);
+            SlashCommand.sendAutoComplete(event, options);
 
         } else if (focus.equals("leaderboard")) {
             HashMap<String, String> options = new HashMap<String, String>();
             for (LEADERBOARD t : LEADERBOARD.values())
                 options.put(t.name(), t.name());
-            sendAutoComplete(event, options);
+            SlashCommand.sendAutoComplete(event, options);
         }
     }
 }

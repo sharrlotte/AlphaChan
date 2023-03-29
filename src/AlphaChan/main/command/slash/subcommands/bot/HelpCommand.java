@@ -9,18 +9,14 @@ import java.util.HashMap;
 
 import AlphaChan.main.command.SlashCommand;
 import AlphaChan.main.command.SlashSubcommand;
+import AlphaChan.main.handler.MessageHandler;
 import AlphaChan.main.handler.CommandHandler.SlashCommandHandler;
 
 public class HelpCommand extends SlashSubcommand {
     public HelpCommand() {
-        super("help", "Hiển thị thông tin các lệnh");
-        addOption(OptionType.STRING, "command", "Tên lệnh", true, true);
-        addOption(OptionType.STRING, "subcommand", "Tên lệnh", true, true);
-    }
-
-    @Override
-    public String getHelpString() {
-        return "Help";
+        super("help", "<@command.command_help>");
+        addOption(OptionType.STRING, "command", "<@command.command_name>", true, true);
+        addOption(OptionType.STRING, "subcommand", "<@command.subcommand_name>", true, true);
     }
 
     @Override
@@ -34,10 +30,11 @@ public class HelpCommand extends SlashSubcommand {
         String command = commandOption.getAsString();
         String subcommand = subcommandOption.getAsString();
         if (SlashCommandHandler.getCommandMap().containsKey(command))
-            reply(event, "/" + command + " " + subcommand + ":"
-                    + SlashCommandHandler.getCommandMap().get(command).getHelpString(subcommand), 60);
+            MessageHandler.reply(event,
+                    "/" + command + " " + subcommand + ":" + SlashCommandHandler.getCommandMap().get(command).getHelpString(subcommand),
+                    60);
         else
-            reply(event, "Lệnh " + command + " " + subcommand + " không tồn tại", 10);
+            MessageHandler.reply(event, "Lệnh " + command + " " + subcommand + " không tồn tại", 10);
     }
 
     @Override
@@ -46,7 +43,7 @@ public class HelpCommand extends SlashSubcommand {
         if (focus.equals("command")) {
             HashMap<String, String> options = new HashMap<String, String>();
             SlashCommandHandler.getCommandMap().keySet().forEach(t -> options.put(t, t));
-            sendAutoComplete(event, options);
+            SlashCommand.sendAutoComplete(event, options);
 
         } else if (focus.equals("subcommand")) {
             OptionMapping commandOption = event.getOption("command");
@@ -57,8 +54,8 @@ public class HelpCommand extends SlashSubcommand {
             if (subcommands == null)
                 return;
             HashMap<String, String> options = new HashMap<String, String>();
-            subcommands.subcommands.keySet().forEach(t -> options.put(t, t));
-            sendAutoComplete(event, options);
+            subcommands.getSubcommands().forEach(t -> options.put(t.getName(), t.getName()));
+            SlashCommand.sendAutoComplete(event, options);
 
         }
     }

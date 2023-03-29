@@ -21,7 +21,7 @@ public class MusicPlayerHandler extends DefaultAudioPlayerManager {
         source(YoutubeAudioSourceManager.class).setPlaylistPageCount(10);
     }
 
-    public static MusicPlayerHandler getInstance() {
+    public synchronized static MusicPlayerHandler getInstance() {
         if (instance == null)
             instance = new MusicPlayerHandler();
 

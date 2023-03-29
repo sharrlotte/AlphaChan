@@ -6,8 +6,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
-import javax.annotation.Nonnull;
-
 import org.bson.Document;
 import org.bson.conversions.Bson;
 
@@ -43,7 +41,7 @@ public final class UserHandler implements Updatable {
         Log.system("User handler up");
     }
 
-    public static UserHandler getInstance() {
+    public synchronized static UserHandler getInstance() {
         if (instance == null)
             instance = new UserHandler();
         return instance;
@@ -140,7 +138,7 @@ public final class UserHandler implements Updatable {
     }
 
     // Add user to cache
-    public static UserCache addUser(@Nonnull String guildId, String userId) {
+    public static UserCache addUser(String guildId, String userId) {
         UserCache userData = new UserCache(guildId, userId);
         // Key is hashId = guildId + userId
         userCache.put(userData.getHashId(), userData);
@@ -154,7 +152,7 @@ public final class UserHandler implements Updatable {
         return addUser(member.getGuild().getId(), member.getId());
     }
 
-    public static UserCache getUserNoCache(@Nonnull String guildId, String userId) {
+    public static UserCache getUserNoCache(String guildId, String userId) {
         String hashId = guildId + userId;
         if (userCache.containsKey(hashId))
             return userCache.get(hashId);
@@ -164,14 +162,14 @@ public final class UserHandler implements Updatable {
     }
 
     // Get user without adding it to cache
-    public static UserCache getUserNoCache(@Nonnull Member member) {
+    public static UserCache getUserNoCache(Member member) {
         String guildId = member.getGuild().getId();
         String userId = member.getId();
         return getUserNoCache(guildId, userId);
     }
 
     // Waiting for data from Database
-    public static UserCache getUserAwait(@Nonnull Member member) {
+    public static UserCache getUserAwait(Member member) {
         String guildId = member.getGuild().getId();
         String userId = member.getId();
         // If user exist in cache then return, else query user from Database
@@ -186,7 +184,7 @@ public final class UserHandler implements Updatable {
         return userFromDatabase;
     }
 
-    public static ConcurrentHashMap<String, UserCache> getUserFromGuild(@Nonnull String guildId) {
+    public static ConcurrentHashMap<String, UserCache> getUserFromGuild(String guildId) {
         ConcurrentHashMap<String, UserCache> users = new ConcurrentHashMap<String, UserCache>();
         userCache.values().forEach(user -> {
             if (user.getData().getGuildId().equals(guildId))
@@ -195,7 +193,7 @@ public final class UserHandler implements Updatable {
         return users;
     }
 
-    public static UserCache getUserFromDatabase(@Nonnull String guildId, String userId) {
+    public static UserCache getUserFromDatabase(String guildId, String userId) {
 
         MongoCollection<UserData> collection = DatabaseHandler.getCollection(Database.USER, guildId, UserData.class);
 

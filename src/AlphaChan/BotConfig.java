@@ -10,6 +10,8 @@ import java.util.Properties;
 
 import AlphaChan.main.util.Log;
 
+import static AlphaChan.AlphaChan.*;
+
 public final class BotConfig {
 
     private static final String CONFIG_PATH = "config.properties";
@@ -20,12 +22,14 @@ public final class BotConfig {
     public static enum Config {
         YUI_ID("719322804549320725"),
 
-        // Cache
         UPDATE_PERIOD(60 * 1000), // Time between each update
-        UPDATE_LIMIT(1), GUILD_ALIVE_TIME(30), USER_ALIVE_TIME(10),
+        UPDATE_LIMIT(1), //
+        GUILD_ALIVE_TIME(30), //
+        USER_ALIVE_TIME(10),
 
-        // Database
-        GUILD_COLLECTION("GUILD_DATA"), SCHEMATIC_INFO_COLLECTION("SCHEMATIC_INFO"), SCHEMATIC_DATA_COLLECTION("SCHEMATIC_DATA"),
+        GUILD_COLLECTION("GUILD_DATA"), //
+        SCHEMATIC_INFO_COLLECTION("SCHEMATIC_INFO"), //
+        SCHEMATIC_DATA_COLLECTION("SCHEMATIC_DATA"), //
         MAX_LOG_COUNT(8000), // Max log messages that database can store for each type
         TIME_INSERT("time"), // Time field name in Database
 
@@ -35,8 +39,8 @@ public final class BotConfig {
 
         public final String value;
 
-        Config(Object value) {
-            this.value = value.toString();
+        Config(Object v) {
+            this.value = v.toString();
         }
 
         @Override
@@ -66,6 +70,10 @@ public final class BotConfig {
         public String toString() {
             return value;
         }
+    }
+
+    static {
+        onShutdown.connect((code) -> save());
     }
 
     public static Properties getProperties() {

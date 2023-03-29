@@ -10,13 +10,8 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 
 public class AvatarCommand extends SlashSubcommand {
     public AvatarCommand() {
-        super("avatar", "Hiển thị ảnh của người dùng");
-        this.addOption(OptionType.USER, "user", "Tên", true);
-    }
-
-    @Override
-    public String getHelpString() {
-        return "Hiển thị ảnh của người dùng";
+        super("avatar", "<@command.command_avatar>");
+        this.addOption(OptionType.USER, "user", "<@command.user_name>", true);
     }
 
     @Override
@@ -25,8 +20,7 @@ public class AvatarCommand extends SlashSubcommand {
         if (userOption == null)
             return;
         User user = userOption.getAsUser();
-        event.getHook().sendMessage("\n" + user.getAvatarUrl())
-                .queue(_message -> _message.delete().queueAfter(30, TimeUnit.SECONDS));
+        event.getHook().sendMessage("\n" + user.getAvatarUrl()).queue(_message -> _message.delete().queueAfter(30, TimeUnit.SECONDS));
     }
 
 }

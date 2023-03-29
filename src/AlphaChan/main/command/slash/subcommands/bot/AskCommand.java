@@ -6,6 +6,7 @@ import com.theokanning.openai.service.OpenAiService;
 import AlphaChan.BotConfig;
 import AlphaChan.BotConfig.Config;
 import AlphaChan.main.command.SlashSubcommand;
+import AlphaChan.main.handler.MessageHandler;
 import AlphaChan.main.handler.UpdatableHandler;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
@@ -23,8 +24,8 @@ public class AskCommand extends SlashSubcommand {
     private int cooldown = 1000 * 60 * 2; // 2 min for every question
 
     public AskCommand() {
-        super("ask", "Hỏi bot");
-        addOption(OptionType.STRING, "question", "Câu hỏi", true);
+        super("ask", "<@command.command_ask_bot>");
+        addOption(OptionType.STRING, "question", "<@command.question>", true);
 
         chatGPTKey = BotConfig.readString(Config.CHAT_GPT_TOKEN, "NULL");
 
@@ -43,21 +44,20 @@ public class AskCommand extends SlashSubcommand {
         tries += 1;
 
         if (hasKey != true) {
-            reply(command, "Ad chưa có tiền mua acc chat gpt nên chưa dùng được :v", 10);
+            MessageHandler.reply(command, "Ad chưa có tiền mua acc chat gpt nên chưa dùng được :v", 10);
             return;
         }
 
         if (remain > 0) {
-            reply(command,
-                    "Vui lòng đợi " + TimeFormat.RELATIVE.before(System.currentTimeMillis() + remain).toString() + " để sử dụng lệnh",
-                    (int) remain);
+            MessageHandler.reply(command, "Vui lòng đợi " + TimeFormat.RELATIVE.before(System.currentTimeMillis() + remain).toString() //
+                    + " để sử dụng lệnh", (int) remain);
             return;
         }
 
         OptionMapping questionOption = command.getOption("question");
 
         if (questionOption == null) {
-            reply(command, "BRUH", 10);
+            MessageHandler.reply(command, "BRUH", 10);
             return;
         }
         String text = questionOption.getAsString();
@@ -72,7 +72,7 @@ public class AskCommand extends SlashSubcommand {
                         .n(1)//
                         .build();//
 
-                reply(command, text + "\n\n" + api.createCompletion(request).getChoices().get(0).getText());
+                MessageHandler.reply(command, text + "\n\n" + api.createCompletion(request).getChoices().get(0).getText(), 1000000);
 
                 lastTime = System.currentTimeMillis();
 
@@ -81,7 +81,7 @@ public class AskCommand extends SlashSubcommand {
                     runCommand(command);
 
                 } else {
-                    delete(command);
+                    MessageHandler.delete(command);
                     e.printStackTrace();
                     tries = 0;
                 }

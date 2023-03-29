@@ -42,16 +42,11 @@ public class PostSchemCommand extends SlashSubcommand {
     private static List<String> tags = SchematicTag.getTags();
 
     public PostSchemCommand() {
-        super("postschem", "Chuyển tập tin bản thiết kế thành hình ảnh và đăng lên cơ sở dữ liệu", false, true);
-        addOption(OptionType.STRING, "tag", "Gắn thẻ cho bản thiết kế", true, true);
-        addOption(OptionType.ATTACHMENT, "schematicfile", "File để đăng");
-        addOption(OptionType.STRING, "text", "Bản thiết kế để đăng");
-        addOption(OptionType.BOOLEAN, "preview", "Gửi hình ảnh của bản thiết kế");
-    }
-
-    @Override
-    public String getHelpString() {
-        return "Chuyển tập tin bản thiết kế thành hình ảnh:\n\t<schematicfile>: Tập tin chứ bản thiết kế muốn gửi, tập tin phải có định dạng (đuôi) .msch";
+        super("postschem", "<@command.command_post_schem>", false, true);
+        addOption(OptionType.STRING, "tag", "<@command.schematic_tag>", true, true);
+        addOption(OptionType.ATTACHMENT, "schematicfile", "<@command.schematic_file>");
+        addOption(OptionType.STRING, "text", "<@command.schematic_text>");
+        addOption(OptionType.BOOLEAN, "preview", "<@command.show_image>");
     }
 
     @Override
@@ -60,7 +55,7 @@ public class PostSchemCommand extends SlashSubcommand {
         OptionMapping textOption = event.getOption("text");
 
         if (fileOption == null && textOption == null) {
-            reply(event, "Thiếu dữ liệu bản thế kế (file/text)", MAX_OPTIONS);
+            MessageHandler.reply(event, "<@command.no_file_or_text_schematic_provided> (file/text)", MAX_OPTIONS);
             return;
         }
 
@@ -79,7 +74,7 @@ public class PostSchemCommand extends SlashSubcommand {
         tag.removeIf(contain);
 
         if (tag.isEmpty()) {
-            reply(event, "Bản thiết kế không hợp lệ, thiếu nhãn", 30);
+            MessageHandler.reply(event, "<@command.no_tag_provided>", 30);
 
         } else {
 
@@ -103,7 +98,7 @@ public class PostSchemCommand extends SlashSubcommand {
                 FindIterable<SchematicData> result = collection.find(filter);
 
                 if (result.first() != null) {
-                    reply(event, "Bản thiết kế đã tồn tại", 10);
+                    MessageHandler.reply(event, "<@command.schematic_exists>", 10);
                     return;
                 }
 
@@ -114,7 +109,7 @@ public class PostSchemCommand extends SlashSubcommand {
                 if (previewOption != null && previewOption.getAsBoolean() == true)
                     MessageHandler.sendSchematicPreview(event);
 
-                reply(event, "Đăng bản thiết kế thành công", 10);
+                MessageHandler.reply(event, "<@command.post_schematic_success>", 10);
             }
 
             if (textOption != null) {
@@ -137,7 +132,7 @@ public class PostSchemCommand extends SlashSubcommand {
                 FindIterable<SchematicData> result = collection.find(filter);
 
                 if (result.first() != null) {
-                    reply(event, "Bản thiết kế đã tồn tại", 10);
+                    MessageHandler.reply(event, "<@command.schematic_exists>", 10);
                     return;
                 }
 

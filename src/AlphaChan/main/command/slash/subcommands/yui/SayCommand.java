@@ -11,6 +11,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import java.util.HashMap;
 import java.util.List;
 
+import AlphaChan.main.command.SlashCommand;
 import AlphaChan.main.command.SlashSubcommand;
 
 import static AlphaChan.AlphaChan.*;
@@ -24,11 +25,6 @@ public class SayCommand extends SlashSubcommand {
         addOption(OptionType.STRING, "channel", "Yui only", false, true);
         addOption(OptionType.STRING, "reply", "Yui only", false, true);
 
-    }
-
-    @Override
-    public String getHelpString() {
-        return "";
     }
 
     @Override
@@ -61,8 +57,7 @@ public class SayCommand extends SlashSubcommand {
         if (replyIdOption == null)
             channel.sendMessage(content).queue();
         else {
-            channel.retrieveMessageById(replyIdOption.getAsString())
-                    .queue((message) -> message.reply(content));
+            channel.retrieveMessageById(replyIdOption.getAsString()).queue((message) -> message.reply(content));
         }
 
     }
@@ -73,7 +68,7 @@ public class SayCommand extends SlashSubcommand {
         if (focus.equals("guild")) {
             HashMap<String, String> guildNames = new HashMap<>();
             jda.getGuilds().forEach(s -> guildNames.put(s.getName(), s.getId()));
-            sendAutoComplete(event, guildNames);
+            SlashCommand.sendAutoComplete(event, guildNames);
 
             // Show all channels
         } else if (focus.equals("channel")) {
@@ -86,14 +81,14 @@ public class SayCommand extends SlashSubcommand {
                 guild = jda.getGuildById(guildIdOption.getAsString());
 
             if (guild == null) {
-                sendAutoComplete(event, "No guild found");
+                SlashCommand.sendAutoComplete(event, "No guild found");
                 return;
             }
 
             List<TextChannel> channels = guild.getTextChannels();
             HashMap<String, String> channelNames = new HashMap<>();
             channels.forEach(c -> channelNames.put(c.getName(), c.getId()));
-            sendAutoComplete(event, channelNames);
+            SlashCommand.sendAutoComplete(event, channelNames);
 
         } else if (focus.equals("reply")) {
             OptionMapping guildIdOption = event.getOption("guild");
@@ -117,7 +112,7 @@ public class SayCommand extends SlashSubcommand {
             channel.getHistory().retrieveFuture(10).queue(messages -> {
                 HashMap<String, String> messageContents = new HashMap<>();
                 messages.forEach(m -> messageContents.put(m.getContentDisplay(), m.getId()));
-                sendAutoComplete(event, messageContents);
+                SlashCommand.sendAutoComplete(event, messageContents);
             });
         }
     }

@@ -33,7 +33,7 @@ public final class ServerStatusHandler {
         // net.discoverServers(this::addServerIP, this::endDiscover);
     }
 
-    public static ServerStatusHandler getInstance() {
+    public synchronized static ServerStatusHandler getInstance() {
         if (instance == null)
             instance = new ServerStatusHandler();
         return instance;

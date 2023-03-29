@@ -17,11 +17,6 @@ public class SetRoleCommand extends SlashSubcommand {
     }
 
     @Override
-    public String getHelpString() {
-        return "";
-    }
-
-    @Override
     public void runCommand(SlashCommandInteractionEvent event) {
         OptionMapping roleOption = event.getOption("role");
         if (roleOption == null)

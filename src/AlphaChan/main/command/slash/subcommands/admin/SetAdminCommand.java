@@ -5,6 +5,7 @@ import java.util.List;
 import AlphaChan.main.command.SlashSubcommand;
 import AlphaChan.main.data.user.GuildCache;
 import AlphaChan.main.handler.GuildHandler;
+import AlphaChan.main.handler.MessageHandler;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
@@ -13,13 +14,8 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 public class SetAdminCommand extends SlashSubcommand {
 
     public SetAdminCommand() {
-        super("setadmin", "Cài đặt vai trò admin cho máy chủ");
-        this.addOption(OptionType.ROLE, "role", "Vai trò admin", true);
-    }
-
-    @Override
-    public String getHelpString() {
-        return "Cài đặt vai trò của máy chủ:\n\t<role>: vai trò admin\n\tThêm lần nữa để xóa";
+        super("setadmin", "<@command.command_set_admin>");
+        this.addOption(OptionType.ROLE, "role", "<@command.admin_role>", true);
     }
 
     @Override
@@ -39,14 +35,14 @@ public class SetAdminCommand extends SlashSubcommand {
 
         if (adminRoleIds.contains(roleId)) {
             if (adminRoleIds.remove(roleId))
-                reply(event, "Xóa vai trò thành công", 30);
+                MessageHandler.reply(event, "<@command.delete_successfully>", 30);
             else
-                reply(event, "Xóa vai trò thất bại", 30);
+                MessageHandler.reply(event, "<@command.delete_failed>", 30);
         } else {
             if (adminRoleIds.add(roleId))
-                reply(event, "Thêm vai trò thành công", 30);
+                MessageHandler.reply(event, "<@command.add_successfully>", 30);
             else
-                reply(event, "Thêm vai trò thất bại", 30);
+                MessageHandler.reply(event, "<@command.add_failed>", 30);
         }
     }
 }

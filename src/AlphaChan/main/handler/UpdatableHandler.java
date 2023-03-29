@@ -24,7 +24,7 @@ public final class UpdatableHandler {
         Log.system("Updatable handler up");
     }
 
-    public static UpdatableHandler getInstance() {
+    public synchronized static UpdatableHandler getInstance() {
         if (instance == null)
             instance = new UpdatableHandler();
         return instance;

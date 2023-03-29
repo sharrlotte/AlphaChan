@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
-import javax.annotation.Nonnull;
-
 import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
 
@@ -35,7 +33,7 @@ public class LeaderboardTable extends PageTable {
 
     private List<UserCache> users = new ArrayList<UserCache>();
 
-    public LeaderboardTable(@Nonnull SlashCommandInteractionEvent event, LEADERBOARD leaderboard, ORDER order) {
+    public LeaderboardTable(SlashCommandInteractionEvent event, LEADERBOARD leaderboard, ORDER order) {
         super(event, 2);
         this.leaderboard = leaderboard;
         this.order = order;
@@ -132,7 +130,7 @@ public class LeaderboardTable extends PageTable {
 
         Member member = getEventMember();
         if (member == null)
-            return new EmbedBuilder().addField("NULL", "Lỗi: Người dùng không tồn tại", false);
+            return new EmbedBuilder().addField("NULL", "<@command.user_not_found>", false);
 
         EmbedBuilder builder = new EmbedBuilder();
         builder.setTitle("BẢNG XẾP HẠNG (" + leaderboard + ")");
@@ -162,19 +160,19 @@ public class LeaderboardTable extends PageTable {
                 break;
 
             case PVP_POINT:
-                data += user.getPoint(PointType.PVP_POINT) + " điểm";
+                data += user.getPoint(PointType.PVP_POINT) + " <@command.point>";
                 break;
 
             default:
-                data += "cấp " + user.getPoint(PointType.LEVEL) + " (" + user.getPoint(PointType.EXP) + " kinh nghiệm)";
+                data += "<@command.level> " + user.getPoint(PointType.LEVEL) + " (" + user.getPoint(PointType.EXP) + " <@command.exp>)";
                 break;
             }
-            data += "\nMáy chủ: " + user.getGuild().getName();
+            data += "\n<@command.guild>: " + user.getGuild().getName();
             return data;
 
         } catch (Exception e) {
             Log.error(e);
-            return "Người dùng đã rời khỏi máy chủ";
+            return "<@command.user_left_guild>";
         }
     }
 }

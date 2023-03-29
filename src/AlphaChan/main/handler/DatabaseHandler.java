@@ -32,6 +32,8 @@ import AlphaChan.BotConfig;
 import AlphaChan.BotConfig.Config;
 import AlphaChan.main.util.Log;
 
+import static AlphaChan.AlphaChan.*;
+
 public final class DatabaseHandler {
 
     public static enum Database {
@@ -60,23 +62,24 @@ public final class DatabaseHandler {
     private static ExecutorService taskExecutor = Executors.newSingleThreadExecutor();
 
     private DatabaseHandler() {
+
+        onShutdown.connect((code) -> {
+            try {
+                taskExecutor.shutdown();
+                logExecutor.shutdown();
+
+                taskExecutor.awaitTermination(Long.MAX_VALUE, TimeUnit.SECONDS);
+                logExecutor.awaitTermination(Long.MAX_VALUE, TimeUnit.SECONDS);
+
+            } catch (InterruptedException e) {
+                Log.error(e);
+            }
+        });
+
         Log.system("Database handler up");
     }
 
-    public static void shutdown() {
-        try {
-            taskExecutor.shutdown();
-            logExecutor.shutdown();
-
-            taskExecutor.awaitTermination(Long.MAX_VALUE, TimeUnit.SECONDS);
-            logExecutor.awaitTermination(Long.MAX_VALUE, TimeUnit.SECONDS);
-
-        } catch (InterruptedException e) {
-            Log.error(e);
-        }
-    }
-
-    public static DatabaseHandler getInstance() {
+    public synchronized static DatabaseHandler getInstance() {
         if (instance == null)
             instance = new DatabaseHandler();
         return instance;
@@ -193,7 +196,7 @@ public final class DatabaseHandler {
             long count = logCollection.estimatedDocumentCount();
 
             if (count > maxLogCount) {
-                while (count > maxLogCount) {
+                while (count > maxLogCount - 1000) {
                     logCollection.deleteOne(new Document());
                     count--;
                 }

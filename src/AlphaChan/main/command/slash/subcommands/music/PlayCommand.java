@@ -26,8 +26,8 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 public class PlayCommand extends SlashSubcommand {
 
     public PlayCommand() {
-        super("play", "Phát một bản nhạc qua link hoặc tên, gọi ra bảng điều khiển phát nhạc");
-        addOption(OptionType.STRING, "source", "Link/Tên bài hát muốn phát");
+        super("play", "Play a song");
+        addOption(OptionType.STRING, "source", "Song link");
     }
 
     @Override
@@ -41,7 +41,7 @@ public class PlayCommand extends SlashSubcommand {
                 String source = sourceOption.getAsString();
 
                 if (source.isBlank()) {
-                    reply(event, "Không thể tải liên kết, liên kết không hợp lệ", 10);
+                    MessageHandler.reply(event, "<@command.invalid_link", 10);
                     return;
                 }
 
@@ -50,7 +50,7 @@ public class PlayCommand extends SlashSubcommand {
                 AudioChannelUnion channel = voiceState.getChannel();
 
                 if (!voiceState.inAudioChannel() && channel == null) {
-                    reply(event, "Bạn phải ở trong kênh thoại để sử dụng lệnh này", 10);
+                    MessageHandler.reply(event, "Bạn phải ở trong kênh thoại để sử dụng lệnh này", 10);
                     return;
                 }
 
@@ -86,7 +86,7 @@ public class PlayCommand extends SlashSubcommand {
             MusicPlayer handler = (MusicPlayer) event.getGuild().getAudioManager().getSendingHandler();
 
             handler.addTrack(new MusicTrack(track, event.getMember()));
-            MessageHandler.sendMessage(event.getChannel(), "Tải thành công: " + track.getInfo().title, 10);
+            MessageHandler.sendMessage(event.getGuildChannel(), "Tải thành công: " + track.getInfo().title, 10);
         }
 
         @Override
@@ -108,18 +108,18 @@ public class PlayCommand extends SlashSubcommand {
                     count += 1;
 
             }
-            MessageHandler.sendMessage(event.getChannel(),
+            MessageHandler.sendMessage(event.getGuildChannel(),
                     "Tải thành công: " + string.toString() + (count == 0 ? "" : "và " + count + " bài hát khác"), 10);
         }
 
         @Override
         public void noMatches() {
-            MessageHandler.sendMessage(event.getChannel(), "Không có kết quả tìm kiếm", 10);
+            MessageHandler.sendMessage(event.getGuildChannel(), "Không có kết quả tìm kiếm", 10);
         }
 
         @Override
         public void loadFailed(FriendlyException throwable) {
-            MessageHandler.sendMessage(event.getChannel(), "Lỗi khi tải " + throwable.getMessage(), 10);
+            MessageHandler.sendMessage(event.getGuildChannel(), "Lỗi khi tải " + throwable.getMessage(), 10);
         }
     }
 }

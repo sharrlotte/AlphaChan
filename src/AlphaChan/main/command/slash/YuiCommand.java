@@ -7,6 +7,7 @@ import AlphaChan.main.command.slash.subcommands.yui.AddCommand;
 import AlphaChan.main.command.slash.subcommands.yui.SayCommand;
 import AlphaChan.main.command.slash.subcommands.yui.SetRoleCommand;
 import AlphaChan.main.command.slash.subcommands.yui.UpdateCommand;
+import AlphaChan.main.handler.MessageHandler;
 import AlphaChan.main.handler.UserHandler;
 
 public class YuiCommand extends SlashCommand {
@@ -22,7 +23,7 @@ public class YuiCommand extends SlashCommand {
     @Override
     public void onCommand(SlashCommandInteractionEvent event) {
         if (!UserHandler.isYui(event.getMember())) {
-            reply(event, "Bạn không có quyền để sử dụng lệnh này", 10);
+            MessageHandler.reply(event, "<@command.no_permission>", 10);
             return;
         }
         runCommand(event);
@@ -35,8 +36,6 @@ public class YuiCommand extends SlashCommand {
             sendAutoComplete(event, "Bạn không có quyền để sử dụng lệnh này");
             return;
         }
-        if (subcommands.containsKey(event.getSubcommandName())) {
-            subcommands.get(event.getSubcommandName()).onAutoComplete(event);
-        }
+        super.onAutoComplete(event);
     }
 }

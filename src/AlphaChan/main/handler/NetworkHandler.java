@@ -14,10 +14,10 @@ public class NetworkHandler {
     private static NetworkHandler instance = new NetworkHandler();
 
     private NetworkHandler() {
-        
+
     }
 
-    public static NetworkHandler getInstance() {
+    public synchronized static NetworkHandler getInstance() {
         if (instance == null)
             instance = new NetworkHandler();
         return instance;

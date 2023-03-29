@@ -11,8 +11,8 @@ import AlphaChan.main.util.Log;
 public class HelpConsole extends ConsoleCommand {
 
     public HelpConsole() {
-        super("help", "\n\t- <>: Show all commands" + //
-                "\n\t- <command name>: Show command");
+        super("help", "\n\t- <>: <@command.command_help>" + //
+                "\n\t- <command name>: <@command.command_to_show>");
     }
 
     @Override

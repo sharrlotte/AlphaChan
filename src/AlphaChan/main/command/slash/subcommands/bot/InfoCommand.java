@@ -10,6 +10,7 @@ import AlphaChan.BotConfig;
 import AlphaChan.BotConfig.Config;
 import AlphaChan.main.command.SlashSubcommand;
 import AlphaChan.main.handler.GuildHandler;
+import AlphaChan.main.handler.MessageHandler;
 import AlphaChan.main.handler.UserHandler;
 
 import static AlphaChan.AlphaChan.*;
@@ -18,7 +19,7 @@ import java.time.format.DateTimeFormatter;
 
 public class InfoCommand extends SlashSubcommand {
     public InfoCommand() {
-        super("info", "Hiển thị thông tin cơ bản của bot");
+        super("info", "<@command.command_bot_info>");
     }
 
     @Override
@@ -41,15 +42,13 @@ public class InfoCommand extends SlashSubcommand {
         else
             field.append("Chủ nhân: " + yui.getEffectiveName() + "\n");
 
-        field.append(
-                "Máy chủ: " + GuildHandler.getActiveGuildCount() + "\\" + jda.getGuilds().size() + " trực tuyến\n");
+        field.append("Máy chủ: " + GuildHandler.getActiveGuildCount() + "\\" + jda.getGuilds().size() + " trực tuyến\n");
         field.append("Thành viên: " + UserHandler.getActiveUserCount() + "\\" + totalMember + " hoạt động\n");
-        field.append("Ngày sinh: " + bot.getTimeCreated().format(DateTimeFormatter.ofPattern("dd/MM/yyyy-hh:mm:ss"))
-                + "\n");
+        field.append("Ngày sinh: " + bot.getTimeCreated().format(DateTimeFormatter.ofPattern("dd/MM/yyyy-hh:mm:ss")) + "\n");
         builder.addField("Thông tin", "```" + field.toString() + "```", false);
         builder.setThumbnail(bot.getEffectiveAvatarUrl());
         builder.setTitle(bot.getName(), jda.getInviteUrl(Permission.ADMINISTRATOR));
 
-        replyEmbed(event, builder, 30);
+        MessageHandler.replyEmbed(event, builder, 30);
     }
 }

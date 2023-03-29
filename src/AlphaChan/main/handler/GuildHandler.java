@@ -4,8 +4,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 
-import javax.annotation.Nonnull;
-
 import org.bson.Document;
 import org.bson.conversions.Bson;
 
@@ -36,7 +34,7 @@ public class GuildHandler implements Updatable {
         Log.system("Guild handler up");
     }
 
-    public static GuildHandler getInstance() {
+    public synchronized static GuildHandler getInstance() {
         if (instance == null)
             instance = new GuildHandler();
         return instance;
@@ -89,14 +87,14 @@ public class GuildHandler implements Updatable {
     }
 
     // Add guild to cache
-    public static GuildCache addGuild(@Nonnull String guildId) {
+    public static GuildCache addGuild(String guildId) {
         GuildCache guildData = new GuildCache(guildId);
         guildCaches.put(guildId, guildData);
         return guildData;
     }
 
     // Get guild from cache/Database
-    public static GuildCache getGuild(@Nonnull String guildId) {
+    public static GuildCache getGuild(String guildId) {
         // If guild exist in cache then return, else query guild from Database
         if (guildCaches.containsKey(guildId)) {
             GuildCache guildData = guildCaches.get(guildId);

@@ -3,6 +3,7 @@ package AlphaChan.main.gui.discord;
 import java.util.ArrayList;
 import java.util.List;
 
+import AlphaChan.main.handler.MessageHandler;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -72,7 +73,7 @@ public class PageTable extends Table {
     public void onPrepareTable(MessageEditAction action) {
         MessageEmbed page = getCurrentPage().build();
         if (getMaxPage() <= 0 || page == null) {
-            sendMessage("Không có dữ liệu", 10);
+            MessageHandler.sendMessage(getEventTextChannel(), "Không có dữ liệu", 10);
             return;
         }
 

@@ -1,8 +1,10 @@
 package AlphaChan.main.command.slash.subcommands.user;
 
+import AlphaChan.main.command.SlashCommand;
 import AlphaChan.main.command.SlashSubcommand;
 import AlphaChan.main.data.user.UserCache;
 import AlphaChan.main.data.user.UserCache.PointType;
+import AlphaChan.main.handler.MessageHandler;
 import AlphaChan.main.handler.UserHandler;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
@@ -17,15 +19,10 @@ import java.util.HashMap;
 public class TransferCommand extends SlashSubcommand {
 
     public TransferCommand() {
-        super("transfer", "Chuyển chỉ số cho người khác", true, false);
-        addOption(OptionType.STRING, "type", "Loại chỉ số muốn chuyển", true, true);
-        addOption(OptionType.USER, "user", "Người muốn chuyển", true);
-        addOption(OptionType.INTEGER, "point", "Số điểm muốn chuyển", true);
-    }
-
-    @Override
-    public String getHelpString() {
-        return "Chuyển chỉ số cho người khác:\n\t<type>: Loại chỉ số muốn chuyển:\n\t\t- MONEY: chuyển tiền\n\t\t- PVPPoint: chuyển điểm pvp\n\t<user>: Tên người muốn chuyển cho\n\t<point>: số điểm muốn chuyển";
+        super("transfer", "<@command.command_transfer>", true, false);
+        addOption(OptionType.STRING, "type", "<@command.point_type>", true, true);
+        addOption(OptionType.USER, "user", "<@command.user_name>", true);
+        addOption(OptionType.INTEGER, "point", "<@command.amount>", true);
     }
 
     @Override
@@ -51,14 +48,14 @@ public class TransferCommand extends SlashSubcommand {
             Member r = guild.getMember(user);
 
             if (r == null || s == null) {
-                reply(event, "Người nhận không hợp lệ", 30);
+                MessageHandler.reply(event, "<@command.invalid_user>", 30);
                 return;
             }
             PointType type = PointType.valueOf(typeOption.getAsString());
 
             UserCache sender = UserHandler.getUserAwait(s);
             UserCache receiver = UserHandler.getUserNoCache(s);
-            String result = "Loại điểm muốn chuyển không hợp lệ";
+            String result = "<@command.invalid_point_type>";
 
             switch (type) {
             case LEVEL:
@@ -69,18 +66,18 @@ public class TransferCommand extends SlashSubcommand {
                 if (sender.getPoint(type) - point >= 0) {
                     sender.addPoint(type, -point);
                     receiver.addPoint(type, point);
-                    result = "Đã chuyển " + point + " điểm PVP cho " + receiver.getName();
+                    result = "<@command.transfer> " + point + " <@command.pvp_point> " + receiver.getName();
 
                 } else {
-                    result = "Không đủ điểm để chuyển";
+                    result = "<@command.not_enough>";
                     break;
                 }
 
             }
 
-            reply(event, result, 30);
+            MessageHandler.reply(event, result, 30);
         } catch (Exception e) {
-            reply(event, "Loại điểm muốn chuyển không hợp lệ", 10);
+            MessageHandler.reply(event, "<@command.invalid_point_type>", 10);
         }
 
     }
@@ -95,7 +92,7 @@ public class TransferCommand extends SlashSubcommand {
             for (int i = 2; i < type.length; i++)
                 options.put(type[i].name(), type[i].name());
 
-            sendAutoComplete(event, options);
+            SlashCommand.sendAutoComplete(event, options);
         }
     }
 }

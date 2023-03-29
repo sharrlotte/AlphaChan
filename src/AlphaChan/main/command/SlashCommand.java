@@ -3,46 +3,41 @@ package AlphaChan.main.command;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
-import javax.annotation.Nonnull;
-
-import net.dv8tion.jda.api.EmbedBuilder;
+import AlphaChan.main.handler.MessageHandler;
 import net.dv8tion.jda.api.events.interaction.command.CommandAutoCompleteInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.Command;
-import net.dv8tion.jda.api.interactions.commands.build.Commands;
-import net.dv8tion.jda.api.interactions.commands.build.SlashCommandData;
+import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
+import net.dv8tion.jda.internal.interactions.CommandDataImpl;
 
-public class SlashCommand {
+public abstract class SlashCommand extends CommandDataImpl {
 
-    public SlashCommandData command;
-    public HashMap<String, SlashSubcommand> subcommands = new HashMap<>();
+    private static final int MAX_OPTIONS = 10;
 
-    private final int MAX_OPTIONS = 10;
-
-    public SlashCommand(@Nonnull String name, String description) {
-        command = Commands.slash(name, description);
+    public SlashCommand(String name, String description) {
+        super(name, description);
     }
 
-    public String getName() {
-        return this.command.getName();
-    }
-
-    public String getDescription() {
-        return this.command.getDescription();
-    }
-
-    // Override
     public String getHelpString() {
-        return "";
+        StringBuilder builder = new StringBuilder();
+        builder.append("<@command.command>: " + getName());
+        for (SubcommandData subcommand : getSubcommands()) {
+            builder.append("\n\t" + subcommand.getName());
+        }
+
+        return builder.toString();
     }
 
-    // Can be overridden
-    public String getHelpString(String subCommand) {
-        if (!subcommands.containsKey(subCommand))
-            return "Không tìm thấy lệnh " + subCommand;
-        return subcommands.get(subCommand).getHelpString();
+    public String getHelpString(String name) {
+        SubcommandData subcommand = getSubcommand(name);
+        if (subcommand == null)
+            return "<@command.command_not_found> " + name;
+
+        if (subcommand instanceof SlashSubcommand slashSubcommand)
+            return slashSubcommand.getHelpString();
+
+        return "<@command.command_not_found> " + name;
     }
 
     // Can be overridden
@@ -50,32 +45,46 @@ public class SlashCommand {
         runCommand(event);
     }
 
-    protected void runCommand(SlashCommandInteractionEvent event) {
-        if (subcommands.containsKey(event.getSubcommandName()))
-            subcommands.get(event.getSubcommandName()).onCommand(event);
-        else
-            reply(event, "Lệnh sai rồi kìa baka", 10);
+    public SubcommandData getSubcommand(String name) {
+        for (SubcommandData subcommandData : getSubcommands()) {
+            if (subcommandData.getName().equals(name))
+                return subcommandData;
+        }
+        return null;
     }
 
-    public SlashSubcommand addSubcommands(SlashSubcommand subcommand) {
-        subcommands.put(subcommand.getName(), subcommand);
-        command.addSubcommands(subcommand);
-        return subcommand;
+    protected void runCommand(SlashCommandInteractionEvent event) {
+        SubcommandData subcommand = getSubcommand(event.getSubcommandName());
+        if (subcommand == null) {
+            MessageHandler.reply(event, "<@command.command_not_found>", 10);
+            return;
+        }
+        if (subcommand instanceof SlashSubcommand slashSubcommand) {
+            slashSubcommand.onCommand(event);
+        }
     }
 
     // Auto complete handler
-    public void sendAutoComplete(@Nonnull CommandAutoCompleteInteractionEvent event, HashMap<String, String> list) {
-        if (list.isEmpty()) {
-            sendAutoComplete(event, "Không tìm thấy kết quả khớp");
+    public void onAutoComplete(CommandAutoCompleteInteractionEvent event) {
+        SubcommandData subcommand = getSubcommand(event.getSubcommandName());
+        if (subcommand == null)
             return;
+
+        if (subcommand instanceof SlashSubcommand slashSubcommand) {
+            slashSubcommand.onAutoComplete(event);
         }
-        String focusString = event.getFocusedOption().getValue().toLowerCase();
+    }
+
+    public static void sendAutoComplete(CommandAutoCompleteInteractionEvent event, HashMap<String, String> list) {
+
+        String focusString = event.getFocusedOption().getValue();
         List<Command.Choice> options = new ArrayList<Command.Choice>();
 
         int count = 0;
         for (String name : list.keySet()) {
             if (count > MAX_OPTIONS)
                 break;
+
             if (name.toLowerCase().contains(focusString)) {
                 String value = list.get(name);
                 if (value == null)
@@ -92,30 +101,14 @@ public class SlashCommand {
         event.replyChoices(options).queue();
     }
 
-    public void sendAutoComplete(@Nonnull CommandAutoCompleteInteractionEvent event, String value) {
+    public static void sendAutoComplete(CommandAutoCompleteInteractionEvent event, String value) {
         sendAutoComplete(event, value, value);
     }
 
-    public void sendAutoComplete(@Nonnull CommandAutoCompleteInteractionEvent event, String name, String value) {
+    public static void sendAutoComplete(CommandAutoCompleteInteractionEvent event, String name, String value) {
         if (value.isBlank())
             event.replyChoice("Không tìm thấy kết quả khớp", "Không tìm thấy kết quả khớp").queue();
         else
             event.replyChoice(name, value).queue();
     }
-
-    // Can be overridden
-    public void onAutoComplete(CommandAutoCompleteInteractionEvent event) {
-        if (subcommands.containsKey(event.getSubcommandName())) {
-            subcommands.get(event.getSubcommandName()).onAutoComplete(event);
-        }
-    }
-
-    protected void replyEmbed(SlashCommandInteractionEvent event, EmbedBuilder builder, int deleteAfter) {
-        event.getHook().sendMessageEmbeds(builder.build()).queue(_message -> _message.delete().queueAfter(deleteAfter, TimeUnit.SECONDS));
-    }
-
-    protected void reply(SlashCommandInteractionEvent event, String content, int deleteAfter) {
-        event.getHook().sendMessage("```" + content + "```").queue(_message -> _message.delete().queueAfter(deleteAfter, TimeUnit.SECONDS));
-    }
-
 }

@@ -26,14 +26,9 @@ public class DeletedMessageCommand extends SlashSubcommand {
     private final int MAX_DISPLAY = 10;
 
     public DeletedMessageCommand() {
-        super("deletedmessage", "Hiển thị tin nhắn đã xóa gần đây nhất", true, false);
-        addOption(OptionType.INTEGER, "amount", "Số lượng tin nhắn", true);
-        addOption(OptionType.USER, "user", "Người xóa tin nhắn");
-    }
-
-    @Override
-    public String getHelpString() {
-        return "Hiển thị thông tin người dùng:\n\t<user>: Tên người dùng muốn xem thông tin, nếu không nhập thì hiển thị thông tin bản thân";
+        super("deletedmessage", "<@command.command_deleted_message>", true, false);
+        addOption(OptionType.INTEGER, "amount", "<@command.amount>", true);
+        addOption(OptionType.USER, "user", "<@command.user_name>");
     }
 
     @Override
@@ -96,7 +91,7 @@ public class DeletedMessageCommand extends SlashSubcommand {
                 field.append(content + "\n");
 
                 if (i % MAX_DISPLAY == MAX_DISPLAY - 1) {
-                    builder.addField("Tin nhắn đã xóa", field.toString(), false);
+                    builder.addField("<@command.deleted_message>", field.toString(), false);
                     table.addPage(builder);
                     field = new StringBuilder();
                     builder.clear();
@@ -107,7 +102,7 @@ public class DeletedMessageCommand extends SlashSubcommand {
             if (i >= amount)
                 break;
         }
-        builder.addField("Tin nhắn đã xóa", field.toString(), false);
+        builder.addField("<@command.deleted_message>", field.toString(), false);
         table.addPage(builder);
         table.sendTable();
     }
