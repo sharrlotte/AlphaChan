@@ -61,6 +61,11 @@ public class StringUtils {
                 point -= Math.abs(points[i] - base[i]);
             }
 
+            for (int i = 2; i < input.length(); i++) {
+                if (l.contains(input.substring(0, i)))
+                    point += i;
+            }
+
             if (point > max) {
                 max = point;
                 estimate = l;

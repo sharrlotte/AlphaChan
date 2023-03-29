@@ -24,8 +24,8 @@ public class AskCommand extends SlashSubcommand {
     private int cooldown = 1000 * 60 * 2; // 2 min for every question
 
     public AskCommand() {
-        super("ask", "<@command.command_ask_bot>");
-        addOption(OptionType.STRING, "question", "<@command.question>", true);
+        super("ask", "<?command.command_ask_bot>");
+        addOption(OptionType.STRING, "question", "<?command.question>", true);
 
         chatGPTKey = BotConfig.readString(Config.CHAT_GPT_TOKEN, "NULL");
 

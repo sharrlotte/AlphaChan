@@ -111,7 +111,7 @@ public final class MessageHandler extends ListenerAdapter {
 
             if ((isMapChannel && !isMapMessage) || (isSchematicChannel && !isSchematicMessage)) {
                 message.delete().queue();
-                replyMessage(message, "<@message.don't_send_message_here>", 30);
+                replyMessage(message, "<?message.don't_send_message_here>", 30);
 
             } else {
                 // Update level, money on message sent
@@ -138,7 +138,7 @@ public final class MessageHandler extends ListenerAdapter {
             return;
 
         Member target = event.getEntity();
-        log(event.getGuild(), target.getUser().getName() + " <@message.change_name_to> " + target.getEffectiveName());
+        log(event.getGuild(), target.getUser().getName() + " <?message.change_name_to> " + target.getEffectiveName());
 
     }
 
@@ -157,13 +157,13 @@ public final class MessageHandler extends ListenerAdapter {
             Invite invite = inviteChannels.get(0).createInvite().setMaxUses(0).setMaxAge(0).complete();
             user.openPrivateChannel().queue(channel -> channel.sendMessage(invite.getUrl()).queue());
         }
-        log(event.getGuild(), user.getName() + " <@message.leave_guild>");
+        log(event.getGuild(), user.getName() + " <?message.leave_guild>");
     }
 
     @Override
     public void onGuildMemberJoin(GuildMemberJoinEvent event) {
         UserHandler.addUser(event.getMember());
-        log(event.getGuild(), event.getMember().getEffectiveName() + " <@message.join_guild>");
+        log(event.getGuild(), event.getMember().getEffectiveName() + " <?message.join_guild>");
     }
 
     public static void log(Guild guild, String content) {
@@ -226,13 +226,13 @@ public final class MessageHandler extends ListenerAdapter {
         Attachment attachment = fileOption.getAsAttachment();
 
         if (!ContentHandler.isMapFile(attachment)) {
-            MessageHandler.reply(event, "<@message.not_map_file>", 10);
+            MessageHandler.reply(event, "<?message.not_map_file>", 10);
             return;
         }
 
         Member member = event.getMember();
         sendMapPreview(attachment, member, event.getChannel());
-        MessageHandler.reply(event, "<@message.send_successfully>", 10);
+        MessageHandler.reply(event, "<?message.send_successfully>", 10);
     }
 
     public static void sendSchematicPreview(SlashCommandInteractionEvent event) {
@@ -242,7 +242,7 @@ public final class MessageHandler extends ListenerAdapter {
         Attachment attachment = fileOption.getAsAttachment();
 
         if (!ContentHandler.isSchematicFile(attachment)) {
-            MessageHandler.reply(event, "<@message.not_schematic_file>", 10);
+            MessageHandler.reply(event, "<?message.not_schematic_file>", 10);
             return;
         }
         Member member = event.getMember();
@@ -291,7 +291,7 @@ public final class MessageHandler extends ListenerAdapter {
 
             channel.sendFiles(FileUpload.fromData(schemFile), FileUpload.fromData(previewFile)).setEmbeds(builder.build()).queue();
         } catch (Exception e) {
-            sendMessage(channel, "<@message.error>: " + e.getMessage(), 30);
+            sendMessage(channel, "<?message.error>: " + e.getMessage(), 30);
         }
     }
 

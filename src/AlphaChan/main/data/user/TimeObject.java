@@ -28,8 +28,10 @@ public abstract class TimeObject {
         if (time > 0)
             return true;
 
-        onTimeOut.emit(0);
-        isKilled = true;
+        if (isKilled == false) {
+            onTimeOut.emit(0);
+            isKilled = true;
+        }
         return false;
     }
 

@@ -8,7 +8,7 @@ import AlphaChan.main.command.slash.subcommands.mindustry.SearchSchematicCommand
 
 public class MindustryCommand extends SlashCommand {
     public MindustryCommand() {
-        super("mindustry", "<@command.command_mindustry>");
+        super("mindustry", "<?command.command_mindustry>");
         addSubcommands(new PingCommand());
         addSubcommands(new PostSchemCommand());
         addSubcommands(new RefreshServerCommand());

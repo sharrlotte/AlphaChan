@@ -17,9 +17,9 @@ import AlphaChan.main.handler.MessageHandler;
 
 public class SetLevelRoleCommand extends SlashSubcommand {
     public SetLevelRoleCommand() {
-        super("setlevelrole", "<@command.command_level_role>");
-        addOption(OptionType.ROLE, "role", "<@command.level_role>", true);
-        addOption(OptionType.INTEGER, "level", "<@command.required_level>", true);
+        super("setlevelrole", "<?command.command_level_role>");
+        addOption(OptionType.ROLE, "role", "<?command.level_role>", true);
+        addOption(OptionType.INTEGER, "level", "<?command.required_level>", true);
     }
 
     @Override
@@ -44,14 +44,14 @@ public class SetLevelRoleCommand extends SlashSubcommand {
 
         if (level <= -1) {
             if (guildData.removeLevelRole(roleId))
-                MessageHandler.reply(event, "<@command.delete_successfully>", 30);
+                MessageHandler.reply(event, "<?command.delete_successfully>", 30);
             else
-                MessageHandler.reply(event, "<@command.delete_failed", 30);
+                MessageHandler.reply(event, "<?command.delete_failed", 30);
         } else {
             if (guildData.addLevelRole(roleId, level))
-                MessageHandler.reply(event, "<@command.add_successfully>", 30);
+                MessageHandler.reply(event, "<?command.add_successfully>", 30);
             else
-                MessageHandler.reply(event, "<@command.add_failed>", 30);
+                MessageHandler.reply(event, "<?command.add_failed>", 30);
         }
     }
 

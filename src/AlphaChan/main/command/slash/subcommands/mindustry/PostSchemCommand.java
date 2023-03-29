@@ -42,11 +42,11 @@ public class PostSchemCommand extends SlashSubcommand {
     private static List<String> tags = SchematicTag.getTags();
 
     public PostSchemCommand() {
-        super("postschem", "<@command.command_post_schem>", false, true);
-        addOption(OptionType.STRING, "tag", "<@command.schematic_tag>", true, true);
-        addOption(OptionType.ATTACHMENT, "schematicfile", "<@command.schematic_file>");
-        addOption(OptionType.STRING, "text", "<@command.schematic_text>");
-        addOption(OptionType.BOOLEAN, "preview", "<@command.show_image>");
+        super("postschem", "<?command.command_post_schem>", false, true);
+        addOption(OptionType.STRING, "tag", "<?command.schematic_tag>", true, true);
+        addOption(OptionType.ATTACHMENT, "schematicfile", "<?command.schematic_file>");
+        addOption(OptionType.STRING, "text", "<?command.schematic_text>");
+        addOption(OptionType.BOOLEAN, "preview", "<?command.show_image>");
     }
 
     @Override
@@ -55,7 +55,7 @@ public class PostSchemCommand extends SlashSubcommand {
         OptionMapping textOption = event.getOption("text");
 
         if (fileOption == null && textOption == null) {
-            MessageHandler.reply(event, "<@command.no_file_or_text_schematic_provided> (file/text)", MAX_OPTIONS);
+            MessageHandler.reply(event, "<?command.no_file_or_text_schematic_provided> (file/text)", MAX_OPTIONS);
             return;
         }
 
@@ -74,7 +74,7 @@ public class PostSchemCommand extends SlashSubcommand {
         tag.removeIf(contain);
 
         if (tag.isEmpty()) {
-            MessageHandler.reply(event, "<@command.no_tag_provided>", 30);
+            MessageHandler.reply(event, "<?command.no_tag_provided>", 30);
 
         } else {
 
@@ -98,7 +98,7 @@ public class PostSchemCommand extends SlashSubcommand {
                 FindIterable<SchematicData> result = collection.find(filter);
 
                 if (result.first() != null) {
-                    MessageHandler.reply(event, "<@command.schematic_exists>", 10);
+                    MessageHandler.reply(event, "<?command.schematic_exists>", 10);
                     return;
                 }
 
@@ -109,7 +109,7 @@ public class PostSchemCommand extends SlashSubcommand {
                 if (previewOption != null && previewOption.getAsBoolean() == true)
                     MessageHandler.sendSchematicPreview(event);
 
-                MessageHandler.reply(event, "<@command.post_schematic_success>", 10);
+                MessageHandler.reply(event, "<?command.post_schematic_success>", 10);
             }
 
             if (textOption != null) {
@@ -132,7 +132,7 @@ public class PostSchemCommand extends SlashSubcommand {
                 FindIterable<SchematicData> result = collection.find(filter);
 
                 if (result.first() != null) {
-                    MessageHandler.reply(event, "<@command.schematic_exists>", 10);
+                    MessageHandler.reply(event, "<?command.schematic_exists>", 10);
                     return;
                 }
 

@@ -10,8 +10,8 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 public class SetVolumeCommand extends SlashSubcommand {
 
     public SetVolumeCommand() {
-        super("setvolume", "<@command.command_set_volume>");
-        addOption(OptionType.INTEGER, "volume", "<@command.volume>", true);
+        super("setvolume", "<?command.command_set_volume>");
+        addOption(OptionType.INTEGER, "volume", "<?command.volume>", true);
     }
 
     @Override

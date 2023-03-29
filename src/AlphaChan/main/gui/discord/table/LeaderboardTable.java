@@ -130,10 +130,10 @@ public class LeaderboardTable extends PageTable {
 
         Member member = getEventMember();
         if (member == null)
-            return new EmbedBuilder().addField("NULL", "<@command.user_not_found>", false);
+            return new EmbedBuilder().addField("NULL", "<?command.user_not_found>", false);
 
         EmbedBuilder builder = new EmbedBuilder();
-        builder.setTitle("BẢNG XẾP HẠNG (" + leaderboard + ")");
+        builder.setTitle("<?command.leaderboard> (" + leaderboard + ")");
 
         UserCache user = UserHandler.getUserNoCache(member);
         int position = users.indexOf(user);
@@ -160,19 +160,19 @@ public class LeaderboardTable extends PageTable {
                 break;
 
             case PVP_POINT:
-                data += user.getPoint(PointType.PVP_POINT) + " <@command.point>";
+                data += user.getPoint(PointType.PVP_POINT) + " <?command.point>";
                 break;
 
             default:
-                data += "<@command.level> " + user.getPoint(PointType.LEVEL) + " (" + user.getPoint(PointType.EXP) + " <@command.exp>)";
+                data += "<?command.level> " + user.getPoint(PointType.LEVEL) + " (" + user.getPoint(PointType.EXP) + " <?command.exp>)";
                 break;
             }
-            data += "\n<@command.guild>: " + user.getGuild().getName();
+            data += "\n<?command.guild>: " + user.getGuild().getName();
             return data;
 
         } catch (Exception e) {
             Log.error(e);
-            return "<@command.user_left_guild>";
+            return "<?command.user_left_guild>";
         }
     }
 }

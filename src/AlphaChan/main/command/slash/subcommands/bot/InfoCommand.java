@@ -19,7 +19,7 @@ import java.time.format.DateTimeFormatter;
 
 public class InfoCommand extends SlashSubcommand {
     public InfoCommand() {
-        super("info", "<@command.command_bot_info>");
+        super("info", "<?command.command_bot_info>");
     }
 
     @Override

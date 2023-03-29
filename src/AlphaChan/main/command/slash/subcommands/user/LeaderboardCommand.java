@@ -24,9 +24,9 @@ public class LeaderboardCommand extends SlashSubcommand {
     }
 
     public LeaderboardCommand() {
-        super("leaderboard", "<@command.command_leaderboard>", true, false);
-        addOptions(new OptionData(OptionType.STRING, "orderby", "<@command.order>", true, true));
-        addOptions(new OptionData(OptionType.STRING, "leaderboard", "<@command.name>", true, true));
+        super("leaderboard", "<?command.command_leaderboard>", true, false);
+        addOptions(new OptionData(OptionType.STRING, "orderby", "<?command.order>", true, true));
+        addOptions(new OptionData(OptionType.STRING, "leaderboard", "<?command.name>", true, true));
     }
 
     @Override

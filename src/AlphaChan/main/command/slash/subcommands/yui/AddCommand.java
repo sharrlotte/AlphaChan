@@ -54,7 +54,7 @@ public class AddCommand extends SlashSubcommand {
 
             UserCache receiver = UserHandler.getUserNoCache(r);
 
-            String result = "<@command.invalid_point_type>";
+            String result = "<?command.invalid_point_type>";
 
             switch (type) {
             case LEVEL:
@@ -63,13 +63,13 @@ public class AddCommand extends SlashSubcommand {
 
             default:
                 receiver.addPoint(type, point);
-                result = "<@command.add> " + point + " <@command.point> " + type.name() + " <@command.to> " + receiver.getName();
+                result = "<?command.add> " + point + " <?command.point> " + type.name() + " <?command.to> " + receiver.getName();
             }
 
             MessageHandler.reply(event, result, 30);
 
         } catch (Exception e) {
-            MessageHandler.reply(event, "<@command.invalid_point_type>", 10);
+            MessageHandler.reply(event, "<?command.invalid_point_type>", 10);
         }
     }
 

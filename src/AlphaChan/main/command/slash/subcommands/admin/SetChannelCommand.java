@@ -18,8 +18,8 @@ import AlphaChan.main.handler.MessageHandler;
 public class SetChannelCommand extends SlashSubcommand {
 
     public SetChannelCommand() {
-        super("setchannel", "<@command.command_set_channel>");
-        this.addOption(OptionType.STRING, "type", "<@command.channel_type>", true, true);
+        super("setchannel", "<?command.command_set_channel>");
+        this.addOption(OptionType.STRING, "type", "<?command.channel_type>", true, true);
     }
 
     @Override
@@ -38,15 +38,15 @@ public class SetChannelCommand extends SlashSubcommand {
 
             if (guildData.hasChannel(type, channel.getId())) {
                 if (guildData.removeChannel(type, channel.getId()))
-                    MessageHandler.reply(event, "<@command.delete_failed>", 30);
+                    MessageHandler.reply(event, "<?command.delete_failed>", 30);
                 else
-                    MessageHandler.reply(event, "<@command.delete_successfully>", 30);
+                    MessageHandler.reply(event, "<?command.delete_successfully>", 30);
 
             } else {
                 if (guildData.addChannel(type, channel.getId()))
-                    MessageHandler.reply(event, "<@command.add_successfully>", 30);
+                    MessageHandler.reply(event, "<?command.add_successfully>", 30);
                 else
-                    MessageHandler.reply(event, "<@command.add_failed>", 30);
+                    MessageHandler.reply(event, "<?command.add_failed>", 30);
             }
         } catch (Exception e) {
             MessageHandler.reply(event, "Loại kênh không hợp lệ", 10);

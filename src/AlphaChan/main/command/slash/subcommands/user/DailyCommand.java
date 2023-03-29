@@ -19,7 +19,7 @@ import com.mongodb.client.MongoCollection;
 
 public class DailyCommand extends SlashSubcommand {
     public DailyCommand() {
-        super("daily", "<@command.command_daily>", true, false);
+        super("daily", "<?command.command_daily>", true, false);
     }
 
     @Override
@@ -59,14 +59,16 @@ public class DailyCommand extends SlashSubcommand {
         }
 
         if (money > 0)
-            MessageHandler.reply(event, "📝<@command.daily_success>\n💰<@command.point_reward>: " + money + " Alpha" + //
-                    "\n💰<@command.current_point>: " + userData.getPoint(PointType.MONEY), 30);
+            MessageHandler.reply(event, "📝<?command.daily_success>\n💰<?command.point_reward>: " + money + " Alpha" + //
+                    "\n💰<?command.current_point>: " + userData.getPoint(PointType.MONEY), 30);
         else {
             if (data != null) {
                 if (data.containsKey("time")) {
                     Long lastTime = (Long) data.get("time");
-                    MessageHandler.replyEmbed(event, "📝<@command.wait_to> " + TimeFormat.RELATIVE.atTimestamp(lastTime).plus(24 * 60 * 60 * 1000) //
-                            + "\n📝<@command.last_time>: " + TimeFormat.DATE_TIME_SHORT.format(lastTime), 30);
+                    MessageHandler.replyEmbed(event,
+                            "📝<?command.wait_to> " + TimeFormat.RELATIVE.atTimestamp(lastTime).plus(24 * 60 * 60 * 1000) //
+                                    + "\n📝<?command.last_time>: " + TimeFormat.DATE_TIME_SHORT.format(lastTime),
+                            30);
                 }
             }
         }

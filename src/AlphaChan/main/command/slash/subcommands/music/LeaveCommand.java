@@ -8,7 +8,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 public class LeaveCommand extends SlashSubcommand {
 
     public LeaveCommand() {
-        super("leave", "<@command.command_music_bot_leave");
+        super("leave", "<?command.command_music_bot_leave");
     }
 
     @Override

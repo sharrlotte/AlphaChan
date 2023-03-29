@@ -4,9 +4,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import AlphaChan.main.handler.LocaleManager;
 import AlphaChan.main.handler.MessageHandler;
 import net.dv8tion.jda.api.events.interaction.command.CommandAutoCompleteInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.interactions.DiscordLocale;
 import net.dv8tion.jda.api.interactions.commands.Command;
 import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
 import net.dv8tion.jda.internal.interactions.CommandDataImpl;
@@ -16,14 +18,14 @@ public abstract class SlashCommand extends CommandDataImpl {
     private static final int MAX_OPTIONS = 10;
 
     public SlashCommand(String name, String description) {
-        super(name, description);
+        super(LocaleManager.format(DiscordLocale.ENGLISH_US, name), description);
     }
 
     public String getHelpString() {
         StringBuilder builder = new StringBuilder();
-        builder.append("<@command.command>: " + getName());
+        builder.append("<?command.command>: " + getName());
         for (SubcommandData subcommand : getSubcommands()) {
-            builder.append("\n\t" + subcommand.getName());
+            builder.append("\n\t: " + subcommand.getName());
         }
 
         return builder.toString();
@@ -32,12 +34,12 @@ public abstract class SlashCommand extends CommandDataImpl {
     public String getHelpString(String name) {
         SubcommandData subcommand = getSubcommand(name);
         if (subcommand == null)
-            return "<@command.command_not_found> " + name;
+            return "<?command.command_not_found> " + name;
 
         if (subcommand instanceof SlashSubcommand slashSubcommand)
             return slashSubcommand.getHelpString();
 
-        return "<@command.command_not_found> " + name;
+        return "<?command.command_not_found> " + name;
     }
 
     // Can be overridden
@@ -56,7 +58,7 @@ public abstract class SlashCommand extends CommandDataImpl {
     protected void runCommand(SlashCommandInteractionEvent event) {
         SubcommandData subcommand = getSubcommand(event.getSubcommandName());
         if (subcommand == null) {
-            MessageHandler.reply(event, "<@command.command_not_found>", 10);
+            MessageHandler.reply(event, "<?command.command_not_found>", 10);
             return;
         }
         if (subcommand instanceof SlashSubcommand slashSubcommand) {

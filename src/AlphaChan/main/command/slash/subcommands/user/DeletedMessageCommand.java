@@ -26,9 +26,9 @@ public class DeletedMessageCommand extends SlashSubcommand {
     private final int MAX_DISPLAY = 10;
 
     public DeletedMessageCommand() {
-        super("deletedmessage", "<@command.command_deleted_message>", true, false);
-        addOption(OptionType.INTEGER, "amount", "<@command.amount>", true);
-        addOption(OptionType.USER, "user", "<@command.user_name>");
+        super("deletedmessage", "<?command.command_deleted_message>", true, false);
+        addOption(OptionType.INTEGER, "amount", "<?command.amount>", true);
+        addOption(OptionType.USER, "user", "<?command.user_name>");
     }
 
     @Override
@@ -91,7 +91,7 @@ public class DeletedMessageCommand extends SlashSubcommand {
                 field.append(content + "\n");
 
                 if (i % MAX_DISPLAY == MAX_DISPLAY - 1) {
-                    builder.addField("<@command.deleted_message>", field.toString(), false);
+                    builder.addField("<?command.deleted_message>", field.toString(), false);
                     table.addPage(builder);
                     field = new StringBuilder();
                     builder.clear();
@@ -102,7 +102,7 @@ public class DeletedMessageCommand extends SlashSubcommand {
             if (i >= amount)
                 break;
         }
-        builder.addField("<@command.deleted_message>", field.toString(), false);
+        builder.addField("<?command.deleted_message>", field.toString(), false);
         table.addPage(builder);
         table.sendTable();
     }

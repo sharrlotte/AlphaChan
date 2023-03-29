@@ -9,7 +9,7 @@ import AlphaChan.main.command.slash.subcommands.music.SkipCommand;
 public class MusicCommand extends SlashCommand {
 
     public MusicCommand() {
-        super("music", "<@command.command_music>");
+        super("music", "<?command.command_music>");
         addSubcommands(new PlayCommand());
         addSubcommands(new SkipCommand());
         addSubcommands(new SetVolumeCommand());

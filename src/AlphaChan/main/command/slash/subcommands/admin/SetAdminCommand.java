@@ -14,8 +14,8 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 public class SetAdminCommand extends SlashSubcommand {
 
     public SetAdminCommand() {
-        super("setadmin", "<@command.command_set_admin>");
-        this.addOption(OptionType.ROLE, "role", "<@command.admin_role>", true);
+        super("setadmin", "<?command.command_set_admin>");
+        this.addOption(OptionType.ROLE, "role", "<?command.admin_role>", true);
     }
 
     @Override
@@ -35,14 +35,14 @@ public class SetAdminCommand extends SlashSubcommand {
 
         if (adminRoleIds.contains(roleId)) {
             if (adminRoleIds.remove(roleId))
-                MessageHandler.reply(event, "<@command.delete_successfully>", 30);
+                MessageHandler.reply(event, "<?command.delete_successfully>", 30);
             else
-                MessageHandler.reply(event, "<@command.delete_failed>", 30);
+                MessageHandler.reply(event, "<?command.delete_failed>", 30);
         } else {
             if (adminRoleIds.add(roleId))
-                MessageHandler.reply(event, "<@command.add_successfully>", 30);
+                MessageHandler.reply(event, "<?command.add_successfully>", 30);
             else
-                MessageHandler.reply(event, "<@command.add_failed>", 30);
+                MessageHandler.reply(event, "<?command.add_failed>", 30);
         }
     }
 }

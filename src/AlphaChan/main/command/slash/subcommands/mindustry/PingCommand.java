@@ -12,8 +12,8 @@ import mindustry.net.Host;
 
 public class PingCommand extends SlashSubcommand {
     public PingCommand() {
-        super("ping", "<@command.command_ping_mindustry_server>");
-        this.addOption(OptionType.STRING, "ip", "<@command.mindustry_server_ip>", true);
+        super("ping", "<?command.command_ping_mindustry_server>");
+        this.addOption(OptionType.STRING, "ip", "<?command.mindustry_server_ip>", true);
     }
 
     @Override

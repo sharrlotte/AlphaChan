@@ -14,9 +14,9 @@ import AlphaChan.main.handler.CommandHandler.SlashCommandHandler;
 
 public class HelpCommand extends SlashSubcommand {
     public HelpCommand() {
-        super("help", "<@command.command_help>");
-        addOption(OptionType.STRING, "command", "<@command.command_name>", true, true);
-        addOption(OptionType.STRING, "subcommand", "<@command.subcommand_name>", true, true);
+        super("help", "<?command.command_help>");
+        addOption(OptionType.STRING, "command", "<?command.command_name>", false, true);
+        addOption(OptionType.STRING, "subcommand", "<?command.subcommand_name>", false, true);
     }
 
     @Override
@@ -34,7 +34,7 @@ public class HelpCommand extends SlashSubcommand {
                     "/" + command + " " + subcommand + ":" + SlashCommandHandler.getCommandMap().get(command).getHelpString(subcommand),
                     60);
         else
-            MessageHandler.reply(event, "Lệnh " + command + " " + subcommand + " không tồn tại", 10);
+            MessageHandler.reply(event,"<?command.command> " + command + " " + subcommand + " <?command.does_not_exist>", 10);
     }
 
     @Override
@@ -47,8 +47,10 @@ public class HelpCommand extends SlashSubcommand {
 
         } else if (focus.equals("subcommand")) {
             OptionMapping commandOption = event.getOption("command");
-            if (commandOption == null)
+            if (commandOption == null){
+                SlashCommand.sendAutoComplete(event, "<?command.no_command_provided>");
                 return;
+            }
             String command = commandOption.getAsString();
             SlashCommand subcommands = SlashCommandHandler.getCommandMap().get(command);
             if (subcommands == null)
@@ -56,7 +58,6 @@ public class HelpCommand extends SlashSubcommand {
             HashMap<String, String> options = new HashMap<String, String>();
             subcommands.getSubcommands().forEach(t -> options.put(t.getName(), t.getName()));
             SlashCommand.sendAutoComplete(event, options);
-
         }
     }
 }

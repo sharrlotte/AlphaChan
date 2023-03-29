@@ -143,22 +143,15 @@ public final class DatabaseHandler {
 
     // Check if collection exists
     public static boolean collectionExists(MongoDatabase Database, final String collectionName) {
-        try {
-            MongoCursor<String> collectionNames = Database.listCollectionNames().iterator();
-            String name;
-            while (collectionNames.hasNext()) {
-                name = collectionNames.next();
-                if (name.equalsIgnoreCase(collectionName)) {
-                    return true;
-                }
+        MongoCursor<String> collectionNames = Database.listCollectionNames().iterator();
+        String name;
+        while (collectionNames.hasNext()) {
+            name = collectionNames.next();
+            if (name.equalsIgnoreCase(collectionName)) {
+                return true;
             }
-            return false;
-
-        } catch (Exception e) {
-            Log.error(e);
-
-            return false;
         }
+        return false;
     }
 
     public static boolean collectionExists(Database databaseName, final String collectionName) {

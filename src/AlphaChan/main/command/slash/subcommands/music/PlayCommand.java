@@ -41,7 +41,7 @@ public class PlayCommand extends SlashSubcommand {
                 String source = sourceOption.getAsString();
 
                 if (source.isBlank()) {
-                    MessageHandler.reply(event, "<@command.invalid_link", 10);
+                    MessageHandler.reply(event, "<?command.invalid_link", 10);
                     return;
                 }
 

@@ -25,8 +25,8 @@ public class GuildCommand extends SlashSubcommand {
     private final int MAX_DISPLAY = 7;
 
     public GuildCommand() {
-        super("guild", "<@command.command_guild>", false, false);
-        this.addOption(OptionType.STRING, "guild", "<@command.guild_name>", false, true);
+        super("guild", "<?command.command_guild>", false, false);
+        this.addOption(OptionType.STRING, "guild", "<?command.guild_name>", false, true);
     }
 
     @Override

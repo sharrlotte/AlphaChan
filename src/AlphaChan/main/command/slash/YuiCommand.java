@@ -23,7 +23,7 @@ public class YuiCommand extends SlashCommand {
     @Override
     public void onCommand(SlashCommandInteractionEvent event) {
         if (!UserHandler.isYui(event.getMember())) {
-            MessageHandler.reply(event, "<@command.no_permission>", 10);
+            MessageHandler.reply(event, "<?command.no_permission>", 10);
             return;
         }
         runCommand(event);

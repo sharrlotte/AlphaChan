@@ -37,10 +37,10 @@ public class SearchSchematicCommand extends SlashSubcommand {
     private static List<String> tags = SchematicTag.getTags();
 
     public SearchSchematicCommand() {
-        super("searchschematic", "<@command.command_search_schematic>", true, false);
-        addOption(OptionType.STRING, "tag", "<@command.schematic_tag>", false, true);
-        addOption(OptionType.USER, "user", "<@command.schematic_author>");
-        addOption(OptionType.BOOLEAN, "own", "<@command.prevent_other_interact>");
+        super("searchschematic", "<?command.command_search_schematic>", true, false);
+        addOption(OptionType.STRING, "tag", "<?command.schematic_tag>", false, true);
+        addOption(OptionType.USER, "user", "<?command.schematic_author>");
+        addOption(OptionType.BOOLEAN, "own", "<?command.prevent_other_interact>");
 
     }
 
@@ -78,9 +78,9 @@ public class SearchSchematicCommand extends SlashSubcommand {
 
         if (schematicInfo.first() == null) {
             if (tagOption == null)
-                MessageHandler.reply(event, "<@command.no_schematic>", 30);
+                MessageHandler.reply(event, "<?command.no_schematic>", 30);
             else
-                MessageHandler.reply(event, "<@command.command_search_schematic_with_tag>: " + tagOption.getAsString().toLowerCase(), 30);
+                MessageHandler.reply(event, "<?command.command_search_schematic_with_tag>: " + tagOption.getAsString().toLowerCase(), 30);
 
         } else {
 

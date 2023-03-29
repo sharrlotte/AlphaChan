@@ -19,8 +19,8 @@ import java.awt.Color;
 
 public class InfoCommand extends SlashSubcommand {
     public InfoCommand() {
-        super("info", "<@command.command_user_info>", true, false);
-        this.addOption(OptionType.USER, "user", "<@command.user_name>", false);
+        super("info", "<?command.command_user_info>", true, false);
+        this.addOption(OptionType.USER, "user", "<?command.user_name>", false);
     }
 
     @Override
@@ -67,14 +67,13 @@ public class InfoCommand extends SlashSubcommand {
 
         UserCache user = UserHandler.getUserNoCache(member);
 
-        builder.addField("<@command.role>", roleString, false);
-        builder.addField("<@command.basic_info>",
-                "<@command.level>: " + user.getPoint(PointType.LEVEL) + " (" + user.getPoint(PointType.EXP) + "\\" + user.getLevelCap() + ")" + //
-                        "\n<@command.total_exp>: " + user.getTotalPoint(),
-                false);
+        builder.addField("<?command.role>", roleString, false);
+        builder.addField("<?command.basic_info>", "<?command.level>: " + user.getPoint(PointType.LEVEL) + " ("
+                + user.getPoint(PointType.EXP) + "\\" + user.getLevelCap() + ")" + //
+                "\n<?command.total_exp>: " + user.getTotalPoint(), false);
 
-        builder.addField("<@command.point>", "<@command.total_money>: " + user.getPoint(PointType.MONEY) + "\n<@command.total_pvp_point>: " + user.getPoint(PointType.PVP_POINT),
-                false);
+        builder.addField("<?command.point>", "<?command.total_money>: " + user.getPoint(PointType.MONEY) + "\n<?command.total_pvp_point>: "
+                + user.getPoint(PointType.PVP_POINT), false);
 
         builder.setColor(Color.BLUE);
 

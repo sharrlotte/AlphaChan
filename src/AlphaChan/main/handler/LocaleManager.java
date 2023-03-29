@@ -5,8 +5,9 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
-
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -25,11 +26,11 @@ public class LocaleManager {
 
     public static final DiscordLocale DEFAULT_LOCALE = DiscordLocale.ENGLISH_US;
 
-    private static final DiscordLocale[] SUPPORTED_LOCALE = { DiscordLocale.ENGLISH_UK, DiscordLocale.VIETNAMESE };
+    private static final DiscordLocale[] SUPPORTED_LOCALE = { DEFAULT_LOCALE, DiscordLocale.VIETNAMESE };
 
     private static final String LOCALE_FOLDER_PATH = "locale/";
     private static final String KEY_NOT_FOUND_STRING = "???";
-    private static final Pattern KEY_PATTERN = Pattern.compile("<@([a-zA-Z]+)>");
+    private static final Pattern KEY_PATTERN = Pattern.compile("<\\?(.+)>");
 
     private static ConcurrentHashMap<DiscordLocale, Bundle> bundles;
     private static LocaleManager localeManager;
@@ -58,13 +59,13 @@ public class LocaleManager {
         return format(guild.getLocale(), s);
     }
 
-    public static String format(DiscordLocale DiscordLocale, String s) {
-        if (isLocaleSupported(DiscordLocale)) {
+    public static String format(DiscordLocale discordLocale, String s) {
+        if (isLocaleSupported(discordLocale)) {
             Matcher matcher = KEY_PATTERN.matcher(s);
-            while (matcher.matches()) {
-                String match = matcher.group(0);
-                String value = getOrDefault(DiscordLocale, match);
-                s.replace(match, value);
+            while (matcher.find()) {
+                String match = matcher.group(1);
+                String value = getOrDefault(discordLocale, match);
+                s = s.replace(matcher.group(0), value);
             }
         }
 
@@ -79,7 +80,6 @@ public class LocaleManager {
 
             bundle = new Bundle(DiscordLocale, LOCALE_FOLDER_PATH);
             bundles.put(DiscordLocale, bundle);
-            return bundle.getOrDefault(key);
         }
 
         return bundle.getOrDefault(key);
@@ -108,7 +108,7 @@ public class LocaleManager {
 
                 InputStream input = new FileInputStream(file);
                 properties = new OrderedProperties();
-                properties.load(input);
+                properties.load(new InputStreamReader(input, StandardCharsets.UTF_8));
 
                 input.close();
 
@@ -139,12 +139,13 @@ public class LocaleManager {
                     save();
                     return KEY_NOT_FOUND_STRING;
                 }
-
                 value = LocaleManager.getOrDefault(DEFAULT_LOCALE, key);
                 properties.put(key, value);
                 save();
                 return value;
+
             }
+
             return value;
         }
     }

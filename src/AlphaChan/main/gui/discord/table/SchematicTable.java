@@ -96,7 +96,7 @@ public class SchematicTable extends PageTable {
         if (currentInfo.addLike(getTriggerMember().getId()))
             updateTable();
         else
-            MessageHandler.sendMessage(getEventTextChannel(), "<@command.already_like>", 10);
+            MessageHandler.sendMessage(getEventTextChannel(), "<?command.already_like>", 10);
     }
 
     private void addDislike() {
@@ -106,12 +106,12 @@ public class SchematicTable extends PageTable {
         if (currentInfo.addDislike(getTriggerMember().getId()))
             updateTable();
         else
-            MessageHandler.sendMessage(getEventTextChannel(), "<@command.already_dislike>", 10);
+            MessageHandler.sendMessage(getEventTextChannel(), "<?command.already_dislike>", 10);
     }
 
     private void deleteSchematic() {
         if (!UserHandler.isAdmin(getTriggerMember())) {
-            MessageHandler.sendMessage(getEventTextChannel(), "<@command.no_permission>", 10);
+            MessageHandler.sendMessage(getEventTextChannel(), "<?command.no_permission>", 10);
             return;
         }
 
@@ -123,7 +123,7 @@ public class SchematicTable extends PageTable {
             if (currentCode != null)
                 currentCode.delete();
 
-            MessageHandler.sendMessage(getEventTextChannel(), "<@command.schematic_deleted>", 10);
+            MessageHandler.sendMessage(getEventTextChannel(), "<?command.schematic_deleted>", 10);
 
             if (schematicInfoList.size() == 0) {
                 deleteTable();
@@ -184,8 +184,7 @@ public class SchematicTable extends PageTable {
             SchematicData schematicData = collection.find(Filters.eq("_id", currentInfo.getData().getId())).limit(1).first();
 
             if (schematicData == null) {
-                MessageHandler.sendMessage(getEventTextChannel(),
-                        "<@command.no_schematic>:" + currentInfo.getData().getId(), 10);
+                MessageHandler.sendMessage(getEventTextChannel(), "<?command.no_schematic>:" + currentInfo.getData().getId(), 10);
                 return;
             }
 
@@ -204,16 +203,16 @@ public class SchematicTable extends PageTable {
                 Member member = getEventGuild().getMember(user);
 
                 if (member != null) {
-                    field.append("- <@command.author>: " + member.getEffectiveName() + "\n");
+                    field.append("- <?command.author>: " + member.getEffectiveName() + "\n");
                     builder.setAuthor(member.getEffectiveName(), member.getEffectiveAvatarUrl(), member.getEffectiveAvatarUrl());
 
                 } else if (user != null) {
-                    field.append("- <@command.author>: " + user.getName() + "\n");
+                    field.append("- <?command.author>: " + user.getName() + "\n");
                     builder.setAuthor(user.getName(), user.getEffectiveAvatarUrl(), user.getEffectiveAvatarUrl());
                 }
             }
 
-            field.append("- <@command.tag>: ");
+            field.append("- <?command.tag>: ");
 
             for (int i = 0; i < currentInfo.getData().getTag().size() - 1; i++)
                 field.append(StringUtils.capitalize(currentInfo.getData().getTag().get(i).replace("_", " ").toLowerCase() + ", "));
@@ -221,10 +220,10 @@ public class SchematicTable extends PageTable {
             field.append(StringUtils.capitalize(
                     currentInfo.getData().getTag().get(currentInfo.getData().getTag().size() - 1).replace("_", " ").toLowerCase() + "\n"));
 
-            field.append("- <@command.like>: " + currentInfo.getLike() + "\n");
-            field.append("- <@command.dislike>: " + currentInfo.getDislike() + "\n");
+            field.append("- <?command.like>: " + currentInfo.getLike() + "\n");
+            field.append("- <?command.dislike>: " + currentInfo.getDislike() + "\n");
 
-            builder.addField("<@command.info>", field.toString(), true);
+            builder.addField("<?command.info>", field.toString(), true);
 
             for (Field f : ContentHandler.getSchematicInfoEmbedBuilder(schem, getEvent().getMember()).getFields()) {
                 builder.addField(f);

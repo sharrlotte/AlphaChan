@@ -19,10 +19,10 @@ import java.util.HashMap;
 public class TransferCommand extends SlashSubcommand {
 
     public TransferCommand() {
-        super("transfer", "<@command.command_transfer>", true, false);
-        addOption(OptionType.STRING, "type", "<@command.point_type>", true, true);
-        addOption(OptionType.USER, "user", "<@command.user_name>", true);
-        addOption(OptionType.INTEGER, "point", "<@command.amount>", true);
+        super("transfer", "<?command.command_transfer>", true, false);
+        addOption(OptionType.STRING, "type", "<?command.point_type>", true, true);
+        addOption(OptionType.USER, "user", "<?command.user_name>", true);
+        addOption(OptionType.INTEGER, "point", "<?command.amount>", true);
     }
 
     @Override
@@ -48,14 +48,14 @@ public class TransferCommand extends SlashSubcommand {
             Member r = guild.getMember(user);
 
             if (r == null || s == null) {
-                MessageHandler.reply(event, "<@command.invalid_user>", 30);
+                MessageHandler.reply(event, "<?command.invalid_user>", 30);
                 return;
             }
             PointType type = PointType.valueOf(typeOption.getAsString());
 
             UserCache sender = UserHandler.getUserAwait(s);
             UserCache receiver = UserHandler.getUserNoCache(s);
-            String result = "<@command.invalid_point_type>";
+            String result = "<?command.invalid_point_type>";
 
             switch (type) {
             case LEVEL:
@@ -66,10 +66,10 @@ public class TransferCommand extends SlashSubcommand {
                 if (sender.getPoint(type) - point >= 0) {
                     sender.addPoint(type, -point);
                     receiver.addPoint(type, point);
-                    result = "<@command.transfer> " + point + " <@command.pvp_point> " + receiver.getName();
+                    result = "<?command.transfer> " + point + " <?command.pvp_point> " + receiver.getName();
 
                 } else {
-                    result = "<@command.not_enough>";
+                    result = "<?command.not_enough>";
                     break;
                 }
 
@@ -77,7 +77,7 @@ public class TransferCommand extends SlashSubcommand {
 
             MessageHandler.reply(event, result, 30);
         } catch (Exception e) {
-            MessageHandler.reply(event, "<@command.invalid_point_type>", 10);
+            MessageHandler.reply(event, "<?command.invalid_point_type>", 10);
         }
 
     }

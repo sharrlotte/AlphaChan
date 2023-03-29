@@ -84,7 +84,7 @@ public abstract class Table extends TimeObject {
 
         if (requestor != null) {
             if (!getTriggerMember().getId().equals(requestor)) {
-                MessageHandler.reply(event, "<@command.no_interact_permission>", 10);
+                MessageHandler.reply(event, "<?command.no_interact_permission>", 10);
                 return;
             }
         }
@@ -120,8 +120,6 @@ public abstract class Table extends TimeObject {
     }
 
     public synchronized void deleteTable() {
-
-        Log.warning("Shutting down");
 
         if (isAlive()) {
 

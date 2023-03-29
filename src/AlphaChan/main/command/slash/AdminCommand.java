@@ -13,7 +13,7 @@ import AlphaChan.main.handler.UserHandler;
 public class AdminCommand extends SlashCommand {
 
     public AdminCommand() {
-        super("admin", "<@command.command_admin>");
+        super("admin", "<?command.command_admin>");
         addSubcommands(new ReloadServerCommand());
         addSubcommands(new SetChannelCommand());
         addSubcommands(new SetLevelRoleCommand());
@@ -25,7 +25,7 @@ public class AdminCommand extends SlashCommand {
         if (UserHandler.isAdmin(event.getMember()))
             runCommand(event);
         else
-            MessageHandler.reply(event, "<@command.no_permission>", 10);
+            MessageHandler.reply(event, "<?command.no_permission>", 10);
     }
 
     @Override

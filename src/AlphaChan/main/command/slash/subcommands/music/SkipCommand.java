@@ -10,8 +10,8 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 public class SkipCommand extends SlashSubcommand {
 
     public SkipCommand() {
-        super("skip", "<@command.command_music_skip>");
-        addOption(OptionType.INTEGER, "number", "<@command.number>", true);
+        super("skip", "<?command.command_music_skip>");
+        addOption(OptionType.INTEGER, "number", "<?command.number>", true);
     }
 
     @Override

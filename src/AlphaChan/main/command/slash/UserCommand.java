@@ -10,7 +10,7 @@ import AlphaChan.main.command.slash.subcommands.user.TransferCommand;
 
 public class UserCommand extends SlashCommand {
     public UserCommand() {
-        super("user", "<@command.command_user>");
+        super("user", "<?command.command_user>");
         addSubcommands(new DailyCommand());
         addSubcommands(new InfoCommand());
         addSubcommands(new LeaderboardCommand());
