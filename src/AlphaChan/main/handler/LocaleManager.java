@@ -6,7 +6,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -29,7 +29,6 @@ public class LocaleManager {
     private static final DiscordLocale[] SUPPORTED_LOCALE = { DEFAULT_LOCALE, DiscordLocale.VIETNAMESE };
 
     private static final String LOCALE_FOLDER_PATH = "locale/";
-    private static final String KEY_NOT_FOUND_STRING = "???";
     private static final Pattern KEY_PATTERN = Pattern.compile("<\\?(.+)>");
 
     private static ConcurrentHashMap<DiscordLocale, Bundle> bundles;
@@ -122,7 +121,7 @@ public class LocaleManager {
         }
 
         public void save() {
-            try (OutputStream output = new FileOutputStream(getLocaleFilePath())) {
+            try (OutputStreamWriter output = new OutputStreamWriter(new FileOutputStream(getLocaleFilePath()), StandardCharsets.UTF_8)) {
 
                 properties.store(output, null);
 
@@ -135,9 +134,9 @@ public class LocaleManager {
             String value = properties.getProperty(key);
             if (value == null) {
                 if (DiscordLocale == DEFAULT_LOCALE) {
-                    properties.put(key, KEY_NOT_FOUND_STRING);
+                    properties.put(key, key);
                     save();
-                    return KEY_NOT_FOUND_STRING;
+                    return key;
                 }
                 value = LocaleManager.getOrDefault(DEFAULT_LOCALE, key);
                 properties.put(key, value);

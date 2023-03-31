@@ -141,14 +141,14 @@ public class UserCache extends TimeObject implements DatabaseObject {
             return;
 
         for (String key : levelRoleId.keySet()) {
-            if (levelRoleId.get(key) <= getPoint(PointType.LEVEL)) {
+            if (levelRoleId.get(key) == getPoint(PointType.LEVEL)) {
                 if (key == null)
                     return;
                 Role role = guild.getRoleById(key);
                 if (role == null)
                     return;
 
-                guild.addRoleToMember(member, role);
+                guild.addRoleToMember(member, role).queue();
                 Log.info("AUTO-ROLE", "Đã thêm vai trò " + role.getName() + " cho " + member.getEffectiveName());
             }
         }

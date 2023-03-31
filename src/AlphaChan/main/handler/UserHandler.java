@@ -137,6 +137,11 @@ public final class UserHandler implements Updatable {
         return false;
     }
 
+    public static void removeUser(String guildId, String userId) {
+        String hashId = guildId + userId;
+        userCache.remove(hashId);
+    }
+
     // Add user to cache
     public static UserCache addUser(String guildId, String userId) {
         UserCache userData = new UserCache(guildId, userId);

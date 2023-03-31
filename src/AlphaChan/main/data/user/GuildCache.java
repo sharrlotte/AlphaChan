@@ -82,8 +82,8 @@ public class GuildCache extends TimeObject implements DatabaseObject {
         if (channelIds.contains(channelId))
             return false;
 
-        return channelIds.add(channelId);
-
+        channelIds.add(channelId);
+        return true;
     }
 
     public boolean removeChannel(ChannelType channelType, String channelId) {
@@ -94,11 +94,19 @@ public class GuildCache extends TimeObject implements DatabaseObject {
     }
 
     public boolean addLevelRole(String roleId, int level) {
-        return data.getLevelRoleId().put(roleId, level) == null;
+        if (data.getLevelRoleId().containsKey(roleId))
+            return false;
+
+        data.getLevelRoleId().put(roleId, level);
+        return true;
     }
 
     public boolean removeLevelRole(String roleId) {
-        return data.getLevelRoleId().remove(roleId) != null;
+        if (!data.getLevelRoleId().containsKey(roleId))
+            return false;
+
+        data.getLevelRoleId().remove(roleId);
+        return true;
     }
 
     // Update guild on Database

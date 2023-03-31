@@ -27,9 +27,11 @@ public abstract class SlashSubcommand extends SubcommandData {
 
     public String getHelpString() {
         StringBuilder builder = new StringBuilder();
-        builder.append("<?command.command>: " + getName());
         for (OptionData option : getOptions()) {
-            builder.append(String.format("\n\t<%s>: %s", option.getName(), option.getDescription()));
+            builder.append(String.format("\n\t<%s>: %s %s", //
+                    option.getName(), //
+                    option.getDescription(), //
+                    option.isRequired() ? "(<?command.required>)" : ""));
         }
 
         return builder.toString();
@@ -41,7 +43,7 @@ public abstract class SlashSubcommand extends SubcommandData {
             MessageHandler.reply(event, "<?command.updating>", 60);
 
         if (this.isThreaded)
-            UpdatableHandler.run(name, 0, () -> runCommand(event));
+            UpdatableHandler.run(getName(), 0, () -> runCommand(event));
         else
             runCommand(event);
     }

@@ -36,11 +36,10 @@ public class AlphaChan {
 
             String TOKEN = System.getenv("TOKEN");
 
-            jda = JDABuilder
-                    .createDefault(TOKEN, GatewayIntent.GUILD_MESSAGES, GatewayIntent.MESSAGE_CONTENT,
-                            GatewayIntent.GUILD_EMOJIS_AND_STICKERS, GatewayIntent.GUILD_MEMBERS, GatewayIntent.GUILD_PRESENCES,
-                            GatewayIntent.GUILD_MESSAGE_REACTIONS, GatewayIntent.GUILD_VOICE_STATES, GatewayIntent.GUILD_MODERATION,
-                            GatewayIntent.GUILD_INVITES)
+            jda = JDABuilder.createDefault(TOKEN, //
+                    GatewayIntent.GUILD_MESSAGES, GatewayIntent.MESSAGE_CONTENT, GatewayIntent.GUILD_EMOJIS_AND_STICKERS,
+                    GatewayIntent.GUILD_MEMBERS, GatewayIntent.GUILD_PRESENCES, GatewayIntent.GUILD_MESSAGE_REACTIONS,
+                    GatewayIntent.GUILD_VOICE_STATES, GatewayIntent.GUILD_MODERATION, GatewayIntent.GUILD_INVITES)
 
                     .enableCache(CacheFlag.VOICE_STATE).setMemberCachePolicy(MemberCachePolicy.ALL).build();
             jda.awaitReady();

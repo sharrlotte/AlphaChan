@@ -39,7 +39,7 @@ public class StringUtils {
         byte[] base = new byte[127];
         String estimate = null;
         int diff = 10;
-        int max = -9999, point = 0;
+        int max = 1, point = 0;
 
         for (int i = 0; i < input.length(); i++) {
             base[input.charAt(i)] += 1;
@@ -58,7 +58,7 @@ public class StringUtils {
             }
 
             for (int i = 0; i < 127; i++) {
-                point -= Math.abs(points[i] - base[i]);
+                point += Math.min(0, Math.abs(points[i] - base[i]));
             }
 
             for (int i = 2; i < input.length(); i++) {
@@ -98,6 +98,7 @@ public class StringUtils {
     }
 
     public static String capitalize(String str) {
+        str = str.toLowerCase();
         return str.substring(0, 1).toUpperCase() + str.substring(1);
     }
 }

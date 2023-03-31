@@ -33,10 +33,7 @@ public abstract class SlashCommand extends CommandDataImpl {
 
     public String getHelpString(String name) {
         SubcommandData subcommand = getSubcommand(name);
-        if (subcommand == null)
-            return "<?command.command_not_found> " + name;
-
-        if (subcommand instanceof SlashSubcommand slashSubcommand)
+        if (subcommand != null && subcommand instanceof SlashSubcommand slashSubcommand)
             return slashSubcommand.getHelpString();
 
         return "<?command.command_not_found> " + name;

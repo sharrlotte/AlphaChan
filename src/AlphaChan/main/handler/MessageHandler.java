@@ -158,6 +158,8 @@ public final class MessageHandler extends ListenerAdapter {
             user.openPrivateChannel().queue(channel -> channel.sendMessage(invite.getUrl()).queue());
         }
         log(event.getGuild(), user.getName() + " <?message.leave_guild>");
+
+        UserHandler.removeUser(event.getGuild().getId(), event.getMember().getId());
     }
 
     @Override
