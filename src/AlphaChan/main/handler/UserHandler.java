@@ -59,13 +59,17 @@ public final class UserHandler implements Updatable {
         Iterator<UserCache> iterator = userCache.values().iterator();
         while (iterator.hasNext()) {
             UserCache user = iterator.next();
-            if (!user.isAlive(1)) {
-                Log.info("STATUS", "User <" + user.getName() + ":" + user.getData().getUserId() + "> offline");
-                UpdatableHandler.updateStatus();
+            if (user.isAlive(1))
+                continue;
+
+            try {
                 user.update();
+                Log.info("STATUS", "User <" + user.getName() + ":" + user.getData().getUserId() + "> offline");
+            } finally {
                 iterator.remove();
             }
         }
+        UpdatableHandler.updateStatus();
     }
 
     public void save() {
@@ -77,7 +81,12 @@ public final class UserHandler implements Updatable {
         Iterator<UserCache> iterator = userCache.values().iterator();
         while (iterator.hasNext()) {
             UserCache user = iterator.next();
-            user.update();
+            try {
+                user.update();
+            } catch (Exception exception) {
+                Log.error(exception);
+            }
+
         }
     }
 
@@ -137,13 +146,8 @@ public final class UserHandler implements Updatable {
         return false;
     }
 
-    public static void removeUser(String guildId, String userId) {
-        String hashId = guildId + userId;
-        userCache.remove(hashId);
-    }
-
     // Add user to cache
-    public static UserCache addUser(String guildId, String userId) {
+    public synchronized static UserCache addUser(String guildId, String userId) {
         UserCache userData = new UserCache(guildId, userId);
         // Key is hashId = guildId + userId
         userCache.put(userData.getHashId(), userData);
@@ -157,7 +161,7 @@ public final class UserHandler implements Updatable {
         return addUser(member.getGuild().getId(), member.getId());
     }
 
-    public static UserCache getUserNoCache(String guildId, String userId) {
+    public synchronized static UserCache getUserNoCache(String guildId, String userId) {
         String hashId = guildId + userId;
         if (userCache.containsKey(hashId))
             return userCache.get(hashId);
@@ -167,14 +171,14 @@ public final class UserHandler implements Updatable {
     }
 
     // Get user without adding it to cache
-    public static UserCache getUserNoCache(Member member) {
+    public synchronized static UserCache getUserNoCache(Member member) {
         String guildId = member.getGuild().getId();
         String userId = member.getId();
         return getUserNoCache(guildId, userId);
     }
 
     // Waiting for data from Database
-    public static UserCache getUserAwait(Member member) {
+    public synchronized static UserCache getUserAwait(Member member) {
         String guildId = member.getGuild().getId();
         String userId = member.getId();
         // If user exist in cache then return, else query user from Database

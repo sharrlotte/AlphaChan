@@ -159,7 +159,6 @@ public final class MessageHandler extends ListenerAdapter {
         }
         log(event.getGuild(), user.getName() + " <?message.leave_guild>");
 
-        UserHandler.removeUser(event.getGuild().getId(), event.getMember().getId());
     }
 
     @Override

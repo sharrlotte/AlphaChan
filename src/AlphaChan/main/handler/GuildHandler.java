@@ -53,7 +53,8 @@ public class GuildHandler implements Updatable {
         while (iterator.hasNext()) {
             GuildCache guild = iterator.next();
             if (!guild.isAlive(1)) {
-                Log.info("STATUS", "Guild <" + guild.getGuild().getName() + ":" + guild.getGuild().getId() + "> offline");
+                Log.info("STATUS",
+                        "Guild <" + guild.getGuild().getName() + ":" + guild.getGuild().getId() + "> offline");
                 UpdatableHandler.updateStatus();
                 guild.update();
                 iterator.remove();
@@ -79,7 +80,7 @@ public class GuildHandler implements Updatable {
         return guildCaches.size();
     }
 
-    public static GuildCache getGuild(Guild guild) {
+    public synchronized static GuildCache getGuild(Guild guild) {
         if (guild == null)
             throw new IllegalStateException("Guild is not exists");
 
@@ -94,7 +95,7 @@ public class GuildHandler implements Updatable {
     }
 
     // Get guild from cache/Database
-    public static GuildCache getGuild(String guildId) {
+    public synchronized static GuildCache getGuild(String guildId) {
         // If guild exist in cache then return, else query guild from Database
         if (guildCaches.containsKey(guildId)) {
             GuildCache guildData = guildCaches.get(guildId);
@@ -110,7 +111,8 @@ public class GuildHandler implements Updatable {
             return addGuild(guildId);
         }
 
-        MongoCollection<GuildData> collection = DatabaseHandler.getDatabase(Database.GUILD).getCollection(guildCollectionName,
+        MongoCollection<GuildData> collection = DatabaseHandler.getDatabase(Database.GUILD).getCollection(
+                guildCollectionName,
                 GuildData.class);
 
         // Get guild from Database

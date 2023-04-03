@@ -5,6 +5,7 @@ import AlphaChan.main.gui.discord.Table;
 import AlphaChan.main.music.MusicPlayer;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.interactions.components.buttons.ButtonStyle;
 import net.dv8tion.jda.api.requests.restaction.MessageEditAction;
 
 public class MusicPlayerTable extends Table {
@@ -15,10 +16,12 @@ public class MusicPlayerTable extends Table {
         super(event, 10);
         this.player = player;
 
-        addButton(primary("play", Emoji.fromUnicode(player.getTrackStatus()), () -> player.play()));
-        addButton(primary("next", Emoji.fromUnicode(BotConfig.TEmoji.FORWARD.value), () -> player.playNext()));
-        addButton(primary("clear", Emoji.fromUnicode(BotConfig.TEmoji.CLEAR.value), () -> player.clear()));
-        addButton(deny("X", () -> this.deleteTable()));
+        addButton(button("play", ButtonStyle.PRIMARY, Emoji.fromUnicode(player.getTrackStatus()), () -> player.play()));
+        addButton(button("next", ButtonStyle.PRIMARY, Emoji.fromUnicode(BotConfig.TEmoji.FORWARD.value),
+                () -> player.playNext()));
+        addButton(button("clear", ButtonStyle.PRIMARY, Emoji.fromUnicode(BotConfig.TEmoji.CLEAR.value),
+                () -> player.clear()));
+        addButton(button("X", ButtonStyle.DANGER, () -> deleteTable()));
 
         player.setTable(this);
         onTimeOut.connect((n) -> player.setTable(null));
@@ -27,6 +30,6 @@ public class MusicPlayerTable extends Table {
     }
 
     public void onPrepareTable(MessageEditAction action) {
-        setButton(primary("play", Emoji.fromUnicode(player.getTrackStatus()), () -> player.play()));
+        setButton(button("play", ButtonStyle.PRIMARY, Emoji.fromUnicode(player.getTrackStatus()), () -> player.play()));
     }
 }

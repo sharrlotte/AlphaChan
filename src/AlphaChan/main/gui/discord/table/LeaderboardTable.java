@@ -22,6 +22,7 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.interactions.components.buttons.ButtonStyle;
 
 import static AlphaChan.AlphaChan.*;
 
@@ -38,11 +39,11 @@ public class LeaderboardTable extends PageTable {
         this.leaderboard = leaderboard;
         this.order = order;
 
-        addButton(primary("<<<", () -> this.firstPage()));
-        addButton(primary("<", () -> this.previousPage()));
-        addButton(deny("X", () -> this.deleteTable()));
-        addButton(primary(">", () -> this.nextPage()));
-        addButton(primary(">>>", () -> this.lastPage()));
+        addButton(button("<<<", ButtonStyle.PRIMARY, () -> firstPage()));
+        addButton(button("<", ButtonStyle.PRIMARY, () -> previousPage()));
+        addButton(button("X", ButtonStyle.PRIMARY, () -> deleteTable()));
+        addButton(button(">", ButtonStyle.DANGER, () -> nextPage()));
+        addButton(button(">>>", ButtonStyle.PRIMARY, () -> lastPage()));
     }
 
     @Override
@@ -67,62 +68,64 @@ public class LeaderboardTable extends PageTable {
     public void getLeaderboardData(LEADERBOARD leaderboard, ORDER order) {
 
         switch (leaderboard) {
-        case ALL:
-            jda.getGuilds().forEach(guild -> {
+            case ALL:
+                jda.getGuilds().forEach(guild -> {
+                    String guildId = guild.getId();
+                    MongoCollection<UserData> collection = DatabaseHandler.getCollection(Database.USER, guildId,
+                            UserData.class);
+                    try {
+                        FindIterable<UserData> data = collection.find();
+                        data.forEach(d -> users.add(new UserCache(d)));
+                    } catch (Exception e) {
+
+                    }
+                });
+                break;
+
+            case GUILD:
+                Guild guild = getEvent().getGuild();
+                if (guild == null)
+                    throw new IllegalStateException("Guild not found");
+
                 String guildId = guild.getId();
-                MongoCollection<UserData> collection = DatabaseHandler.getCollection(Database.USER, guildId, UserData.class);
-                try {
-                    FindIterable<UserData> data = collection.find();
-                    data.forEach(d -> users.add(new UserCache(d)));
-                } catch (Exception e) {
+                MongoCollection<UserData> collection = DatabaseHandler.getCollection(Database.USER, guildId,
+                        UserData.class);
 
-                }
-            });
-            break;
+                FindIterable<UserData> data = collection.find();
+                data.forEach(d -> users.add(new UserCache(d)));
+                break;
 
-        case GUILD:
-            Guild guild = getEvent().getGuild();
-            if (guild == null)
-                throw new IllegalStateException("Guild not found");
-
-            String guildId = guild.getId();
-            MongoCollection<UserData> collection = DatabaseHandler.getCollection(Database.USER, guildId, UserData.class);
-
-            FindIterable<UserData> data = collection.find();
-            data.forEach(d -> users.add(new UserCache(d)));
-            break;
-
-        case ONLINE:
-            users.addAll(UserHandler.getCachedUser());
+            case ONLINE:
+                users.addAll(UserHandler.getCachedUser());
         }
 
         switch (order) {
-        case MONEY:
-            users.sort(new Comparator<UserCache>() {
-                @Override
-                public int compare(UserCache a, UserCache b) {
-                    return b.getPoint(PointType.MONEY) - a.getPoint(PointType.MONEY);
-                }
-            });
-            break;
+            case MONEY:
+                users.sort(new Comparator<UserCache>() {
+                    @Override
+                    public int compare(UserCache a, UserCache b) {
+                        return b.getPoint(PointType.MONEY) - a.getPoint(PointType.MONEY);
+                    }
+                });
+                break;
 
-        case PVP_POINT:
-            users.sort(new Comparator<UserCache>() {
-                @Override
-                public int compare(UserCache a, UserCache b) {
-                    return b.getPoint(PointType.PVP_POINT) - a.getPoint(PointType.PVP_POINT);
-                }
-            });
-            break;
+            case PVP_POINT:
+                users.sort(new Comparator<UserCache>() {
+                    @Override
+                    public int compare(UserCache a, UserCache b) {
+                        return b.getPoint(PointType.PVP_POINT) - a.getPoint(PointType.PVP_POINT);
+                    }
+                });
+                break;
 
-        default:
-            users.sort(new Comparator<UserCache>() {
-                @Override
-                public int compare(UserCache a, UserCache b) {
-                    return b.getTotalPoint() - a.getTotalPoint();
-                }
-            });
-            break;
+            default:
+                users.sort(new Comparator<UserCache>() {
+                    @Override
+                    public int compare(UserCache a, UserCache b) {
+                        return b.getTotalPoint() - a.getTotalPoint();
+                    }
+                });
+                break;
         }
     }
 
@@ -155,17 +158,18 @@ public class LeaderboardTable extends PageTable {
         try {
             String data = user.getName() + ": ";
             switch (order) {
-            case MONEY:
-                data += user.getPoint(PointType.MONEY) + " Alpha";
-                break;
+                case MONEY:
+                    data += user.getPoint(PointType.MONEY) + " Alpha";
+                    break;
 
-            case PVP_POINT:
-                data += user.getPoint(PointType.PVP_POINT) + " <?command.point>";
-                break;
+                case PVP_POINT:
+                    data += user.getPoint(PointType.PVP_POINT) + " <?command.point>";
+                    break;
 
-            default:
-                data += "<?command.level> " + user.getPoint(PointType.LEVEL) + " (" + user.getPoint(PointType.EXP) + " <?command.exp>)";
-                break;
+                default:
+                    data += "<?command.level> " + user.getPoint(PointType.LEVEL) + " (" + user.getPoint(PointType.EXP)
+                            + " <?command.exp>)";
+                    break;
             }
             data += "\n<?command.guild>: " + user.getGuild().getName();
             return data;

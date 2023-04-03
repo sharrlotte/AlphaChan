@@ -19,6 +19,7 @@ import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
+import net.dv8tion.jda.api.interactions.components.buttons.ButtonStyle;
 
 public class DeletedMessageCommand extends SlashSubcommand {
 
@@ -52,7 +53,8 @@ public class DeletedMessageCommand extends SlashSubcommand {
         else
             amount = Math.min(amountOption.getAsInt(), MAX_RETRIEVE);
 
-        MongoCollection<Document> messageCollection = DatabaseHandler.getCollection(Database.LOG, LogCollection.MESSAGE.name(),
+        MongoCollection<Document> messageCollection = DatabaseHandler.getCollection(Database.LOG,
+                LogCollection.MESSAGE.name(),
                 Document.class);
 
         FindIterable<Document> data = DatabaseHandler
@@ -64,11 +66,11 @@ public class DeletedMessageCommand extends SlashSubcommand {
         StringBuilder field = new StringBuilder();
         PageTable table = new PageTable(event, 2);
 
-        table.addButton(table.primary("<<<", () -> table.firstPage()));
-        table.addButton(table.primary("<", () -> table.previousPage()));
-        table.addButton(table.deny("X", () -> table.deleteTable()));
-        table.addButton(table.primary(">", () -> table.nextPage()));
-        table.addButton(table.primary(">>>", () -> table.lastPage()));
+        table.addButton(table.button("<<<", ButtonStyle.PRIMARY, () -> table.firstPage()));
+        table.addButton(table.button("<", ButtonStyle.PRIMARY, () -> table.previousPage()));
+        table.addButton(table.button("X", ButtonStyle.PRIMARY, () -> table.deleteTable()));
+        table.addButton(table.button(">", ButtonStyle.PRIMARY, () -> table.nextPage()));
+        table.addButton(table.button(">>>", ButtonStyle.PRIMARY, () -> table.lastPage()));
 
         MongoCursor<Document> cursor = data.iterator();
         int i = 0;

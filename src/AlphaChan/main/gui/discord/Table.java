@@ -22,7 +22,9 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.LayoutComponent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import net.dv8tion.jda.api.interactions.components.buttons.ButtonStyle;
 import net.dv8tion.jda.api.requests.restaction.MessageEditAction;
+import net.dv8tion.jda.internal.interactions.component.ButtonImpl;
 
 public abstract class Table extends TimeObject {
 
@@ -128,11 +130,6 @@ public abstract class Table extends TimeObject {
                 message = null;
             }
 
-            if (interaction != null) {
-                interaction.getHook().deleteOriginal().complete();
-                interaction = null;
-            }
-
             kill();
         }
     }
@@ -189,63 +186,29 @@ public abstract class Table extends TimeObject {
         return interaction.getComponentId();
     }
 
-    public CallbackButton primary(String buttonName, Runnable runnable) {
-        Button button = Button.primary(getId() + SEPARATOR + buttonName, buttonName);
-        CallbackButton tableButton = new CallbackButton(button, runnable);
+    public CallbackButton button(String buttonName, ButtonStyle style, Runnable runnable) {
+        Button button = new ButtonImpl(getId() + SEPARATOR + buttonName, buttonName, style, false, null);
+        CallbackButton callbackButton = new CallbackButton(button, runnable);
 
-        return tableButton;
+        return callbackButton;
     }
 
-    public CallbackButton primary(String buttonId, String buttonName, Runnable runnable) {
-        Button button = Button.primary(getId() + SEPARATOR + buttonId, buttonName);
-        CallbackButton tableButton = new CallbackButton(button, runnable);
-        return tableButton;
+    public CallbackButton button(String buttonId, String buttonName, ButtonStyle style, Runnable runnable) {
+        Button button = new ButtonImpl(getId() + SEPARATOR + buttonId, buttonName, style, false, null);
+        CallbackButton callbackButton = new CallbackButton(button, runnable);
+
+        return callbackButton;
     }
 
-    public CallbackButton primary(String buttonId, Emoji emo, Runnable runnable) {
-        Button button = Button.primary(getId() + SEPARATOR + buttonId, emo);
-        CallbackButton tableButton = new CallbackButton(button, runnable);
+    public CallbackButton button(String buttonId, ButtonStyle style, Emoji emoji, Runnable runnable) {
+        Button button = new ButtonImpl(getId() + SEPARATOR + buttonId, "", style, false, emoji);
+        CallbackButton callbackButton = new CallbackButton(button, runnable);
 
-        return tableButton;
+        return callbackButton;
     }
 
-    public CallbackButton success(String buttonName, Emoji emo, Runnable runnable) {
-        Button button = Button.success(getId() + SEPARATOR + buttonName, emo);
-        CallbackButton tableButton = new CallbackButton(button, runnable);
-
-        return tableButton;
-    }
-
-    public CallbackButton success(String buttonId, String buttonName, Runnable runnable) {
-        Button button = Button.success(getId() + SEPARATOR + buttonId, buttonName);
-        CallbackButton tableButton = new CallbackButton(button, runnable);
-
-        return tableButton;
-    }
-
-    public CallbackButton deny(String buttonName, Runnable runnable) {
-        Button button = Button.danger(getId() + SEPARATOR + buttonName, buttonName);
-        CallbackButton tableButton = new CallbackButton(button, runnable);
-
-        return tableButton;
-    }
-
-    public CallbackButton deny(String buttonName, Emoji emo, Runnable runnable) {
-        Button button = Button.danger(getId() + SEPARATOR + buttonName, emo);
-        CallbackButton tableButton = new CallbackButton(button, runnable);
-
-        return tableButton;
-    }
-
-    public CallbackButton deny(String buttonId, String buttonName, Runnable runnable) {
-        Button button = Button.danger(getId() + SEPARATOR + buttonId, buttonName);
-        CallbackButton tableButton = new CallbackButton(button, runnable);
-
-        return tableButton;
-    }
-
-    public void addButton(CallbackButton tableButton) {
-        buttons.add(tableButton);
+    public void addButton(CallbackButton callbackButton) {
+        buttons.add(callbackButton);
         int row = rows.size() - 1;
         int number = rows.get(row);
         rows.set(row, number + 1);

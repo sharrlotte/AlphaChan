@@ -36,6 +36,7 @@ import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.utils.FileUpload;
 import net.dv8tion.jda.api.requests.restaction.MessageEditAction;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.interactions.components.buttons.ButtonStyle;
 
 import static AlphaChan.AlphaChan.*;
 
@@ -58,17 +59,21 @@ public class SchematicTable extends PageTable {
 
         String schematicDataCollectionName = BotConfig.readString(Config.SCHEMATIC_DATA_COLLECTION, null);
 
-        collection = DatabaseHandler.getCollection(Database.MINDUSTRY, schematicDataCollectionName, SchematicData.class);
+        collection = DatabaseHandler.getCollection(Database.MINDUSTRY, schematicDataCollectionName,
+                SchematicData.class);
 
-        addButton(primary("<", () -> this.previousPage()));
-        addButton(deny("X", () -> this.deleteTable()));
-        addButton(primary(">", () -> this.nextPage()));
+        addButton(button("<", ButtonStyle.PRIMARY, () -> previousPage()));
+        addButton(button("X", ButtonStyle.DANGER, () -> deleteTable()));
+        addButton(button(">", ButtonStyle.PRIMARY, () -> nextPage()));
         addRow();
-        addButton(primary("like", Emoji.fromUnicode(BotConfig.TEmoji.LIKE.value), () -> this.addLike()));
-        addButton(primary("dislike", Emoji.fromUnicode(BotConfig.TEmoji.DISLIKE.value), () -> this.addDislike()));
-        addButton(primary("data", Emoji.fromUnicode(BotConfig.TEmoji.FILE.value), () -> this.sendSchematicCodeMessage()));
+        addButton(button("like", ButtonStyle.PRIMARY, Emoji.fromUnicode(BotConfig.TEmoji.LIKE.value), () -> addLike()));
+        addButton(button("dislike", ButtonStyle.PRIMARY, Emoji.fromUnicode(BotConfig.TEmoji.DISLIKE.value),
+                () -> addDislike()));
+        addButton(button("data", ButtonStyle.PRIMARY, Emoji.fromUnicode(BotConfig.TEmoji.FILE.value),
+                () -> sendSchematicCodeMessage()));
         addRow();
-        addButton(primary("delete", Emoji.fromUnicode(BotConfig.TEmoji.TRASH_CAN.value), () -> this.deleteSchematic()));
+        addButton(button("delete", ButtonStyle.PRIMARY, Emoji.fromUnicode(BotConfig.TEmoji.TRASH_CAN.value),
+                () -> deleteSchematic()));
 
     }
 
@@ -80,9 +85,8 @@ public class SchematicTable extends PageTable {
     @Override
     public void deleteTable() {
         try {
-            super.deleteTable();
-            this.kill();
             this.deleteSChematicCodeMessage();
+            super.deleteTable();
 
         } catch (Exception e) {
             Log.error(e);
@@ -181,10 +185,12 @@ public class SchematicTable extends PageTable {
             deleteSChematicCodeMessage();
 
             currentInfo = schematicInfoList.get(pageNumber);
-            SchematicData schematicData = collection.find(Filters.eq("_id", currentInfo.getData().getId())).limit(1).first();
+            SchematicData schematicData = collection.find(Filters.eq("_id", currentInfo.getData().getId())).limit(1)
+                    .first();
 
             if (schematicData == null) {
-                MessageHandler.sendMessage(getEventTextChannel(), "<?command.no_schematic>:" + currentInfo.getData().getId(), 10);
+                MessageHandler.sendMessage(getEventTextChannel(),
+                        "<?command.no_schematic>:" + currentInfo.getData().getId(), 10);
                 return;
             }
 
@@ -204,7 +210,8 @@ public class SchematicTable extends PageTable {
 
                 if (member != null) {
                     field.append("- <?command.author>: " + member.getEffectiveName() + "\n");
-                    builder.setAuthor(member.getEffectiveName(), member.getEffectiveAvatarUrl(), member.getEffectiveAvatarUrl());
+                    builder.setAuthor(member.getEffectiveName(), member.getEffectiveAvatarUrl(),
+                            member.getEffectiveAvatarUrl());
 
                 } else if (user != null) {
                     field.append("- <?command.author>: " + user.getName() + "\n");
@@ -215,10 +222,12 @@ public class SchematicTable extends PageTable {
             field.append("- <?command.tag>: ");
 
             for (int i = 0; i < currentInfo.getData().getTag().size() - 1; i++)
-                field.append(StringUtils.capitalize(currentInfo.getData().getTag().get(i).replace("_", " ").toLowerCase() + ", "));
+                field.append(StringUtils
+                        .capitalize(currentInfo.getData().getTag().get(i).replace("_", " ").toLowerCase() + ", "));
 
             field.append(StringUtils.capitalize(
-                    currentInfo.getData().getTag().get(currentInfo.getData().getTag().size() - 1).replace("_", " ").toLowerCase() + "\n"));
+                    currentInfo.getData().getTag().get(currentInfo.getData().getTag().size() - 1).replace("_", " ")
+                            .toLowerCase() + "\n"));
 
             field.append("- <?command.like>: " + currentInfo.getLike() + "\n");
             field.append("- <?command.dislike>: " + currentInfo.getDislike() + "\n");

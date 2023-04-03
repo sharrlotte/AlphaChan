@@ -17,6 +17,7 @@ import net.dv8tion.jda.api.events.interaction.command.CommandAutoCompleteInterac
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
+import net.dv8tion.jda.api.interactions.components.buttons.ButtonStyle;
 
 import static AlphaChan.AlphaChan.*;
 
@@ -56,11 +57,11 @@ public class GuildCommand extends SlashSubcommand {
                 }
             }
             table.addPage(builder);
-            table.addButton(table.primary("<<<", () -> table.firstPage()));
-            table.addButton(table.primary("<", () -> table.previousPage()));
-            table.addButton(table.deny("X", () -> table.deleteTable()));
-            table.addButton(table.primary(">", () -> table.nextPage()));
-            table.addButton(table.primary(">>>", () -> table.lastPage()));
+            table.addButton(table.button("<<<", ButtonStyle.PRIMARY, () -> table.firstPage()));
+            table.addButton(table.button("<", ButtonStyle.PRIMARY, () -> table.previousPage()));
+            table.addButton(table.button("X", ButtonStyle.DANGER, () -> table.deleteTable()));
+            table.addButton(table.button(">", ButtonStyle.PRIMARY, () -> table.nextPage()));
+            table.addButton(table.button(">>>", ButtonStyle.PRIMARY, () -> table.lastPage()));
 
             table.sendTable();
 

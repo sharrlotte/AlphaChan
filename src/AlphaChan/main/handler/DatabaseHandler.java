@@ -54,7 +54,8 @@ public final class DatabaseHandler {
 
     private static MongoClient mongoClient = MongoClients.create(settings);
     private static CodecProvider pojoCodecProvider = PojoCodecProvider.builder().automatic(true).build();
-    private static CodecRegistry pojoCodecRegistry = fromRegistries(getDefaultCodecRegistry(), fromProviders(pojoCodecProvider));
+    private static CodecRegistry pojoCodecRegistry = fromRegistries(getDefaultCodecRegistry(),
+            fromProviders(pojoCodecProvider));
 
     private static ConcurrentHashMap<String, MongoDatabase> database = new ConcurrentHashMap<String, MongoDatabase>();
 
@@ -66,9 +67,9 @@ public final class DatabaseHandler {
         onShutdown.connect((code) -> {
             try {
                 taskExecutor.shutdown();
-                logExecutor.shutdown();
-
                 taskExecutor.awaitTermination(Long.MAX_VALUE, TimeUnit.SECONDS);
+
+                logExecutor.shutdown();
                 logExecutor.awaitTermination(Long.MAX_VALUE, TimeUnit.SECONDS);
 
             } catch (InterruptedException e) {
@@ -94,17 +95,19 @@ public final class DatabaseHandler {
         return db;
     }
 
-    public static <T> FindIterable<T> find(Database databaseName, final String collectionName, Class<T> type, Bson filter) {
-        MongoCollection<T> collection = getDatabase(Database.MINDUSTRY).getCollection(collectionName, type);
+    public static <T> FindIterable<T> find(Database databaseName, final String collectionName, Class<T> type,
+            Bson filter) {
+        MongoCollection<T> collection = getCollection(databaseName, collectionName, type);
         return collection.find(filter);
     }
 
     public static <T> void insert(Database databaseName, final String collectionName, Class<T> type, T value) {
-        MongoCollection<T> collection = getDatabase(Database.MINDUSTRY).getCollection(collectionName, type);
+        MongoCollection<T> collection = getCollection(databaseName, collectionName, type);
         collection.insertOne(value);
     }
 
-    public static <T> boolean insertIfNotFound(Database databaseName, final String collectionName, Class<T> type, Bson filter, T value) {
+    public static <T> boolean insertIfNotFound(Database databaseName, final String collectionName, Class<T> type,
+            Bson filter, T value) {
         MongoCollection<T> collection = getCollection(databaseName, collectionName, type);
 
         if (collection.find(filter).first() != null)
@@ -114,7 +117,8 @@ public final class DatabaseHandler {
         return true;
     }
 
-    public static <T> void update(Database databaseName, final String collectionName, Class<T> type, Bson filter, T value) {
+    public static <T> void update(Database databaseName, final String collectionName, Class<T> type, Bson filter,
+            T value) {
         MongoCollection<T> collection = getCollection(databaseName, collectionName, type);
         taskExecutor.submit(() -> collection.replaceOne(filter, value, new ReplaceOptions().upsert(true)));
     }
@@ -125,6 +129,9 @@ public final class DatabaseHandler {
     }
 
     public static <T> long count(Database databaseName, final String collectionName, Class<T> type, Bson filter) {
+        if (collectionExists(databaseName, collectionName))
+            return 0;
+
         MongoCollection<T> collection = getCollection(databaseName, collectionName, type);
 
         if (filter == null)
@@ -133,7 +140,8 @@ public final class DatabaseHandler {
         return collection.countDocuments(filter);
     }
 
-    public static <T> MongoCollection<T> getCollection(Database databaseName, final String collectionName, Class<T> type) {
+    public static <T> MongoCollection<T> getCollection(Database databaseName, final String collectionName,
+            Class<T> type) {
         if (!collectionExists(databaseName, collectionName)) {
             createCollection(databaseName, collectionName);
         }
@@ -198,7 +206,8 @@ public final class DatabaseHandler {
 
             // Insert collection message
             logCollection.insertOne(
-                    content.append(BotConfig.readString(Config.TIME_INSERT, "_timeInsert"), new BsonDateTime(System.currentTimeMillis())));
+                    content.append(BotConfig.readString(Config.TIME_INSERT, "_timeInsert"),
+                            new BsonDateTime(System.currentTimeMillis())));
         }
     }
 }
