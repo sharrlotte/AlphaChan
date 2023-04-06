@@ -33,6 +33,6 @@ public class AdminCommand extends SlashCommand {
         if (UserHandler.isAdmin(event.getMember()))
             super.onAutoComplete(event);
         else
-            sendAutoComplete(event, "Bạn không có quyền để sử dụng lệnh này");
+            sendAutoComplete(event, "<?command.no_permission>");
     }
 }

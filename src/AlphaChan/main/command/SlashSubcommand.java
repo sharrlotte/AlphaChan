@@ -28,7 +28,7 @@ public abstract class SlashSubcommand extends SubcommandData {
     public String getHelpString() {
         StringBuilder builder = new StringBuilder();
         for (OptionData option : getOptions()) {
-            builder.append(String.format("\n\t<%s>: %s %s", //
+            builder.append(String.format("\n\t<?%s>: %s %s", //
                     option.getName(), //
                     option.getDescription(), //
                     option.isRequired() ? "(<?command.required>)" : ""));
