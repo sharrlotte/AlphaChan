@@ -29,7 +29,7 @@ public class LocaleManager {
     private static final DiscordLocale[] SUPPORTED_LOCALE = { DEFAULT_LOCALE, DiscordLocale.VIETNAMESE };
 
     private static final String LOCALE_FOLDER_PATH = "locale/";
-    private static final Pattern KEY_PATTERN = Pattern.compile("<\\?(.+)>");
+    private static final Pattern KEY_PATTERN = Pattern.compile("<\\?([a-z,A-Z0-9._]+)>");
 
     private static ConcurrentHashMap<DiscordLocale, Bundle> bundles;
     private static LocaleManager localeManager;
@@ -56,6 +56,14 @@ public class LocaleManager {
 
     public static String format(Guild guild, String s) {
         return format(guild.getLocale(), s);
+    }
+
+    public static String format(Guild guild, String s, Object... objects) {
+        return String.format(format(guild.getLocale(), s), objects);
+    }
+
+    public static String format(DiscordLocale discordLocale, String s, Object... objects) {
+        return String.format(format(discordLocale, s), objects);
     }
 
     public static String format(DiscordLocale discordLocale, String s) {
@@ -121,7 +129,8 @@ public class LocaleManager {
         }
 
         public void save() {
-            try (OutputStreamWriter output = new OutputStreamWriter(new FileOutputStream(getLocaleFilePath()), StandardCharsets.UTF_8)) {
+            try (OutputStreamWriter output = new OutputStreamWriter(new FileOutputStream(getLocaleFilePath()),
+                    StandardCharsets.UTF_8)) {
 
                 properties.store(output, null);
 
