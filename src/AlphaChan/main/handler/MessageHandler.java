@@ -71,7 +71,8 @@ public final class MessageHandler extends ListenerAdapter {
             Log.print("LOG", getMessageSender(message) + ": " + message.getContentDisplay());
 
         else if (!message.getAttachments().isEmpty())
-            message.getAttachments().forEach(attachment -> Log.print("LOG", getMessageSender(message) + ": " + attachment.getUrl()));
+            message.getAttachments()
+                    .forEach(attachment -> Log.print("LOG", getMessageSender(message) + ": " + attachment.getUrl()));
 
         if (message.getContentRaw().startsWith("/") && UserHandler.isYui(message.getMember())) {
             CommandHandler.ConsoleCommandHandler.runCommand(message.getContentRaw());
@@ -89,7 +90,8 @@ public final class MessageHandler extends ListenerAdapter {
             Member member = message.getMember();
 
             // Schematic preview
-            if ((ContentHandler.isSchematicText(message) && attachments.isEmpty()) || ContentHandler.isSchematicFile(attachments)) {
+            if ((ContentHandler.isSchematicText(message) && attachments.isEmpty())
+                    || ContentHandler.isSchematicFile(attachments)) {
                 sendSchematicPreview(message);
                 Log.system(getMessageSender(message) + ": sent a schematic ");
             }
@@ -106,7 +108,8 @@ public final class MessageHandler extends ListenerAdapter {
             boolean isSchematicChannel = guildData.hasChannel(ChannelType.SCHEMATIC, message.getChannel().getId());
             boolean isMapChannel = guildData.hasChannel(ChannelType.MAP, message.getChannel().getId());
 
-            boolean isSchematicMessage = ContentHandler.isSchematicText(message) || ContentHandler.isSchematicFile(attachments);
+            boolean isSchematicMessage = ContentHandler.isSchematicText(message)
+                    || ContentHandler.isSchematicFile(attachments);
             boolean isMapMessage = ContentHandler.isMapFile(attachments);
 
             if ((isMapChannel && !isMapMessage) || (isSchematicChannel && !isSchematicMessage)) {
@@ -185,7 +188,6 @@ public final class MessageHandler extends ListenerAdapter {
         String memberName = member == null ? "Unknown" : member.getEffectiveName();
 
         return "[" + guildName + "] " + "<" + categoryName + ":" + channelName + "> " + memberName;
-
     }
 
     public static String getMessageSender(Message message) {
@@ -203,7 +205,8 @@ public final class MessageHandler extends ListenerAdapter {
             File mapImageFile = ContentHandler.getMapImageFile(map);
             EmbedBuilder builder = ContentHandler.getMapEmbedBuilder(map, mapFile, mapImageFile, member);
 
-            channel.sendFiles(FileUpload.fromData(mapFile), FileUpload.fromData(mapImageFile)).setEmbeds(builder.build()).queue();
+            channel.sendFiles(FileUpload.fromData(mapFile), FileUpload.fromData(mapImageFile))
+                    .setEmbeds(builder.build()).queue();
 
         } catch (Exception e) {
             Log.error(e);
@@ -248,7 +251,8 @@ public final class MessageHandler extends ListenerAdapter {
         }
         Member member = event.getMember();
         try {
-            sendSchematicPreview(ContentHandler.parseSchematicURL(attachment.getUrl()), member, event.getGuildChannel());
+            sendSchematicPreview(ContentHandler.parseSchematicURL(attachment.getUrl()), member,
+                    event.getGuildChannel());
         } catch (Exception e) {
             Log.error(e);
         }
@@ -290,7 +294,8 @@ public final class MessageHandler extends ListenerAdapter {
             builder.setAuthor(member.getEffectiveName(), member.getEffectiveAvatarUrl(), member.getEffectiveAvatarUrl())
                     .setTitle(schem.name()).setImage("attachment://" + previewFile.getName());
 
-            channel.sendFiles(FileUpload.fromData(schemFile), FileUpload.fromData(previewFile)).setEmbeds(builder.build()).queue();
+            channel.sendFiles(FileUpload.fromData(schemFile), FileUpload.fromData(previewFile))
+                    .setEmbeds(builder.build()).queue();
         } catch (Exception e) {
             sendMessage(channel, "<?message.error>: " + e.getMessage(), 30);
         }
@@ -298,22 +303,18 @@ public final class MessageHandler extends ListenerAdapter {
 
     // Message send commands
 
-    public static void sendMessage(GuildMessageChannel channel, String content, int deleteAfter) {
-        channel.sendMessage("```" + LocaleManager.format(channel.getGuild(), content) + "```")
+    public static void sendMessage(GuildMessageChannel channel, String content, int deleteAfter, Object... objects) {
+        channel.sendMessage("```" + LocaleManager.format(channel.getGuild(), content, objects) + "```")
                 .queue(m -> m.delete().queueAfter(deleteAfter, TimeUnit.SECONDS));
     }
 
-    public static void replyMessage(Message message, String content, int deleteAfter) {
-        message.reply("```" + LocaleManager.format(message.getGuild(), content) + "```")
+    public static void replyMessage(Message message, String content, int deleteAfter, Object... objects) {
+        message.reply("```" + LocaleManager.format(message.getGuild(), content, objects) + "```")
                 .queue(m -> m.delete().queueAfter(deleteAfter, TimeUnit.SECONDS));
     }
 
-    public static void replyMessage(Message message, String content) {
-        message.reply("```" + LocaleManager.format(message.getGuild(), content) + "```").queue();
-    }
-
-    public static void reply(GenericCommandInteractionEvent event, String content, int deleteAfter) {
-        event.getHook().sendMessage("```" + LocaleManager.format(event.getGuild(), content) + "```")
+    public static void reply(GenericCommandInteractionEvent event, String content, int deleteAfter, Object... objects) {
+        event.getHook().sendMessage("```" + LocaleManager.format(event.getGuild(), content, objects) + "```")
                 .queue(_message -> _message.delete().queueAfter(deleteAfter, TimeUnit.SECONDS));
     }
 
@@ -322,18 +323,22 @@ public final class MessageHandler extends ListenerAdapter {
                 .queue(_message -> _message.delete().queueAfter(deleteAfter, TimeUnit.SECONDS));
     }
 
-    public static void replyEmbed(GenericCommandInteractionEvent event, String content, int deleteAfter) {
+    public static void replyEmbed(GenericCommandInteractionEvent event, String content, int deleteAfter,
+            Object... objects) {
         EmbedBuilder builder = new EmbedBuilder();
-        builder.addField(EmbedBuilder.ZERO_WIDTH_SPACE, LocaleManager.format(event.getGuild(), content), false);
-        event.getHook().sendMessageEmbeds(builder.build()).queue(_message -> _message.delete().queueAfter(deleteAfter, TimeUnit.SECONDS));
+        builder.addField(EmbedBuilder.ZERO_WIDTH_SPACE, LocaleManager.format(event.getGuild(), content, objects),
+                false);
+        event.getHook().sendMessageEmbeds(builder.build())
+                .queue(_message -> _message.delete().queueAfter(deleteAfter, TimeUnit.SECONDS));
     }
 
     public static void delete(GenericCommandInteractionEvent event) {
         event.getHook().deleteOriginal().queue();
     }
 
-    public static void reply(GenericComponentInteractionCreateEvent event, String content, int deleteAfter) {
-        event.getHook().sendMessage("```" + LocaleManager.format(event.getGuild(), content) + "```")
+    public static void reply(GenericComponentInteractionCreateEvent event, String content, int deleteAfter,
+            Object... objects) {
+        event.getHook().sendMessage("```" + LocaleManager.format(event.getGuild(), content, objects) + "```")
                 .queue(_message -> _message.delete().queueAfter(deleteAfter, TimeUnit.SECONDS));
     }
 
@@ -342,10 +347,13 @@ public final class MessageHandler extends ListenerAdapter {
                 .queue(_message -> _message.delete().queueAfter(deleteAfter, TimeUnit.SECONDS));
     }
 
-    public static void replyEmbed(GenericComponentInteractionCreateEvent event, String content, int deleteAfter) {
+    public static void replyEmbed(GenericComponentInteractionCreateEvent event, String content, int deleteAfter,
+            Object... objects) {
         EmbedBuilder builder = new EmbedBuilder();
-        builder.addField(EmbedBuilder.ZERO_WIDTH_SPACE, LocaleManager.format(event.getGuild(), content), false);
-        event.getHook().sendMessageEmbeds(builder.build()).queue(_message -> _message.delete().queueAfter(deleteAfter, TimeUnit.SECONDS));
+        builder.addField(EmbedBuilder.ZERO_WIDTH_SPACE, LocaleManager.format(event.getGuild(), content, objects),
+                false);
+        event.getHook().sendMessageEmbeds(builder.build())
+                .queue(_message -> _message.delete().queueAfter(deleteAfter, TimeUnit.SECONDS));
     }
 
     public static void delete(GenericComponentInteractionCreateEvent event) {

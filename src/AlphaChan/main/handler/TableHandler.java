@@ -3,7 +3,7 @@ package AlphaChan.main.handler;
 import java.util.Iterator;
 import java.util.concurrent.ConcurrentHashMap;
 
-import AlphaChan.main.gui.discord.Table;
+import AlphaChan.main.ui.discord.Table;
 import AlphaChan.main.util.Log;
 
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;

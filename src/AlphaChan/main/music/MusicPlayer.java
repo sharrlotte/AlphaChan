@@ -14,7 +14,7 @@ import com.sedmelluq.discord.lavaplayer.track.AudioTrackEndReason;
 import com.sedmelluq.discord.lavaplayer.track.playback.AudioFrame;
 
 import AlphaChan.BotConfig;
-import AlphaChan.main.gui.discord.table.MusicPlayerTable;
+import AlphaChan.main.ui.discord.table.MusicPlayerTable;
 import AlphaChan.main.util.Log;
 import AlphaChan.main.util.StringUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -193,7 +193,8 @@ public class MusicPlayer extends AudioEventAdapter implements AudioSendHandler {
                         + StringUtils.toTime(playing.getDuration()) + //
 
                         "\nNgười yêu cầu: " + playing.getUserData(RequestMetadata.class).getRequester() + "\nÂm lượng: "
-                        + StringUtils.getProgressBar(audioPlayer.getVolume() / 100d, 20, "||", "|", "|") + audioPlayer.getVolume() + "%",
+                        + StringUtils.getProgressBar(audioPlayer.getVolume() / 100d, 20, "||", "|", "|")
+                        + audioPlayer.getVolume() + "%",
 
                         false);
             }

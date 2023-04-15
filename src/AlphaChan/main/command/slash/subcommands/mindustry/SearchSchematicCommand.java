@@ -15,11 +15,10 @@ import AlphaChan.BotConfig.Config;
 import AlphaChan.main.command.SlashSubcommand;
 import AlphaChan.main.data.mindustry.SchematicInfo;
 import AlphaChan.main.data.mindustry.SchematicTag;
-import AlphaChan.main.gui.discord.table.SchematicTable;
 import AlphaChan.main.handler.DatabaseHandler;
 import AlphaChan.main.handler.MessageHandler;
 import AlphaChan.main.handler.DatabaseHandler.Database;
-
+import AlphaChan.main.ui.discord.table.SchematicTable;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.events.interaction.command.CommandAutoCompleteInteractionEvent;
@@ -65,7 +64,8 @@ public class SearchSchematicCommand extends SlashSubcommand {
 
         String schematicCollectionName = BotConfig.readString(Config.SCHEMATIC_INFO_COLLECTION, null);
 
-        MongoCollection<SchematicInfo> collection = DatabaseHandler.getCollection(Database.MINDUSTRY, schematicCollectionName,
+        MongoCollection<SchematicInfo> collection = DatabaseHandler.getCollection(Database.MINDUSTRY,
+                schematicCollectionName,
                 SchematicInfo.class);
 
         FindIterable<SchematicInfo> schematicInfo;
@@ -73,14 +73,16 @@ public class SearchSchematicCommand extends SlashSubcommand {
             schematicInfo = collection.find(filter, SchematicInfo.class).sort(descending("like"));
 
         } else {
-            schematicInfo = collection.find(Filters.and(Filters.all("tag", tags), filter), SchematicInfo.class).sort(descending("like"));
+            schematicInfo = collection.find(Filters.and(Filters.all("tag", tags), filter), SchematicInfo.class)
+                    .sort(descending("like"));
         }
 
         if (schematicInfo.first() == null) {
             if (tagOption == null)
                 MessageHandler.reply(event, "<?command.no_schematic>", 30);
             else
-                MessageHandler.reply(event, "<?command.command_search_schematic_with_tag>: " + tagOption.getAsString().toLowerCase(), 30);
+                MessageHandler.reply(event,
+                        "<?command.command_search_schematic_with_tag>: " + tagOption.getAsString().toLowerCase(), 30);
 
         } else {
 

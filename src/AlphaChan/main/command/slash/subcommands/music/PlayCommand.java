@@ -9,11 +9,11 @@ import com.sedmelluq.discord.lavaplayer.track.AudioPlaylist;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 
 import AlphaChan.main.command.SlashSubcommand;
-import AlphaChan.main.gui.discord.table.MusicPlayerTable;
 import AlphaChan.main.handler.MessageHandler;
 import AlphaChan.main.handler.MusicPlayerHandler;
 import AlphaChan.main.music.MusicPlayer;
 import AlphaChan.main.music.MusicTrack;
+import AlphaChan.main.ui.discord.table.MusicPlayerTable;
 import AlphaChan.main.util.Log;
 import net.dv8tion.jda.api.entities.GuildVoiceState;
 import net.dv8tion.jda.api.entities.Member;
@@ -57,7 +57,8 @@ public class PlayCommand extends SlashSubcommand {
                 MusicPlayerHandler.getInstance().loadItemOrdered(event.getGuild(), source, new ResultHandler(event));
 
                 if (!MusicPlayerHandler.getInstance().hasMusicPlayer(event.getGuild())) {
-                    new MusicPlayerTable(event, MusicPlayerHandler.getInstance().getMusicPlayer(event.getGuild())).sendTable();
+                    new MusicPlayerTable(event, MusicPlayerHandler.getInstance().getMusicPlayer(event.getGuild()))
+                            .sendTable();
                 } else {
 
                     event.getHook().deleteOriginal().queue();
@@ -66,7 +67,8 @@ public class PlayCommand extends SlashSubcommand {
                 MusicPlayerHandler.getInstance().getMusicPlayer(event.getGuild()).start(channel);
             } else {
 
-                new MusicPlayerTable(event, MusicPlayerHandler.getInstance().getMusicPlayer(event.getGuild())).sendTable();
+                new MusicPlayerTable(event, MusicPlayerHandler.getInstance().getMusicPlayer(event.getGuild()))
+                        .sendTable();
             }
         } catch (Exception e) {
             Log.error(e);

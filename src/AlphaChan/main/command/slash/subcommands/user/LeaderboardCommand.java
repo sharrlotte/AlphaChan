@@ -11,7 +11,7 @@ import java.util.HashMap;
 
 import AlphaChan.main.command.SlashCommand;
 import AlphaChan.main.command.SlashSubcommand;
-import AlphaChan.main.gui.discord.table.LeaderboardTable;
+import AlphaChan.main.ui.discord.table.LeaderboardTable;
 
 public class LeaderboardCommand extends SlashSubcommand {
 
