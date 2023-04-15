@@ -42,7 +42,8 @@ public class DailyCommand extends SlashSubcommand {
         UserCache userData = UserHandler.getUserAwait(member);
 
         int money = 0;
-        Document result = new Document().append("userId", userData.getData().getUserId()).append("time", System.currentTimeMillis());
+        Document result = new Document().append("userId", userData.getData().getUserId()).append("time",
+                System.currentTimeMillis());
 
         if (data == null || data.isEmpty()) {
             money = userData.addPoint(PointType.MONEY, userData.getLevelCap());
@@ -66,9 +67,10 @@ public class DailyCommand extends SlashSubcommand {
                 if (data.containsKey("time")) {
                     Long lastTime = (Long) data.get("time");
                     MessageHandler.replyEmbed(event,
-                            "📝<?command.wait_to> " + TimeFormat.RELATIVE.atTimestamp(lastTime).plus(24 * 60 * 60 * 1000) //
-                                    + "\n📝<?command.last_time>: " + TimeFormat.DATE_TIME_SHORT.format(lastTime),
-                            30);
+                            "📝<?command.wait_to %s\n📝last_time: %s>",
+                            30, //
+                            TimeFormat.RELATIVE.atTimestamp(lastTime).plus(24 * 60 * 60 * 1000),
+                            TimeFormat.DATE_TIME_SHORT.format(lastTime));
                 }
             }
         }

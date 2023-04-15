@@ -8,7 +8,7 @@ import AlphaChan.main.util.Log;
 public class SaveConfigConsole extends ConsoleCommand {
 
     public SaveConfigConsole() {
-        super("save-config", "<> Save bot config");
+        super("save-config", "Save bot config");
     }
 
     @Override

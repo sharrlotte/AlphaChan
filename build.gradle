@@ -60,6 +60,5 @@ dependencies{
     implementation "com.sedmelluq:lavaplayer:1.3.76"
     implementation 'com.theokanning.openai-gpt3-java:service:0.11.1'
     
-    implementation files('lib/Project.jar')
 }
 

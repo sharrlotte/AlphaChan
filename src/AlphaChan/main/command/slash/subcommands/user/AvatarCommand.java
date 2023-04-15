@@ -20,7 +20,8 @@ public class AvatarCommand extends SlashSubcommand {
         if (userOption == null)
             return;
         User user = userOption.getAsUser();
-        event.getHook().sendMessage("\n" + user.getAvatarUrl()).queue(_message -> _message.delete().queueAfter(30, TimeUnit.SECONDS));
+        event.getHook().sendMessage("\n" + user.getAvatarUrl())
+                .queue(_message -> _message.delete().queueAfter(30, TimeUnit.SECONDS));
     }
 
 }

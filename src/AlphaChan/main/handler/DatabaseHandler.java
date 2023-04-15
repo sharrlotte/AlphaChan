@@ -44,7 +44,7 @@ public final class DatabaseHandler {
         MESSAGE, DATABASE, MESSAGE_DELETED
     }
 
-    private static final String DATABASE_URL = System.getenv("DATABASE_URL");
+    private static final String DATABASE_URL = System.getenv("DISCORD_BOT_DATABASE_URL");
 
     private static DatabaseHandler instance = new DatabaseHandler();
 

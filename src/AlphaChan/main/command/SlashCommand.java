@@ -6,6 +6,7 @@ import java.util.List;
 
 import AlphaChan.main.handler.LocaleManager;
 import AlphaChan.main.handler.MessageHandler;
+import AlphaChan.main.util.Log;
 import net.dv8tion.jda.api.events.interaction.command.CommandAutoCompleteInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.DiscordLocale;
@@ -53,13 +54,21 @@ public abstract class SlashCommand extends CommandDataImpl {
     }
 
     protected void runCommand(SlashCommandInteractionEvent event) {
-        SubcommandData subcommand = getSubcommand(event.getSubcommandName());
-        if (subcommand == null) {
-            MessageHandler.reply(event, "<?command.command_not_found>", 10);
-            return;
-        }
-        if (subcommand instanceof SlashSubcommand slashSubcommand) {
-            slashSubcommand.onCommand(event);
+
+        try {
+
+            SubcommandData subcommand = getSubcommand(event.getSubcommandName());
+            if (subcommand == null) {
+                MessageHandler.reply(event, "<?command.command_not_found>", 10);
+                return;
+            }
+            if (subcommand instanceof SlashSubcommand slashSubcommand) {
+                slashSubcommand.onCommand(event);
+            }
+
+        } catch (Exception e) {
+            MessageHandler.delete(event);
+            Log.error(e);
         }
     }
 

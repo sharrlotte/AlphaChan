@@ -28,16 +28,18 @@ public class AlphaChan {
 
     public AlphaChan() {
         try {
+
             Log.system("Bot awaking");
 
             BotConfig.load();
 
             Log.system("Connecting to discord");
 
-            String TOKEN = System.getenv("TOKEN");
+            String TOKEN = System.getenv("DISCORD_BOT_TOKEN");
 
             jda = JDABuilder.createDefault(TOKEN, //
-                    GatewayIntent.GUILD_MESSAGES, GatewayIntent.MESSAGE_CONTENT, GatewayIntent.GUILD_EMOJIS_AND_STICKERS,
+                    GatewayIntent.GUILD_MESSAGES, GatewayIntent.MESSAGE_CONTENT,
+                    GatewayIntent.GUILD_EMOJIS_AND_STICKERS,
                     GatewayIntent.GUILD_MEMBERS, GatewayIntent.GUILD_PRESENCES, GatewayIntent.GUILD_MESSAGE_REACTIONS,
                     GatewayIntent.GUILD_VOICE_STATES, GatewayIntent.GUILD_MODERATION, GatewayIntent.GUILD_INVITES)
 

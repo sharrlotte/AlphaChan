@@ -32,5 +32,4 @@ temp/
 build/
 libs/
 bin/
-
-.gradle
+.gradle/

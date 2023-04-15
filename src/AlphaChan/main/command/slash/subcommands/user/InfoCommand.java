@@ -72,8 +72,10 @@ public class InfoCommand extends SlashSubcommand {
                 + user.getPoint(PointType.EXP) + "\\" + user.getLevelCap() + ")" + //
                 "\n<?command.total_exp>: " + user.getTotalPoint(), false);
 
-        builder.addField("<?command.point>", "<?command.total_money>: " + user.getPoint(PointType.MONEY) + "\n<?command.total_pvp_point>: "
-                + user.getPoint(PointType.PVP_POINT), false);
+        builder.addField("<?command.point>",
+                "<?command.total_money>: " + user.getPoint(PointType.MONEY) + "\n<?command.total_pvp_point>: "
+                        + user.getPoint(PointType.PVP_POINT),
+                false);
 
         builder.setColor(Color.BLUE);
 
