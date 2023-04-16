@@ -175,7 +175,7 @@ public final class MessageHandler extends ListenerAdapter {
 
         List<TextChannel> botLogChannel = guildData.getChannels(ChannelType.BOT_LOG);
         if (botLogChannel == null) {
-            Log.error("Bot log channel for guild <" + guild.getName() + "> does not exists");
+            Log.error("Bot log channel for guild [" + guild.getName() + "] does not exists");
 
         } else
             botLogChannel.forEach(c -> c.sendMessage("```" + content + "```").queue());
@@ -187,7 +187,7 @@ public final class MessageHandler extends ListenerAdapter {
         String channelName = channel == null ? "Unknown" : channel.getName();
         String memberName = member == null ? "Unknown" : member.getEffectiveName();
 
-        return "[" + guildName + "] " + "<" + categoryName + ":" + channelName + "> " + memberName;
+        return "[" + guildName + "] " + "[" + categoryName + ":" + channelName + "] " + memberName;
     }
 
     public static String getMessageSender(Message message) {

@@ -44,7 +44,7 @@ public class GuildCache extends TimeObject implements DatabaseObject {
 
         if (guild == null) {
             kill();
-            throw new IllegalStateException("Guild not found with id <" + data.getGuildId() + ">");
+            throw new IllegalStateException("Guild not found with id [" + data.getGuildId() + "]");
         }
 
         return guild;
@@ -110,12 +110,12 @@ public class GuildCache extends TimeObject implements DatabaseObject {
     }
 
     // Update guild on Database
-    @Override
-    public void update() {
+    public void update(Runnable cacheCleaner) {
         if (isAlive()) {
             String guildCollectionName = BotConfig.readString(Config.GUILD_COLLECTION, null);
             Bson filter = new Document().append("guildId", data.getGuildId());
-            DatabaseHandler.update(Database.GUILD, guildCollectionName, GuildData.class, filter, data);
+            DatabaseHandler.updateAndFinish(Database.GUILD, guildCollectionName, GuildData.class, filter, data,
+                    cacheCleaner);
         }
     }
 

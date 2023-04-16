@@ -1,97 +1,59 @@
 package AlphaChan.main.util;
 
+import AlphaChan.main.ui.Console;
+
+import javafx.application.Platform;
+import javafx.scene.paint.Color;
+
 public class Log {
-
-    public enum TextColor {
-        RESET("\033[0m"),
-
-        BLACK("\033[0;30m"), //
-        GREEN("\u001B[32m"), //
-        RED("\u001B[31m"), //
-        YELLOW("\u001B[33m"), //
-        BLUE("\u001B[34m"), //
-        MAGENTA("\033[0;35m"), //
-        CYAN("\033[0;36m"), //
-        WHITE("\033[0;37m"),
-
-        BLACK_UNDERLINED("\033[4;30m"), //
-        RED_UNDERLINED("\033[4;31m"), //
-        GREEN_UNDERLINED("\033[4;32m"), //
-        YELLOW_UNDERLINED("\033[4;33m"), //
-        BLUE_UNDERLINED("\033[4;34m"), //
-        MAGENTA_UNDERLINED("\033[4;35m"), //
-        CYAN_UNDERLINED("\033[4;36m"), //
-        WHITE_UNDERLINED("\033[4;37m"),
-
-        BLACK_BACKGROUND("\033[40m"), //
-        RED_BACKGROUND("\033[41m"), //
-        GREEN_BACKGROUND("\033[42m"), //
-        YELLOW_BACKGROUND("\033[43m"), //
-        BLUE_BACKGROUND("\033[44m"), //
-        MAGENTA_BACKGROUND("\033[45m"), //
-        CYAN_BACKGROUND("\033[46m"), //
-        WHITE_BACKGROUND("\033[47m");
-
-        private final String color;
-
-        TextColor(String color) {
-            this.color = color;
-        }
-
-        @Override
-        public String toString() {
-            return this.color;
-        }
-    }
 
     private static String logHeader = new String();
 
-    public static void print(String logHeader, Object content, TextColor... colors) {
-        if (!logHeader.equals(Log.logHeader)) {
-            Log.logHeader = logHeader;
-            System.out.println();
-        }
+    public static void print(String logHeader, Object content, Color color) {
+        Platform.runLater(() -> {
+            if (!logHeader.equals(Log.logHeader)) {
+                Log.logHeader = logHeader;
+                Console.appendLine(color, "");
+            }
 
-        StringBuilder builder = new StringBuilder();
-        for (TextColor color : colors) {
-            builder.append(color);
-        }
-
-        System.out.println(builder.toString() + "<" + logHeader + "> " + content + TextColor.MAGENTA);
+            Console.appendLine(color, "[" + logHeader + "] " + content);
+        });
     }
 
-    public static void print(String logHeader, Exception e, TextColor... colors) {
+    public static void print(Object content, Color color) {
+        Platform.runLater(() -> {
+            Console.appendLine(color, content.toString());
+        });
+    }
+
+    public static void print(String logHeader, Object content) {
+        print(logHeader, content, Color.WHITE);
+    }
+
+    public static void error(Exception e) {
         StringBuilder builder = new StringBuilder();
 
         builder.append(e.getMessage() + "\n");
         for (StackTraceElement ste : e.getStackTrace()) {
             builder.append("\t" + ste.toString() + "\n");
         }
+        print("ERROR", builder.toString(), Color.RED);
 
-        print(logHeader, builder.toString(), colors);
     }
 
     public static void error(Object content) {
-        print("ERROR", content, TextColor.RED);
-    }
-
-    public static void error(Exception e) {
-        print("ERROR", e, TextColor.RED);
+        print("ERROR", content, Color.web("#DB2D20"));
     }
 
     public static void warning(Object content) {
-        print("WARNING", content, TextColor.YELLOW);
+        print("WARNING", content, Color.web("#FDED02"));
     }
 
     public static void system(Object content) {
-        print("SYSTEM", content, TextColor.BLUE);
+        print("SYSTEM", content, Color.web("#01A0E4"));
     }
 
     public static void info(String logHeader, Object content) {
-        print(logHeader, content, TextColor.GREEN);
-    }
-
-    public static void print(String logHeader, Object content) {
-        print(logHeader, content, TextColor.RESET);
+        print(logHeader, content, Color.GREEN);
     }
 }

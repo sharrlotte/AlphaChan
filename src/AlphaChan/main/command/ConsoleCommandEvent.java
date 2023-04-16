@@ -1,15 +1,21 @@
 package AlphaChan.main.command;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 public class ConsoleCommandEvent {
 
-    private List<String> arguments;
-    private int index = 0;
+    private final String name;
+    private final HashMap<String, String> optionMap;
 
-    public ConsoleCommandEvent(String command) {
-        arguments = new ArrayList<>();
+    private ConsoleCommandEvent(String name, HashMap<String, String> optionMap) {
+        this.name = name;
+        this.optionMap = optionMap;
+    }
+
+    public static ConsoleCommandEvent parseCommand(String command) {
+        List<String> arguments = new ArrayList<>();
         StringBuilder string = new StringBuilder();
         for (int i = 0; i < command.length(); i++) {
 
@@ -44,32 +50,42 @@ public class ConsoleCommandEvent {
                 string.append(command.charAt(i));
         }
         arguments.add(string.toString());
+        String name = arguments.get(0);
+        arguments.remove(0);
+
+        HashMap<String, String> option = new HashMap<>();
+        for (String argument : arguments) {
+            String[] kv = argument.split(":");
+            if (kv.length == 2) {
+                // Put option name and value
+                option.put(kv[0], kv[1]);
+            }
+        }
+
+        return new ConsoleCommandEvent(name, option);
     }
 
-    public List<String> getArguments() {
-        return arguments;
+    public String getCommandName() {
+        return name;
     }
 
-    public int getArgumentCount() {
-        return arguments.size() - 1;
+    public boolean hasOption(String option) {
+        return optionMap.containsKey(option);
     }
 
-    public String getName() {
-        return arguments.get(0);
+    public String getValue(String option) {
+        return optionMap.get(option);
     }
 
-    public String nextString() {
-        index += 1;
-        return arguments.get(index);
-    }
+    @SuppressWarnings("unchecked")
+    public <T> T getValue(String option, Class<T> clazz) {
+        if (optionMap.containsKey(option))
+            try {
+                return (T) optionMap.get(option);
+            } catch (Exception e) {
+                throw new IllegalArgumentException();
+            }
 
-    public int nextInt() {
-        index += 1;
-        return Integer.parseInt(arguments.get(index));
-    }
-
-    public float nextFloat() {
-        index += 1;
-        return Float.parseFloat(arguments.get(index));
+        return null;
     }
 }

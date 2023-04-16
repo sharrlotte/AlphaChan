@@ -16,7 +16,6 @@ import net.dv8tion.jda.api.utils.TimeFormat;
 public class AskCommand extends SlashSubcommand {
 
     private long lastTime = 0;
-    private String chatGPTKey;
     private Boolean hasKey = false;
     private OpenAiService api;
 
@@ -27,7 +26,7 @@ public class AskCommand extends SlashSubcommand {
         super("ask", "<?command.command_ask_bot>");
         addOption(OptionType.STRING, "question", "<?command.question>", true);
 
-        chatGPTKey = BotConfig.readString(Config.CHAT_GPT_TOKEN, "NULL");
+        String chatGPTKey = BotConfig.readString(Config.CHAT_GPT_TOKEN, "NULL");
 
         if (chatGPTKey.isBlank()) {
             throw new IllegalArgumentException("No chat gpt key found on env");
@@ -49,8 +48,10 @@ public class AskCommand extends SlashSubcommand {
         }
 
         if (remain > 0) {
-            MessageHandler.reply(command, "Vui lòng đợi " + TimeFormat.RELATIVE.before(System.currentTimeMillis() + remain).toString() //
-                    + " để sử dụng lệnh", (int) remain);
+            MessageHandler.reply(command,
+                    "Vui lòng đợi " + TimeFormat.RELATIVE.before(System.currentTimeMillis() + remain).toString() //
+                            + " để sử dụng lệnh",
+                    (int) remain);
             return;
         }
 
@@ -72,7 +73,8 @@ public class AskCommand extends SlashSubcommand {
                         .n(1)//
                         .build();//
 
-                MessageHandler.reply(command, text + "\n\n" + api.createCompletion(request).getChoices().get(0).getText(), 1000000);
+                MessageHandler.reply(command,
+                        text + "\n\n" + api.createCompletion(request).getChoices().get(0).getText(), 1000000);
 
                 lastTime = System.currentTimeMillis();
 

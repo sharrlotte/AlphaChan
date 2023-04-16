@@ -17,28 +17,28 @@ public class ShowUserConsole extends ConsoleCommand {
     @Override
     public void runCommand(ConsoleCommandEvent command) {
 
-        if (command.getArgumentCount() == 0) {
-            Log.info("USER STATUS", "Users count: " + UserHandler.getActiveUserCount());
-            for (UserCache ud : UserHandler.getUserCache()) {
-                Log.info("USER STATUS", "\n" + StringUtils.mapToLines(ud.getData().toDocument()) + "\n");
-            }
+        // if (command.getArgumentCount() == 0) {
+        //     Log.info("USER STATUS", "Users count: " + UserHandler.getActiveUserCount());
+        //     for (UserCache ud : UserHandler.getUserCache()) {
+        //         Log.info("USER STATUS", "\n" + StringUtils.mapToLines(ud.getData().toDocument()) + "\n");
+        //     }
 
-        } else if (command.getArgumentCount() == 2) {
-            String guildId = command.nextString();
-            String userId = command.nextString();
-            try {
+        // } else if (command.getArgumentCount() == 2) {
+        //     String guildId = command.nextString();
+        //     String userId = command.nextString();
+        //     try {
 
-                if (guildId == null || userId == null)
-                    throw new IllegalArgumentException();
+        //         if (guildId == null || userId == null)
+        //             throw new IllegalArgumentException();
 
-                UserCache ud = UserHandler.getUserNoCache(guildId, userId);
-                Log.info("USER STATUS", "User id: " + userId + //
-                        "\n" + StringUtils.mapToLines(ud.getData().toDocument()) + "\n");
-            } catch (Exception e) {
-                Log.warning("User with id " + userId + " in guild " + guildId + " not found");
-            }
-        } else {
-            Log.error("Command require [0-1] arguments ");
-        }
+        //         UserCache ud = UserHandler.getUserNoCache(guildId, userId);
+        //         Log.info("USER STATUS", "User id: " + userId + //
+        //                 "\n" + StringUtils.mapToLines(ud.getData().toDocument()) + "\n");
+        //     } catch (Exception e) {
+        //         Log.warning("User with id " + userId + " in guild " + guildId + " not found");
+        //     }
+        // } else {
+        //     Log.error("Command require [0-1] arguments ");
+        // }
     }
 }

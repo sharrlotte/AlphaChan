@@ -59,15 +59,14 @@ public final class UserHandler implements Updatable {
         Iterator<UserCache> iterator = userCache.values().iterator();
         while (iterator.hasNext()) {
             UserCache user = iterator.next();
-            if (user.isAlive(1))
-                continue;
+            if (!user.isAlive(1))
+                try {
+                    user.update(() -> userCache.remove(user.getHashId()));
+                    Log.info("STATUS", "User [" + user.getName() + ":" + user.getData().getUserId() + "] offline");
 
-            try {
-                user.update();
-                Log.info("STATUS", "User <" + user.getName() + ":" + user.getData().getUserId() + "> offline");
-            } finally {
-                iterator.remove();
-            }
+                } catch (Exception e) {
+                    Log.error(e);
+                }
         }
         UpdatableHandler.updateStatus();
     }
@@ -82,7 +81,8 @@ public final class UserHandler implements Updatable {
         while (iterator.hasNext()) {
             UserCache user = iterator.next();
             try {
-                user.update();
+                user.update(() -> {
+                });
             } catch (Exception exception) {
                 Log.error(exception);
             }
@@ -151,7 +151,7 @@ public final class UserHandler implements Updatable {
         UserCache userData = new UserCache(guildId, userId);
         // Key is hashId = guildId + userId
         userCache.put(userData.getHashId(), userData);
-        Log.info("STATUS", "User <" + userData.getName() + ":" + userId + "> online");
+        Log.info("STATUS", "User [" + userData.getName() + ":" + userId + "] online");
         UpdatableHandler.updateStatus();
         return userData;
     }

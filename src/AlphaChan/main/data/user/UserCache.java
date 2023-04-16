@@ -61,7 +61,8 @@ public class UserCache extends TimeObject implements DatabaseObject {
     }
 
     public Integer getTotalPoint() {
-        return ((getPoint(PointType.LEVEL) - 1) * getPoint(PointType.LEVEL) * (2 * (getPoint(PointType.LEVEL) - 1) + 1) / 6)
+        return ((getPoint(PointType.LEVEL) - 1) * getPoint(PointType.LEVEL) * (2 * (getPoint(PointType.LEVEL) - 1) + 1)
+                / 6)
                 + getPoint(PointType.EXP);
     }
 
@@ -70,7 +71,9 @@ public class UserCache extends TimeObject implements DatabaseObject {
         Member member = guild.getMemberById(data.getUserId());
         if (member == null) {
             kill();
-            throw new IllegalStateException("Member not found with id <" + data.getUserId() + ">");
+            throw new IllegalStateException(
+                    "Member not found in guild with id + [" + data.getGuildId() + "] for user with id ["
+                            + data.getUserId() + "]");
         }
         return member;
     }
@@ -79,7 +82,8 @@ public class UserCache extends TimeObject implements DatabaseObject {
         Guild guild = jda.getGuildById(data.getGuildId());
         if (guild == null) {
             kill();
-            throw new IllegalStateException("Guild not found with id + <" + data.getGuildId() + ">");
+            throw new IllegalStateException("Guild not found with id + [" + data.getGuildId() + "] for user with id ["
+                    + data.getUserId() + "]");
         }
         return guild;
     }
@@ -128,7 +132,8 @@ public class UserCache extends TimeObject implements DatabaseObject {
 
     // Add role to member when data.getLevel() is satisfied
     public void checkLevelRole() {
-        ConcurrentHashMap<String, Integer> levelRoleId = GuildHandler.getGuild(data.getGuildId()).getData().getLevelRoleId();
+        ConcurrentHashMap<String, Integer> levelRoleId = GuildHandler.getGuild(data.getGuildId()).getData()
+                .getLevelRoleId();
 
         Guild guild = getGuild();
         Member bot = guild.getSelfMember();
@@ -167,13 +172,16 @@ public class UserCache extends TimeObject implements DatabaseObject {
     }
 
     // Update user on Database
-    public void update() {
+    @Override
+    public void update(Runnable cacheCleaner) {
         if (isAlive()) {
             Bson filter = new Document().append("userId", data.getUserId());
-            DatabaseHandler.update(Database.USER, data.getGuildId(), UserData.class, filter, data);
+            DatabaseHandler.updateAndFinish(Database.USER, data.getGuildId(), UserData.class, filter, data,
+                    cacheCleaner);
         }
     }
 
+    @Override
     public void delete() {
         if (isAlive()) {
             Bson filter = new Document().append("userId", data.getGuildId());

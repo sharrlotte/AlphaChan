@@ -17,26 +17,26 @@ public class ShowGuildConsole extends ConsoleCommand {
     @Override
     public void runCommand(ConsoleCommandEvent command) {
 
-        if (command.getArgumentCount() == 0) {
-            Log.info("GUILD STATUS", "Guild counts: " + GuildHandler.getActiveGuildCount());
-            for (GuildCache gd : GuildHandler.getGuildCache()) {
-                Log.info("GUILD STATUS","\n" + StringUtils.mapToLines(gd.getData().toDocument()) + "\n");
-            }
-        } else if (command.getArgumentCount() == 1) {
-            String guildId = command.nextString();
-            try {
+        // if (command.getArgumentCount() == 0) {
+        //     Log.info("GUILD STATUS", "Guild counts: " + GuildHandler.getActiveGuildCount());
+        //     for (GuildCache gd : GuildHandler.getGuildCache()) {
+        //         Log.info("GUILD STATUS","\n" + StringUtils.mapToLines(gd.getData().toDocument()) + "\n");
+        //     }
+        // } else if (command.getArgumentCount() == 1) {
+        //     String guildId = command.nextString();
+        //     try {
 
-                if (guildId == null)
-                    throw new IllegalArgumentException();
+        //         if (guildId == null)
+        //             throw new IllegalArgumentException();
 
-                GuildCache gd = GuildHandler.getGuild(guildId);
-                Log.info("GUILD STATUS", "Guild id: " + guildId + //
-                        "\n" + StringUtils.mapToLines(gd.getData().toDocument()) + "\n");
-            } catch (Exception e) {
-                Log.warning("Guild with id " + guildId + " not found");
-            }
-        } else {
-            Log.error("Command require {0,2} arguments ");
-        }
+        //         GuildCache gd = GuildHandler.getGuild(guildId);
+        //         Log.info("GUILD STATUS", "Guild id: " + guildId + //
+        //                 "\n" + StringUtils.mapToLines(gd.getData().toDocument()) + "\n");
+        //     } catch (Exception e) {
+        //         Log.warning("Guild with id " + guildId + " not found");
+        //     }
+        // } else {
+        //     Log.error("Command require {0,2} arguments ");
+        // }
     }
 }

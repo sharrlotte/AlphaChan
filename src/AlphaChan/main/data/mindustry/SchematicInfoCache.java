@@ -27,7 +27,6 @@ public class SchematicInfoCache extends TimeObject implements DatabaseObject {
 
         long like = DatabaseHandler.count(Database.LIKE, data.getId(), DislikeData.class, null);
         getData().setLike(like);
-        update();
 
         // Create collection if it's not exist
         return DatabaseHandler.count(Database.LIKE, data.getId(), DislikeData.class, null);
@@ -42,8 +41,6 @@ public class SchematicInfoCache extends TimeObject implements DatabaseObject {
         if (result == true)
             data.setLike(data.getLike() + 1);
 
-        update();
-
         return result;
     }
 
@@ -54,7 +51,6 @@ public class SchematicInfoCache extends TimeObject implements DatabaseObject {
 
         long dislike = DatabaseHandler.count(Database.DISLIKE, data.getId(), LikeData.class, null);
         getData().setDislike(dislike);
-        update();
 
         return dislike;
     }
@@ -68,12 +64,11 @@ public class SchematicInfoCache extends TimeObject implements DatabaseObject {
         if (result == true)
             data.setLike(data.getLike() + 1);
 
-        update();
-
         return result;
     }
 
-    public void update() {
+    @Override
+    public void update(Runnable cacheCleaner) {
         if (isAlive()) {
             String schematicInfoCollectionName = BotConfig.readString(Config.SCHEMATIC_INFO_COLLECTION, null);
             Document filter = new Document().append("_id", data.getId());
@@ -81,6 +76,7 @@ public class SchematicInfoCache extends TimeObject implements DatabaseObject {
         }
     }
 
+    @Override
     public void delete() {
         if (isAlive()) {
             String schematicInfoCollectionName = BotConfig.readString(Config.SCHEMATIC_INFO_COLLECTION, null);

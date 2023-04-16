@@ -12,6 +12,7 @@ import AlphaChan.main.handler.ServerStatusHandler;
 import AlphaChan.main.handler.TableHandler;
 import AlphaChan.main.handler.UpdatableHandler;
 import AlphaChan.main.handler.UserHandler;
+import AlphaChan.main.ui.Console;
 import AlphaChan.main.util.Log;
 
 import net.dv8tion.jda.api.JDA;
@@ -19,6 +20,8 @@ import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.utils.MemberCachePolicy;
 import net.dv8tion.jda.api.utils.cache.CacheFlag;
+
+import javafx.application.Application;
 
 public class AlphaChan {
 
@@ -28,6 +31,7 @@ public class AlphaChan {
 
     public AlphaChan() {
         try {
+            UpdatableHandler.run("Console", 0, () -> Application.launch(Console.class));
 
             Log.system("Bot awaking");
 
@@ -38,10 +42,15 @@ public class AlphaChan {
             String TOKEN = System.getenv("DISCORD_BOT_TOKEN");
 
             jda = JDABuilder.createDefault(TOKEN, //
-                    GatewayIntent.GUILD_MESSAGES, GatewayIntent.MESSAGE_CONTENT,
-                    GatewayIntent.GUILD_EMOJIS_AND_STICKERS,
-                    GatewayIntent.GUILD_MEMBERS, GatewayIntent.GUILD_PRESENCES, GatewayIntent.GUILD_MESSAGE_REACTIONS,
-                    GatewayIntent.GUILD_VOICE_STATES, GatewayIntent.GUILD_MODERATION, GatewayIntent.GUILD_INVITES)
+                    GatewayIntent.GUILD_MESSAGES, //
+                    GatewayIntent.MESSAGE_CONTENT, //
+                    GatewayIntent.GUILD_MESSAGE_REACTIONS, //
+                    GatewayIntent.GUILD_EMOJIS_AND_STICKERS, //
+                    GatewayIntent.GUILD_MEMBERS, //
+                    GatewayIntent.GUILD_PRESENCES, //
+                    GatewayIntent.GUILD_VOICE_STATES, //
+                    GatewayIntent.GUILD_MODERATION, //
+                    GatewayIntent.GUILD_INVITES)
 
                     .enableCache(CacheFlag.VOICE_STATE).setMemberCachePolicy(MemberCachePolicy.ALL).build();
             jda.awaitReady();
@@ -74,7 +83,6 @@ public class AlphaChan {
             onShutdown.emit(0);
 
         } finally {
-            Log.system("Bot shutdown");
             System.exit(0);
         }
     }

@@ -5,8 +5,10 @@ import static org.bson.codecs.configuration.CodecRegistries.fromProviders;
 import static org.bson.codecs.configuration.CodecRegistries.fromRegistries;
 
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
 import org.bson.BsonDateTime;
@@ -27,6 +29,7 @@ import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoCursor;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.ReplaceOptions;
+import com.mongodb.client.result.UpdateResult;
 
 import AlphaChan.BotConfig;
 import AlphaChan.BotConfig.Config;
@@ -61,6 +64,7 @@ public final class DatabaseHandler {
 
     private static ExecutorService logExecutor = Executors.newSingleThreadExecutor();
     private static ExecutorService taskExecutor = Executors.newSingleThreadExecutor();
+    private static ExecutorService finisherExecutor = Executors.newSingleThreadExecutor();
 
     private DatabaseHandler() {
 
@@ -117,10 +121,29 @@ public final class DatabaseHandler {
         return true;
     }
 
-    public static <T> void update(Database databaseName, final String collectionName, Class<T> type, Bson filter,
+    public static <T> Future<UpdateResult> update(Database databaseName, final String collectionName, Class<T> type,
+            Bson filter,
             T value) {
         MongoCollection<T> collection = getCollection(databaseName, collectionName, type);
-        taskExecutor.submit(() -> collection.replaceOne(filter, value, new ReplaceOptions().upsert(true)));
+        return taskExecutor.submit(() -> collection.replaceOne(filter, value, new ReplaceOptions().upsert(true)));
+    }
+
+    public static <T> void updateAndFinish(Database databaseName, final String collectionName, Class<T> type,
+            Bson filter,
+            T value, Runnable taskAfterFinish) {
+        MongoCollection<T> collection = getCollection(databaseName, collectionName, type);
+
+        finisherExecutor.submit(() -> {
+            try {
+                taskExecutor.submit(() -> collection.replaceOne(filter, value, new ReplaceOptions().upsert(true)))
+                        .get();
+            } catch (InterruptedException | ExecutionException e) {
+                Log.error(e);
+
+            } finally {
+                UpdatableHandler.addCacheCleaner(taskAfterFinish);
+            }
+        });
     }
 
     public static <T> void delete(Database databaseName, final String collectionName, Class<T> type, Bson filter) {

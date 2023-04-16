@@ -54,10 +54,9 @@ public class GuildHandler implements Updatable {
             GuildCache guild = iterator.next();
             if (!guild.isAlive(1)) {
                 Log.info("STATUS",
-                        "Guild <" + guild.getGuild().getName() + ":" + guild.getGuild().getId() + "> offline");
+                        "Guild [" + guild.getGuild().getName() + ":" + guild.getGuild().getId() + "] offline");
                 UpdatableHandler.updateStatus();
-                guild.update();
-                iterator.remove();
+                guild.update(() -> guildCaches.remove(guild.getData().getGuildId()));
             }
         }
     }
@@ -72,7 +71,8 @@ public class GuildHandler implements Updatable {
         Iterator<GuildCache> iterator = guildCaches.values().iterator();
         while (iterator.hasNext()) {
             GuildCache guild = iterator.next();
-            guild.update();
+            guild.update(() -> {
+            });
         }
     }
 
@@ -124,13 +124,13 @@ public class GuildHandler implements Updatable {
 
         if (first != null) {
             cache = new GuildCache(first);
-            Log.info("STATUS", "Guild <" + cache.getGuild().getName() + ":" + guildId + "> online");
+            Log.info("STATUS", "Guild [" + cache.getGuild().getName() + ":" + guildId + "] online");
             guildCaches.put(guildId, cache);
             return cache;
 
         } else {
             cache = addGuild(guildId);
-            Log.info("STATUS", "New guild <" + cache.getGuild().getName() + ":" + guildId + "> online");
+            Log.info("STATUS", "New guild [" + cache.getGuild().getName() + ":" + guildId + "] online");
             return cache;
         }
     }

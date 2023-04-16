@@ -1,6 +1,8 @@
 package AlphaChan.main.handler;
 
 import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -17,11 +19,10 @@ public final class UpdatableHandler {
 
     private static UpdatableHandler instance = new UpdatableHandler();
     private static List<Updatable> listeners = new ArrayList<>();
+    private static LinkedList<Runnable> cacheCleaners = new LinkedList<>();
 
     private UpdatableHandler() {
         run("UPDATE", 0, BotConfig.readInt(Config.UPDATE_PERIOD, 10), () -> update());
-
-        Log.system("Updatable handler up");
     }
 
     public synchronized static UpdatableHandler getInstance() {
@@ -34,12 +35,24 @@ public final class UpdatableHandler {
         listeners.add(listener);
     }
 
+    public static void addCacheCleaner(Runnable cleaner) {
+        cacheCleaners.add(cleaner);
+    }
+
     private static void update() {
 
         // ServerStatusHandler.update();
         try {
             for (Updatable listener : listeners)
                 listener.update();
+
+            // Clean cache
+            Iterator<Runnable> it = cacheCleaners.iterator();
+            while (it.hasNext()) {
+                Runnable r = it.next();
+                r.run();
+                it.remove();
+            }
 
             updateStatus();
 
@@ -53,7 +66,8 @@ public final class UpdatableHandler {
             return;
 
         jda.getPresence().setActivity(Activity
-                .playing("with " + GuildHandler.getActiveGuildCount() + " servers | " + UserHandler.getActiveUserCount() + " users"));
+                .playing("with " + GuildHandler.getActiveGuildCount() + " servers | " + UserHandler.getActiveUserCount()
+                        + " users"));
     }
 
     public static void run(String name, long delay, long period, Runnable r) {

@@ -22,7 +22,7 @@ import AlphaChan.main.command.slash.MindustryCommand;
 import AlphaChan.main.command.slash.MusicCommand;
 import AlphaChan.main.command.slash.UserCommand;
 import AlphaChan.main.command.slash.YuiCommand;
-
+import AlphaChan.main.ui.Console;
 import AlphaChan.main.util.Log;
 import AlphaChan.main.util.StringUtils;
 
@@ -164,7 +164,8 @@ public class CommandHandler {
                             + event.getSubcommandName() + " " + event.getOptions().toString());
                     // Send to discord log channel
                     if (!command.equals("yui")) {
-                        MessageHandler.log(guild, member.getEffectiveName() + " đã sử dụng " + command + " " + event.getSubcommandName());
+                        MessageHandler.log(guild,
+                                member.getEffectiveName() + " đã sử dụng " + command + " " + event.getSubcommandName());
                     }
                 }
 
@@ -177,9 +178,6 @@ public class CommandHandler {
 
     public class ConsoleCommandHandler {
 
-        private static boolean isRunning = true;
-
-        private static String command = new String();
         private static final String SEPARATOR = " ";
 
         private static HashMap<String, ConsoleCommand> consoleCommands;
@@ -197,7 +195,8 @@ public class CommandHandler {
             addCommand(new SaveConfigConsole());
             addCommand(new ShutdownConsole());
 
-            UpdatableHandler.run("CONSOLE", 0, () -> run());
+            Console.onInputAccepted.connect((content) -> runCommand(content));
+
             Log.system("Console command handler up");
         }
 
@@ -211,18 +210,6 @@ public class CommandHandler {
 
         public static void addCommand(ConsoleCommand command) {
             consoleCommands.put(command.getName(), command);
-        }
-
-        public static void run() {
-            isRunning = true;
-            while (isRunning) {
-                command = System.console().readLine();
-                runCommand(command);
-            }
-        }
-
-        public static void kill() {
-            isRunning = false;
         }
 
         public static void runCommand(String command) {
@@ -240,7 +227,7 @@ public class CommandHandler {
             String[] field = command.split(SEPARATOR);
 
             if (consoleCommands.containsKey(field[0])) {
-                consoleCommands.get(field[0]).onCommand(new ConsoleCommandEvent(command));
+                consoleCommands.get(field[0]).onCommand(ConsoleCommandEvent.parseCommand(command));
 
             } else {
 
@@ -301,10 +288,10 @@ public class CommandHandler {
             if (member == null)
                 return;
 
-
             if (contextCommands.containsKey(command)) {
                 contextCommands.get(command).onCommand(event);
-                Log.info("INTERACTION", MessageHandler.getMessageSender(event.getTarget()) + ": used " + event.getName());
+                Log.info("INTERACTION",
+                        MessageHandler.getMessageSender(event.getTarget()) + ": used " + event.getName());
             }
 
         }

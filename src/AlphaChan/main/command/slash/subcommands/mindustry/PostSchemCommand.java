@@ -91,7 +91,8 @@ public class PostSchemCommand extends SlashSubcommand {
                     return;
                 }
 
-                MongoCollection<SchematicData> collection = DatabaseHandler.getCollection(Database.MINDUSTRY, schematicDataCollectionName,
+                MongoCollection<SchematicData> collection = DatabaseHandler.getCollection(Database.MINDUSTRY,
+                        schematicDataCollectionName,
                         SchematicData.class);
 
                 Bson filter = new Document().append("data", data);
@@ -103,8 +104,10 @@ public class PostSchemCommand extends SlashSubcommand {
                 }
 
                 String uuid = UUID.randomUUID().toString();
-                new SchematicCache(new SchematicData(uuid, data)).update();
-                new SchematicInfoCache(new SchematicInfo(uuid, member.getId(), tag)).update();
+                new SchematicCache(new SchematicData(uuid, data)).update(() -> {
+                });
+                new SchematicInfoCache(new SchematicInfo(uuid, member.getId(), tag)).update(() -> {
+                });
 
                 if (previewOption != null && previewOption.getAsBoolean() == true)
                     MessageHandler.sendSchematicPreview(event);
@@ -125,7 +128,8 @@ public class PostSchemCommand extends SlashSubcommand {
                     return;
                 }
 
-                MongoCollection<SchematicData> collection = DatabaseHandler.getCollection(Database.MINDUSTRY, schematicDataCollectionName,
+                MongoCollection<SchematicData> collection = DatabaseHandler.getCollection(Database.MINDUSTRY,
+                        schematicDataCollectionName,
                         SchematicData.class);
 
                 Bson filter = new Document().append("data", data);
@@ -137,8 +141,10 @@ public class PostSchemCommand extends SlashSubcommand {
                 }
 
                 String uuid = UUID.randomUUID().toString();
-                new SchematicCache(new SchematicData(uuid, data)).update();
-                new SchematicInfoCache(new SchematicInfo(uuid, member.getId(), tag)).update();
+                new SchematicCache(new SchematicData(uuid, data)).update(() -> {
+                });
+                new SchematicInfoCache(new SchematicInfo(uuid, member.getId(), tag)).update(() -> {
+                });
 
                 if (previewOption != null && previewOption.getAsBoolean() == true)
                     MessageHandler.sendSchematicPreview(event);

@@ -4,6 +4,8 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
+import javafx.scene.paint.Color;
+
 public class StringUtils {
 
     public static String toTime(long duration) {
@@ -14,7 +16,8 @@ public class StringUtils {
         seconds %= 60 * 60;
         long minutes = seconds / 60;
         seconds %= 60;
-        return (hours > 0 ? hours + ":" : "") + (minutes < 10 ? "0" + minutes : minutes) + ":" + (seconds < 10 ? "0" + seconds : seconds);
+        return (hours > 0 ? hours + ":" : "") + (minutes < 10 ? "0" + minutes : minutes) + ":"
+                + (seconds < 10 ? "0" + seconds : seconds);
     }
 
     public static String getProgressBar(double percent, int barLength, String mark, String head, String tail) {
@@ -100,5 +103,16 @@ public class StringUtils {
     public static String capitalize(String str) {
         str = str.toLowerCase();
         return str.substring(0, 1).toUpperCase() + str.substring(1);
+    }
+
+    private static String format(double val) {
+        String in = Integer.toHexString((int) Math.round(val * 255));
+        return in.length() == 1 ? "0" + in : in;
+    }
+
+    public static String toHexString(Color value) {
+        return "#" + (format(value.getRed()) + format(value.getGreen()) + format(value.getBlue())
+                + format(value.getOpacity()))
+                .toUpperCase();
     }
 }
