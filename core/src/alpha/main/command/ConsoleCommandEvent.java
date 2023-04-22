@@ -18,6 +18,11 @@ public class ConsoleCommandEvent {
         this.optionMap = optionMap;
     }
 
+    protected ConsoleCommandEvent(ConsoleCommandEvent event) {
+        this.name = event.name;
+        this.optionMap = event.optionMap;
+    }
+
     public static ConsoleCommandEvent parseCommand(String command) {
 
         Matcher nameMatcher = COMMAND_NAME_PATTERN.matcher(command);

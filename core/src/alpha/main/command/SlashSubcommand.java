@@ -55,7 +55,9 @@ public abstract class SlashSubcommand extends SubcommandData {
     }
 
     // Override
-    public void onCommand(SlashCommandInteractionEvent event) {
+    public abstract void onCommand(SlashCommandInteractionEvent event);
+
+    public void runCommand(SlashCommandInteractionEvent event) {
         if (updateMessage)
             MessageHandler.replyTranslate(event.getHook(), StringUtils.backtick("<command.updating>[Updating]"), 60);
 
@@ -66,7 +68,6 @@ public abstract class SlashSubcommand extends SubcommandData {
     }
 
     // Override
-    public abstract void runCommand(SlashCommandInteractionEvent command);
 
     // Override
     public void onAutoComplete(CommandAutoCompleteInteractionEvent event) {

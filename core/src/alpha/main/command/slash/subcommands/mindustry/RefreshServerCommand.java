@@ -11,7 +11,7 @@ public class RefreshServerCommand extends SlashSubcommand {
     }
 
     @Override
-    public void runCommand(SlashCommandInteractionEvent event) {
+    public void onCommand(SlashCommandInteractionEvent event) {
         ServerStatusHandler.refreshServerStat(event.getGuild(), event.getMessageChannel());
         MessageHandler.replyTranslate(event.getHook(),
                 "<command.mindustry_server_refreshed>[Mindustry server list refreshed]", 10);

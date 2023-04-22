@@ -12,7 +12,7 @@ public class PingCommand extends SlashSubcommand {
     }
 
     @Override
-    public void runCommand(SlashCommandInteractionEvent event) {
+    public void onCommand(SlashCommandInteractionEvent event) {
         long ping = event.getJDA().getGatewayPing();
 
         MessageHandler.reply(event.getHook(), StringUtils.backtick("Ping: " + ping + "ms"), 10);

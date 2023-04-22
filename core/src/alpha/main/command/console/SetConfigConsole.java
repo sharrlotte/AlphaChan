@@ -16,7 +16,7 @@ public class SetConfigConsole extends ConsoleCommand {
     }
 
     @Override
-    public void runCommand(ConsoleCommandEvent event) {
+    public void onCommand(ConsoleCommandEvent event) {
 
         String key = event.getOption("key");
         String value = event.getOption("value");

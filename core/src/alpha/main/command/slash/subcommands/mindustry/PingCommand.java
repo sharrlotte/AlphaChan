@@ -17,7 +17,7 @@ public class PingCommand extends SlashSubcommand {
     }
 
     @Override
-    public void runCommand(SlashCommandInteractionEvent event) {
+    public void onCommand(SlashCommandInteractionEvent event) {
         OptionMapping ipOption = event.getOption("ip");
         if (ipOption == null)
             return;

@@ -12,7 +12,7 @@ public class SaveConfigConsole extends ConsoleCommand {
     }
 
     @Override
-    public void runCommand(ConsoleCommandEvent event) {
+    public void onCommand(ConsoleCommandEvent event) {
         BotConfig.save();
         Log.system("Config saved");
     }

@@ -12,7 +12,7 @@ public class ReloadSlashCommandConsole extends ConsoleCommand {
     }
 
     @Override
-    public void runCommand(ConsoleCommandEvent event) {
+    public void onCommand(ConsoleCommandEvent event) {
         Log.system("Reload slash command");
         CommandHandler.updateCommand();
         Log.system("Slash command reloaded");

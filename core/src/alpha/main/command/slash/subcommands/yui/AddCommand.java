@@ -29,7 +29,7 @@ public class AddCommand extends SlashSubcommand {
     }
 
     @Override
-    public void runCommand(SlashCommandInteractionEvent event) {
+    public void onCommand(SlashCommandInteractionEvent event) {
         OptionMapping typeOption = event.getOption("type");
         if (typeOption == null)
             return;

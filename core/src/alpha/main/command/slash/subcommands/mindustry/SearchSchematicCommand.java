@@ -45,7 +45,7 @@ public class SearchSchematicCommand extends SlashSubcommand {
     }
 
     @Override
-    public void runCommand(SlashCommandInteractionEvent event) {
+    public void onCommand(SlashCommandInteractionEvent event) {
 
         Document filter = new Document();
         OptionMapping tagOption = event.getOption("tag");

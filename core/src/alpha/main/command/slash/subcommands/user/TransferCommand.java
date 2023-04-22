@@ -28,7 +28,7 @@ public class TransferCommand extends SlashSubcommand {
     }
 
     @Override
-    public void runCommand(SlashCommandInteractionEvent event) {
+    public void onCommand(SlashCommandInteractionEvent event) {
         Guild guild = event.getGuild();
         if (guild == null)
             return;

@@ -11,7 +11,7 @@ public class HelpConsole extends ConsoleCommand {
     }
 
     @Override
-    public void runCommand(ConsoleCommandEvent event) {
+    public void onCommand(ConsoleCommandEvent event) {
 
         // if (command.getArgumentCount() == 0) {
         // StringBuilder content = new StringBuilder();

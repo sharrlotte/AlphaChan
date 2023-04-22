@@ -60,10 +60,13 @@ public abstract class ConsoleCommand {
         return options;
     }
 
-    public void onCommand(ConsoleCommandEvent event) {
-        runCommand(event);
+    public void runCommand(ConsoleCommandEvent event) {
+        onCommand(event);
     }
 
-    public abstract void runCommand(ConsoleCommandEvent event);
+    public void onAutoComplete(ConsoleAutoCompleteEvent event) {
 
+    }
+
+    public abstract void onCommand(ConsoleCommandEvent event);
 }

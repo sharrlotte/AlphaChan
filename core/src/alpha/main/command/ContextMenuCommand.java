@@ -19,9 +19,10 @@ public abstract class ContextMenuCommand {
         return this.name;
     }
 
-    public void onCommand(MessageContextInteractionEvent event) {
-        runCommand(event);
+    public abstract void onCommand(MessageContextInteractionEvent event);
+
+    public void runCommand(MessageContextInteractionEvent event) {
+        onCommand(event);
     }
 
-    public abstract void runCommand(MessageContextInteractionEvent event);
 }

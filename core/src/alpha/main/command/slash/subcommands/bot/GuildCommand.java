@@ -31,7 +31,7 @@ public class GuildCommand extends SlashSubcommand {
     }
 
     @Override
-    public void runCommand(SlashCommandInteractionEvent event) {
+    public void onCommand(SlashCommandInteractionEvent event) {
         OptionMapping guildOption = event.getOption("guild");
         if (guildOption == null) {
             // Show all guild

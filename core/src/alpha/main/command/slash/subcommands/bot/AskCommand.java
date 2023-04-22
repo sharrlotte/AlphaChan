@@ -38,7 +38,7 @@ public class AskCommand extends SlashSubcommand {
     }
 
     @Override
-    public void runCommand(SlashCommandInteractionEvent event) {
+    public void onCommand(SlashCommandInteractionEvent event) {
 
         long remain = cooldown + lastTime - System.currentTimeMillis();
 

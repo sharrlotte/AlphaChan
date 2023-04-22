@@ -14,7 +14,7 @@ public class DeleteMessageContextMenu extends ContextMenuCommand {
     }
 
     @Override
-    public void runCommand(MessageContextInteractionEvent event) {
+    public void onCommand(MessageContextInteractionEvent event) {
         Member member = event.getTarget().getMember();
 
         if (member == null)

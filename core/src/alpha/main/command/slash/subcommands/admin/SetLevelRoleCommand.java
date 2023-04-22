@@ -23,7 +23,7 @@ public class SetLevelRoleCommand extends SlashSubcommand {
     }
 
     @Override
-    public void runCommand(SlashCommandInteractionEvent event) {
+    public void onCommand(SlashCommandInteractionEvent event) {
         OptionMapping roleOption = event.getOption("role");
         if (roleOption == null)
             throw new IllegalStateException("Invalid option");

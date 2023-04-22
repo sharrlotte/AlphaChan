@@ -12,7 +12,7 @@ public class UpdateCommand extends SlashSubcommand {
     }
 
     @Override
-    public void runCommand(SlashCommandInteractionEvent event) {
+    public void onCommand(SlashCommandInteractionEvent event) {
         CommandHandler.updateCommand();
         MessageHandler.reply(event.getHook(), StringUtils.backtick("Slash command updated"), 10);
     }

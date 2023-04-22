@@ -15,7 +15,7 @@ public class SkipCommand extends SlashSubcommand {
     }
 
     @Override
-    public void runCommand(SlashCommandInteractionEvent event) {
+    public void onCommand(SlashCommandInteractionEvent event) {
         OptionMapping numberOption = event.getOption("number");
 
         if (numberOption == null)

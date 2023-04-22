@@ -30,7 +30,7 @@ public class LeaderboardCommand extends SlashSubcommand {
     }
 
     @Override
-    public void runCommand(SlashCommandInteractionEvent event) {
+    public void onCommand(SlashCommandInteractionEvent event) {
         Member member = event.getMember();
         if (member == null)
             throw new IllegalStateException("User not in guild");

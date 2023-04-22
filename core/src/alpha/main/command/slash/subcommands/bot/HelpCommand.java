@@ -22,7 +22,7 @@ public class HelpCommand extends SlashSubcommand {
     }
 
     @Override
-    public void runCommand(SlashCommandInteractionEvent event) {
+    public void onCommand(SlashCommandInteractionEvent event) {
         OptionMapping commandOption = event.getOption("command");
         if (commandOption == null)
             return;

@@ -15,7 +15,7 @@ public class SetVolumeCommand extends SlashSubcommand {
     }
 
     @Override
-    public void runCommand(SlashCommandInteractionEvent event) {
+    public void onCommand(SlashCommandInteractionEvent event) {
         OptionMapping volumeOption = event.getOption("volume");
 
         if (volumeOption == null)

@@ -11,7 +11,7 @@ public class PostMapContextMenu extends ContextMenuCommand {
     }
 
     @Override
-    public void runCommand(MessageContextInteractionEvent event) {
+    public void onCommand(MessageContextInteractionEvent event) {
         MessageHandler.sendMapPreview(event.getTarget(), event.getChannel());
         event.getHook().deleteOriginal().queue();
     }

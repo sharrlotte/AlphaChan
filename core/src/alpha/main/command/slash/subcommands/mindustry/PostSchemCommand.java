@@ -52,7 +52,7 @@ public class PostSchemCommand extends SlashSubcommand {
     }
 
     @Override
-    public void runCommand(SlashCommandInteractionEvent event) {
+    public void onCommand(SlashCommandInteractionEvent event) {
         OptionMapping fileOption = event.getOption("schematicfile");
         OptionMapping textOption = event.getOption("text");
 

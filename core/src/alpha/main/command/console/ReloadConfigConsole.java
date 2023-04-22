@@ -12,7 +12,7 @@ public class ReloadConfigConsole extends ConsoleCommand {
     }
 
     @Override
-    public void runCommand(ConsoleCommandEvent event) {
+    public void onCommand(ConsoleCommandEvent event) {
         BotConfig.load();
         Log.system("Bot config: " + BotConfig.getProperties().toString());
 

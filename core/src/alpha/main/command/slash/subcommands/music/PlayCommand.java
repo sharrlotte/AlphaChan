@@ -31,7 +31,7 @@ public class PlayCommand extends SlashSubcommand {
     }
 
     @Override
-    public void runCommand(SlashCommandInteractionEvent event) {
+    public void onCommand(SlashCommandInteractionEvent event) {
 
         OptionMapping sourceOption = event.getOption("source");
 

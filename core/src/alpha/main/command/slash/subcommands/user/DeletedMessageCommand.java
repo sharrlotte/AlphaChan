@@ -35,7 +35,7 @@ public class DeletedMessageCommand extends SlashSubcommand {
     }
 
     @Override
-    public void runCommand(SlashCommandInteractionEvent event) {
+    public void onCommand(SlashCommandInteractionEvent event) {
         OptionMapping userOption = event.getOption("user");
         OptionMapping amountOption = event.getOption("amount");
 

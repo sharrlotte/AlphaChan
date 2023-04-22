@@ -10,7 +10,7 @@ public class PostSchemContextMenu extends ContextMenuCommand {
     }
 
     @Override
-    public void runCommand(MessageContextInteractionEvent event) {
+    public void onCommand(MessageContextInteractionEvent event) {
         MessageHandler.sendSchematicPreview(event.getTarget());
         event.getHook().deleteOriginal().queue();
     }

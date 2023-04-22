@@ -13,7 +13,7 @@ public class ShowConfigConsole extends ConsoleCommand {
     }
 
     @Override
-    public void runCommand(ConsoleCommandEvent event) {
+    public void onCommand(ConsoleCommandEvent event) {
         Log.system("\nBot config: " + StringUtils.mapToLines(BotConfig.getProperties()));
 
     }
