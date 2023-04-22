@@ -37,9 +37,9 @@ public class SearchSchematicCommand extends SlashSubcommand {
 
     public SearchSchematicCommand() {
         super("searchschematic", "<command.command_search_schematic>[Search for a schematic]", true, false);
-        addOption(OptionType.STRING, "tag", "<command.schematic_tag>[Schematic tag]", false, true);
-        addOption(OptionType.USER, "user", "<command.schematic_author>[Schematic author]");
-        addOption(OptionType.BOOLEAN, "own",
+        addCommandOption(OptionType.STRING, "tag", "<command.schematic_tag>[Schematic tag]", false, true);
+        addCommandOption(OptionType.USER, "user", "<command.schematic_author>[Schematic author]");
+        addCommandOption(OptionType.BOOLEAN, "own",
                 "<command.prevent_other_interact>[Make others can't interact with your table]");
 
     }

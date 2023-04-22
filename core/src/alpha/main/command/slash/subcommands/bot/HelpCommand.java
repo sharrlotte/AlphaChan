@@ -17,8 +17,8 @@ import alpha.main.util.StringUtils;
 public class HelpCommand extends SlashSubcommand {
     public HelpCommand() {
         super("help", "<command.command_help>[Help command]");
-        addOption(OptionType.STRING, "command", "<command.command_name>[Command name]", false, true);
-        addOption(OptionType.STRING, "subcommand", "<command.subcommand_name>[Subcommand name]", false, true);
+        addCommandOption(OptionType.STRING, "command", "<command.command_name>[Command name]", false, true);
+        addCommandOption(OptionType.STRING, "subcommand", "<command.subcommand_name>[Subcommand name]", false, true);
     }
 
     @Override
@@ -38,7 +38,8 @@ public class HelpCommand extends SlashSubcommand {
                     60);
         else
             MessageHandler.reply(event.getHook(), LocaleManager.format(event.getGuild(),
-                    "<command.command_not_exist>[/%s %s doesn't exists]", command, subcommand), 10);
+                    StringUtils.backtick("<command.command_not_exist>[/%s %s doesn't exists]"), command, subcommand),
+                    10);
     }
 
     @Override

@@ -11,7 +11,7 @@ public class SkipCommand extends SlashSubcommand {
 
     public SkipCommand() {
         super("skip", "<command.command_music_skip>[Skip some song]");
-        addOption(OptionType.INTEGER, "number", "<command.number>[Number of song to skip]", true);
+        addCommandOption(OptionType.INTEGER, "number", "<command.number>[Number of song to skip]", true);
     }
 
     @Override

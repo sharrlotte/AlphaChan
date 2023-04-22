@@ -11,8 +11,8 @@ public class SetConfigConsole extends ConsoleCommand {
 
     public SetConfigConsole() {
         super("set-config", "Set bot configure");
-        addOption("key", OptionType.STRING, "Key");
-        addOption("value", OptionType.STRING, "Value");
+        addCommandOption("key", OptionType.STRING, "Key");
+        addCommandOption("value", OptionType.STRING, "Value");
     }
 
     @Override

@@ -11,7 +11,7 @@ public class SetVolumeCommand extends SlashSubcommand {
 
     public SetVolumeCommand() {
         super("setvolume", "<command.command_set_volume>[Set the bot volume]");
-        addOption(OptionType.INTEGER, "volume", "<command.volume>[Volume]", true);
+        addCommandOption(OptionType.INTEGER, "volume", "<command.volume>[Volume]", true);
     }
 
     @Override

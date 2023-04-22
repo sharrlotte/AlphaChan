@@ -20,10 +20,10 @@ public class SayCommand extends SlashSubcommand {
 
     public SayCommand() {
         super("say", "Yui only");
-        addOption(OptionType.STRING, "content", "Yui only", true);
-        addOption(OptionType.STRING, "guild", "Yui only", false, true);
-        addOption(OptionType.STRING, "channel", "Yui only", false, true);
-        addOption(OptionType.STRING, "reply", "Yui only", false, true);
+        addCommandOption(OptionType.STRING, "content", "Yui only", true);
+        addCommandOption(OptionType.STRING, "guild", "Yui only", false, true);
+        addCommandOption(OptionType.STRING, "channel", "Yui only", false, true);
+        addCommandOption(OptionType.STRING, "reply", "Yui only", false, true);
 
     }
 

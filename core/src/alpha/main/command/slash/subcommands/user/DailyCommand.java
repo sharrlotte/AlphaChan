@@ -12,6 +12,7 @@ import alpha.main.handler.LocaleManager;
 import alpha.main.handler.MessageHandler;
 import alpha.main.handler.UserHandler;
 import alpha.main.handler.DatabaseHandler.Database;
+import alpha.main.util.StringUtils;
 
 import org.bson.Document;
 import org.bson.conversions.Bson;
@@ -63,7 +64,8 @@ public class DailyCommand extends SlashSubcommand {
         if (money > 0)
             MessageHandler.reply(event.getHook(),
                     LocaleManager.format(event.getGuild(),
-                            "<command.daily_success>[Reward %d Alpha \nCurrent point: %d ]",
+                            StringUtils.backtick(
+                                    "<command.daily_success>[Reward %d Alpha \nCurrent point: %d ]"),
                             money, userData.getPoint(PointType.MONEY)),
                     30);
         else {
@@ -71,7 +73,7 @@ public class DailyCommand extends SlashSubcommand {
                 if (data.containsKey("time")) {
                     Long lastTime = (Long) data.get("time");
                     MessageHandler.reply(event.getHook(), LocaleManager.format(event.getGuild(),
-                            "<command.daily_fail>[Cooldown until %s \nLast time: %s]",
+                            StringUtils.backtick("<command.daily_fail>[Cooldown until %s \nLast time: %s]"),
                             TimeFormat.RELATIVE.atTimestamp(lastTime).plus(24 * 60 * 60 * 1000),
                             TimeFormat.DATE_TIME_SHORT.format(lastTime)), 30);
                 }

@@ -7,6 +7,7 @@ import alpha.main.util.StringUtils;
 import net.dv8tion.jda.api.events.interaction.command.CommandAutoCompleteInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.DiscordLocale;
+import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
 
@@ -36,6 +37,21 @@ public abstract class SlashSubcommand extends SubcommandData {
         }
 
         return builder.toString();
+    }
+
+    public void addCommandOption(OptionType optionType, String name, String description) {
+        addCommandOption(optionType, name, description, false, false);
+    }
+
+    public void addCommandOption(OptionType optionType, String name, String description, boolean required) {
+        addCommandOption(optionType, name, description, required, false);
+    }
+
+    public void addCommandOption(OptionType optionType, String name, String description, boolean required,
+            boolean autoComplete) {
+
+        addOption(optionType, name,
+                LocaleManager.format(DiscordLocale.ENGLISH_US, description), required, autoComplete);
     }
 
     // Override

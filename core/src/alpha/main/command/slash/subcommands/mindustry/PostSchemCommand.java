@@ -43,11 +43,12 @@ public class PostSchemCommand extends SlashSubcommand {
 
     public PostSchemCommand() {
         super("postschem", "<command.command_post_schem>[Post a schematic to bot database]", false, true);
-        addOption(OptionType.STRING, "tag",
+        addCommandOption(OptionType.STRING, "tag",
                 "<command.schematic_tag>[Schematic tags, you can put multiple tag separate by a colon]", true, true);
-        addOption(OptionType.ATTACHMENT, "schematicfile", "<command.schematic_file>[Schematic file to post]");
-        addOption(OptionType.STRING, "text", "<command.schematic_text>[Schematic code to post]");
-        addOption(OptionType.BOOLEAN, "preview", "<command.show_image>[Send a schematic preview to current channel]");
+        addCommandOption(OptionType.ATTACHMENT, "schematicfile", "<command.schematic_file>[Schematic file to post]");
+        addCommandOption(OptionType.STRING, "text", "<command.schematic_text>[Schematic code to post]");
+        addCommandOption(OptionType.BOOLEAN, "preview",
+                "<command.show_image>[Send a schematic preview to current channel]");
     }
 
     @Override

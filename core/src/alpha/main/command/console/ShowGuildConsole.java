@@ -12,7 +12,7 @@ public class ShowGuildConsole extends ConsoleCommand {
 
     public ShowGuildConsole() {
         super("show-guild", "Show guild");
-        addOption("guildid", OptionType.STRING, "Guild id");
+        addCommandOption("guildid", OptionType.STRING, "Guild id");
     }
 
     @Override

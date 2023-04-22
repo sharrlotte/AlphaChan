@@ -20,7 +20,7 @@ import java.awt.Color;
 public class InfoCommand extends SlashSubcommand {
     public InfoCommand() {
         super("info", "<command.command_user_info>[Show user information]", true, false);
-        this.addOption(OptionType.USER, "user", "<command.user_name>[User want to show information]", false);
+        this.addCommandOption(OptionType.USER, "user", "<command.user_name>[User want to show information]", false);
     }
 
     @Override

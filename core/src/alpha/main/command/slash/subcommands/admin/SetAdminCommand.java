@@ -15,7 +15,7 @@ public class SetAdminCommand extends SlashSubcommand {
 
     public SetAdminCommand() {
         super("setadmin", "<command.command_set_admin>[Set bot admin role to discord role]");
-        this.addOption(OptionType.ROLE, "role", "<command.admin_role>[Admin role]", true);
+        this.addCommandOption(OptionType.ROLE, "role", "<command.admin_role>[Admin role]", true);
     }
 
     @Override

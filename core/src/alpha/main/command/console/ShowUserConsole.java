@@ -12,8 +12,8 @@ public class ShowUserConsole extends ConsoleCommand {
 
     public ShowUserConsole() {
         super("show-user", "Show user status");
-        addOption("guildid", OptionType.STRING, "Guild id");
-        addOption("userid", OptionType.STRING, "User id");
+        addCommandOption("guildid", OptionType.STRING, "Guild id");
+        addCommandOption("userid", OptionType.STRING, "User id");
     }
 
     @Override

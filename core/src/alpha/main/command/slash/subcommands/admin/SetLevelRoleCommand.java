@@ -18,8 +18,8 @@ import alpha.main.handler.MessageHandler;
 public class SetLevelRoleCommand extends SlashSubcommand {
     public SetLevelRoleCommand() {
         super("setlevelrole", "<command.command_level_role>[At a auto level role when user reach level]");
-        addOption(OptionType.ROLE, "role", "<command.level_role>[The role to assign]", true);
-        addOption(OptionType.INTEGER, "level", "<command.required_level>[Required level]", true);
+        addCommandOption(OptionType.ROLE, "role", "<command.level_role>[The role to assign]", true);
+        addCommandOption(OptionType.INTEGER, "level", "<command.required_level>[Required level]", true);
     }
 
     @Override

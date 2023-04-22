@@ -9,6 +9,7 @@ import alpha.main.command.SlashSubcommand;
 import alpha.main.handler.MessageHandler;
 import alpha.main.handler.UpdatableHandler;
 import alpha.main.util.Log;
+import alpha.main.util.StringUtils;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -25,7 +26,7 @@ public class AskCommand extends SlashSubcommand {
 
     public AskCommand() {
         super("ask", "<command.command_ask_bot>[Ask bot a question]");
-        addOption(OptionType.STRING, "question", "<command.question>[The question]", true);
+        addCommandOption(OptionType.STRING, "question", "<command.question>[The question]", true);
 
         String chatGPTKey = BotConfig.readString(Config.CHAT_GPT_TOKEN, "NULL");
 
@@ -49,9 +50,9 @@ public class AskCommand extends SlashSubcommand {
         }
 
         if (remain > 0) {
-            MessageHandler.reply(event.getHook(),
+            MessageHandler.reply(event.getHook(), StringUtils.backtick(
                     "Vui lòng đợi " + TimeFormat.RELATIVE.before(System.currentTimeMillis() + remain).toString() //
-                            + " để sử dụng lệnh",
+                            + " để sử dụng lệnh"),
                     (int) remain);
             return;
         }
@@ -59,7 +60,7 @@ public class AskCommand extends SlashSubcommand {
         OptionMapping questionOption = event.getOption("question");
 
         if (questionOption == null) {
-            MessageHandler.reply(event.getHook(), "BRUH", 10);
+            MessageHandler.reply(event.getHook(), StringUtils.backtick("BRUH"), 10);
             return;
         }
         String text = questionOption.getAsString();
@@ -75,7 +76,9 @@ public class AskCommand extends SlashSubcommand {
                         .build();//
 
                 MessageHandler.reply(event.getHook(),
-                        text + "\n\n" + api.createCompletion(request).getChoices().get(0).getText(), 1000000);
+                        StringUtils.backtick(
+                                text + "\n\n" + api.createCompletion(request).getChoices().get(0).getText()),
+                        1000000);
 
                 lastTime = System.currentTimeMillis();
 

@@ -22,9 +22,9 @@ public class TransferCommand extends SlashSubcommand {
 
     public TransferCommand() {
         super("transfer", "<command.command_transfer>[Transfer your point to others]", true, false);
-        addOption(OptionType.STRING, "type", "<command.point_type>[Point type]", true, true);
-        addOption(OptionType.USER, "user", "<command.user_name>[User you want to transfer to]", true);
-        addOption(OptionType.INTEGER, "point", "<command.amount>[Amount of point to transfer]", true);
+        addCommandOption(OptionType.STRING, "type", "<command.point_type>[Point type]", true, true);
+        addCommandOption(OptionType.USER, "user", "<command.user_name>[User you want to transfer to]", true);
+        addCommandOption(OptionType.INTEGER, "point", "<command.amount>[Amount of point to transfer]", true);
     }
 
     @Override

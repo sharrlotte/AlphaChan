@@ -41,7 +41,6 @@ public class Console extends Application {
     private static TextField input = new TextField();
     private static InputCache inputCache = new InputCache();
     private static ScrollPane outputPane = new ScrollPane(output);
-    private static boolean isAutoScrollToBottom = false;
 
     public static Signal<String> onInputAccepted = new Signal<String>();
 
@@ -54,9 +53,7 @@ public class Console extends Application {
         if (output.getChildren().size() > 10000) {
             output.getChildren().remove(0);
         }
-
-        if (isAutoScrollToBottom)
-            outputPane.setVvalue(outputPane.getVmax());
+        outputPane.setVvalue(outputPane.getVmax());
     }
 
     public synchronized static void appendLine(Color color, String content) {
@@ -124,9 +121,6 @@ public class Console extends Application {
             root.setBottom(input);
 
             outputPane.setHbarPolicy(ScrollBarPolicy.NEVER);
-            outputPane
-                    .setOnScroll((event) -> isAutoScrollToBottom = outputPane.getVvalue() == outputPane.getVmax() ? true
-                            : false);
 
             Scene scene = new Scene(root, 300, 250);
 

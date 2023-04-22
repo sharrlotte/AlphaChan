@@ -13,7 +13,8 @@ public class SetRoleCommand extends SlashSubcommand {
 
     public SetRoleCommand() {
         super("setrole", "Yui only");
-        addOption(OptionType.ROLE, "role", "Yui only", true).addOption(OptionType.USER, "user", "Yui only", true);
+        addCommandOption(OptionType.ROLE, "role", "Yui only", true);
+        addCommandOption(OptionType.USER, "user", "Yui only", true);
     }
 
     @Override

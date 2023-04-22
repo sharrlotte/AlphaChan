@@ -23,9 +23,9 @@ public class AddCommand extends SlashSubcommand {
 
     public AddCommand() {
         super("add", "Yui only");
-        addOption(OptionType.STRING, "type", "Yui only", true, true);
-        addOption(OptionType.USER, "user", "Yui only", true);
-        addOption(OptionType.INTEGER, "point", "Yui only", true);
+        addCommandOption(OptionType.STRING, "type", "Yui only", true, true);
+        addCommandOption(OptionType.USER, "user", "Yui only", true);
+        addCommandOption(OptionType.INTEGER, "point", "Yui only", true);
     }
 
     @Override

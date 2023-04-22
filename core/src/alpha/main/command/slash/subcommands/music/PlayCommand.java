@@ -27,7 +27,7 @@ public class PlayCommand extends SlashSubcommand {
 
     public PlayCommand() {
         super("play", "<command.command_play>[Play a song by Youtube link]");
-        addOption(OptionType.STRING, "source", "<command.link>[Link of the song]");
+        addCommandOption(OptionType.STRING, "source", "<command.link>[Link of the song]");
     }
 
     @Override

@@ -13,7 +13,7 @@ tasks.withType(JavaCompile) {
     options.encoding = 'UTF-8'
 }
 
-project.ext.mainClassName = "AlphaChan.AlphaChan"
+project.ext.mainClassName = "alpha.main.AlphaChan"
 sourceCompatibility = targetCompatibility = 16
 version = '1.0'
 
@@ -23,7 +23,7 @@ ext{
 }
 
 application {
-    mainClass = "AlphaChan.AlphaChan"
+    mainClass = project.mainClassName
 }
 
 allprojects{
@@ -64,6 +64,8 @@ task dist(type: Jar){
 
     manifest{
         attributes 'Main-Class': project.mainClassName
+
+        project.logger.info(project.mainClassName)
     }
 
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE

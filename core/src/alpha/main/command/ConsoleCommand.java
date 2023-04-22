@@ -40,18 +40,20 @@ public abstract class ConsoleCommand {
         return builder.toString();
     }
 
-    public ConsoleCommand addOption(String name, OptionType type, String description, boolean supportAutoComplete,
+    public ConsoleCommand addCommandOption(String name, OptionType type, String description,
+            boolean supportAutoComplete,
             boolean isRequired) {
         options.add(new ConsoleCommandOptionData(name, type, description, supportAutoComplete, isRequired));
         return this;
     }
 
-    public ConsoleCommand addOption(String name, OptionType type, String description, boolean supportAutoComplete) {
-        return addOption(name, type, description, supportAutoComplete, false);
+    public ConsoleCommand addCommandOption(String name, OptionType type, String description,
+            boolean supportAutoComplete) {
+        return addCommandOption(name, type, description, supportAutoComplete, false);
     }
 
-    public ConsoleCommand addOption(String name, OptionType type, String description) {
-        return addOption(name, type, description, false, false);
+    public ConsoleCommand addCommandOption(String name, OptionType type, String description) {
+        return addCommandOption(name, type, description, false, false);
     }
 
     public List<ConsoleCommandOptionData> getOptions() {

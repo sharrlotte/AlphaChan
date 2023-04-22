@@ -10,7 +10,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 public class AvatarCommand extends SlashSubcommand {
     public AvatarCommand() {
         super("avatar", "<command.command_avatar>[Show user avatar]");
-        this.addOption(OptionType.USER, "user", "<command.user_name>[User want to show avatar]", true);
+        this.addCommandOption(OptionType.USER, "user", "<command.user_name>[User want to show avatar]", true);
     }
 
     @Override

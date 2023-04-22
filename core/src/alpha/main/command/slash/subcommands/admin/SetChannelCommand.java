@@ -19,7 +19,7 @@ public class SetChannelCommand extends SlashSubcommand {
 
     public SetChannelCommand() {
         super("setchannel", "<command.command_set_channel>[Set bot usage channel to current channel]");
-        this.addOption(OptionType.STRING, "type", "<command.channel_type>[Channel type]", true, true);
+        this.addCommandOption(OptionType.STRING, "type", "<command.channel_type>[Channel type]", true, true);
     }
 
     @Override

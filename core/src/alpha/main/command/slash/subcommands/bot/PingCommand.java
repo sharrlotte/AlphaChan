@@ -2,6 +2,7 @@ package alpha.main.command.slash.subcommands.bot;
 
 import alpha.main.command.SlashSubcommand;
 import alpha.main.handler.MessageHandler;
+import alpha.main.util.StringUtils;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 
 public class PingCommand extends SlashSubcommand {
@@ -14,7 +15,7 @@ public class PingCommand extends SlashSubcommand {
     public void runCommand(SlashCommandInteractionEvent event) {
         long ping = event.getJDA().getGatewayPing();
 
-        MessageHandler.reply(event.getHook(), "Ping: " + ping + "ms", 10);
+        MessageHandler.reply(event.getHook(), StringUtils.backtick("Ping: " + ping + "ms"), 10);
     }
 
 }

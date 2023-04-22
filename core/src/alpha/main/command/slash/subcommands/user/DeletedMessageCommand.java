@@ -29,8 +29,9 @@ public class DeletedMessageCommand extends SlashSubcommand {
     public DeletedMessageCommand() {
         super("deletedmessage", "<command.command_deleted_message>[Show list of deleted message by users]", true,
                 false);
-        addOption(OptionType.INTEGER, "amount", "<command.amount>[Limit the number of messages, max is 100]", true);
-        addOption(OptionType.USER, "user", "<command.user_name>[Name of the message author]");
+        addCommandOption(OptionType.INTEGER, "amount", "<command.amount>[Limit the number of messages, max is 100]",
+                true);
+        addCommandOption(OptionType.USER, "user", "<command.user_name>[Name of the message author]");
     }
 
     @Override
