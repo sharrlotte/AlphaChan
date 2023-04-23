@@ -20,7 +20,7 @@ import java.awt.Color;
 public class InfoCommand extends SlashSubcommand {
     public InfoCommand() {
         super("info", "<command.command_user_info>[Show user information]", true, false);
-        this.addCommandOption(OptionType.USER, "user", "<command.user_name>[User want to show information]", false);
+        addCommandOption(OptionType.USER, "user", "<command.user_name>[User want to show information]", false);
     }
 
     @Override
@@ -57,17 +57,20 @@ public class InfoCommand extends SlashSubcommand {
         builder.setThumbnail(member.getEffectiveAvatarUrl());
         // Display role
         List<Role> roles = member.getRoles();
-        String roleString = "";
-        for (Role role : roles)
-            roleString += role.getAsMention() + ", ";
+        if (roles.size() > 0) {
+            String roleString = "";
+            for (Role role : roles)
+                roleString += role.getAsMention() + ", ";
 
-        if (!roleString.isEmpty())
-            roleString = roleString.substring(0, roleString.length() - 2);
+            if (!roleString.isEmpty())
+                roleString = roleString.substring(0, roleString.length() - 2);
+
+            builder.addField("<command.role>[Role]", roleString, false);
+        }
+
         // Display point
-
         UserCache user = UserHandler.getUserNoCache(member);
 
-        builder.addField("<command.role>[Role]", roleString, false);
         builder.addField("<command.basic_info>[Basic information]",
                 "<command.level>[Level]:" + user.getPoint(PointType.LEVEL) + " ("
                         + user.getPoint(PointType.EXP) + "\\" + user.getLevelCap() + ")" + //

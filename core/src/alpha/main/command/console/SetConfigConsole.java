@@ -21,8 +21,10 @@ public class SetConfigConsole extends ConsoleCommand {
         String key = event.getOption("key");
         String value = event.getOption("value");
 
-        if (key == null || key.isEmpty() || value == null || value.isEmpty())
+        if (key == null || key.isEmpty() || value == null || value.isEmpty()) {
             Log.error("Key or value is empty");
+            return;
+        }
 
         if (BotConfig.hasProperty(key)) {
             Log.system("Set " + key + " from [" + BotConfig.readString(key, value) + "] to [" + value + "]");

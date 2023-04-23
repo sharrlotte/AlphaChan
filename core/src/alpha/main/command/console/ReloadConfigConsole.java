@@ -8,7 +8,7 @@ import alpha.main.util.Log;
 public class ReloadConfigConsole extends ConsoleCommand {
 
     public ReloadConfigConsole() {
-        super("reload-config", "\n\t- <> Reload config file");
+        super("reload-config", "Reload config file");
     }
 
     @Override

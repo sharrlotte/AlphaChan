@@ -1,6 +1,9 @@
 package alpha.main.util;
 
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -66,7 +69,7 @@ public class StringUtils {
 
             for (int i = 2; i < input.length(); i++) {
                 if (l.contains(input.substring(0, i)))
-                    point += i;
+                    point += i * 2;
             }
 
             if (point > max) {
@@ -76,6 +79,79 @@ public class StringUtils {
 
         }
         return max > -diff ? estimate : null;
+    }
+
+    public static int editDistance(String s1, String s2) {
+        s1 = s1.toLowerCase();
+        s2 = s2.toLowerCase();
+
+        int[] costs = new int[s2.length() + 1];
+        for (int i = 0; i <= s1.length(); i++) {
+            int lastValue = i;
+            for (int j = 0; j <= s2.length(); j++) {
+                if (i == 0)
+                    costs[j] = j;
+                else {
+                    if (j > 0) {
+                        int newValue = costs[j - 1];
+                        if (s1.charAt(i - 1) != s2.charAt(j - 1))
+                            newValue = Math.min(Math.min(newValue, lastValue),
+                                    costs[j]) + 1;
+                        costs[j - 1] = lastValue;
+                        lastValue = newValue;
+                    }
+                }
+            }
+            if (i > 0)
+                costs[s2.length()] = lastValue;
+        }
+        return costs[s2.length()];
+    }
+
+    public static int getMatchPoint(String s1, String s2) {
+        // String longer = s1, shorter = s2;
+        // if (s1.length() < s2.length()) {
+        // longer = s2;
+        // shorter = s1;
+        // }
+        // int longerLength = longer.length();
+        // if (longerLength == 0) {
+        // return 1.0;
+        // }
+
+        // return (longerLength - editDistance(longer, shorter)) / (double)
+        // longerLength;
+
+        int point = 0;
+
+        if (s2.startsWith(s1))
+            point += 1;
+
+        for (int i = 1; i < s1.length() + 1; i++) {
+            if (s2.contains(s1.substring(0, i))) {
+                point += i;
+            } else
+                break;
+        }
+
+        return point;
+    }
+
+    public static List<String> findBestMatches(String input, List<String> list, int maxOption) {
+
+        if (list.isEmpty() || input == null)
+            return list;
+
+        List<String> result = new LinkedList<>();
+
+        list = new ArrayList<>(list);
+        list.sort((o1, o2) -> (getMatchPoint(input, o2) - getMatchPoint(input, o1)));
+
+        for (int i = 0; i < (maxOption < list.size() ? maxOption : list.size()); i++) {
+            String option = list.get(i);
+            result.add(option);
+        }
+        return result;
     }
 
     public static <T> String listToLines(Iterable<T> list) {

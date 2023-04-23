@@ -3,6 +3,7 @@ package alpha.main.handler;
 import alpha.main.command.ConsoleCommandEvent;
 import alpha.main.command.ContextMenuCommand;
 import alpha.main.command.SlashCommand;
+import alpha.main.command.ConsoleAutoCompleteEvent;
 import alpha.main.command.ConsoleCommand;
 import alpha.main.command.console.HelpConsole;
 import alpha.main.command.console.ReloadConfigConsole;
@@ -22,10 +23,9 @@ import alpha.main.command.slash.MindustryCommand;
 import alpha.main.command.slash.MusicCommand;
 import alpha.main.command.slash.UserCommand;
 import alpha.main.command.slash.YuiCommand;
-import alpha.main.ui.bot.Console;
+import alpha.main.ui.bot.AutoCompleteTextField;
 import alpha.main.util.Log;
 import alpha.main.util.StringUtils;
-
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.events.interaction.command.CommandAutoCompleteInteractionEvent;
@@ -36,8 +36,11 @@ import net.dv8tion.jda.api.interactions.commands.Command;
 
 import static alpha.main.AlphaChan.*;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class CommandHandler {
 
@@ -178,8 +181,6 @@ public class CommandHandler {
 
     public class ConsoleCommandHandler {
 
-        private static final String SEPARATOR = " ";
-
         private static HashMap<String, ConsoleCommand> consoleCommands;
 
         private void init() {
@@ -194,8 +195,6 @@ public class CommandHandler {
             addCommand(new SetConfigConsole());
             addCommand(new SaveConfigConsole());
             addCommand(new ShutdownConsole());
-
-            Console.onInputAccepted.connect((content) -> runCommand(content));
 
             Log.system("Console command handler up");
         }
@@ -212,24 +211,16 @@ public class CommandHandler {
             consoleCommands.put(command.getName(), command);
         }
 
-        public static void runCommand(String command) {
+        public static void onCommand(String command) {
 
-            if (command == null)
+            if (!isValidConsoleCommand(command))
                 return;
 
-            if (command.isBlank())
-                return;
+            ConsoleCommandEvent event = ConsoleCommandEvent.parseCommand(command);
 
-            if (command.charAt(0) != '/')
-                return;
-
-            command = command.substring(1, command.length());
-            String[] field = command.split(SEPARATOR);
-
-            if (consoleCommands.containsKey(field[0])) {
-                ConsoleCommandEvent event = ConsoleCommandEvent.parseCommand(command);
-                if (event != null) {
-                    consoleCommands.get(field[0]).onCommand(event);
+            if (consoleCommands.containsKey(event.getCommandName())) {
+                if (event != null && event.getCommandName() != null) {
+                    consoleCommands.get(event.getCommandName()).onCommand(event);
                     return;
                 }
             }
@@ -241,6 +232,44 @@ public class CommandHandler {
             } else {
                 Log.info("COMMAND NOT FOUND", "[/" + command + "] doesn't exists, do you mean [/" + estimate + "]");
             }
+        }
+
+        public static void onAutoComplete(AutoCompleteTextField field) {
+            if (!isValidConsoleCommand(field.getText()))
+                return;
+
+            ConsoleAutoCompleteEvent event = ConsoleAutoCompleteEvent.parseCommand(field);
+
+            if (consoleCommands.containsKey(event.getCommandName())
+                    && event.getCommandName().length() != field.getCaretPosition()) {
+                if (event != null && event.getCommandName() != null) {
+                    consoleCommands.get(event.getCommandName()).runAutoComplete(event);
+                    return;
+                }
+
+            } else {
+
+                ArrayList<String> entries = new ArrayList<String>(consoleCommands.keySet());
+                List<String> result = StringUtils.findBestMatches(event.getCommandName(), entries, 10);
+                field.replyChoices(event.getCommandName(), result//
+                        .stream()//
+                        .map((v) -> new AutoCompleteTextField.Choice(v, v))
+                        .collect(Collectors.toList()));
+
+            }
+        }
+
+        public static boolean isValidConsoleCommand(String command) {
+            if (command == null)
+                return false;
+
+            if (command.isBlank())
+                return false;
+
+            if (command.charAt(0) != '/')
+                return false;
+
+            return true;
         }
     }
 

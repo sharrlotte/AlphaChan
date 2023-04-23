@@ -8,7 +8,7 @@ import alpha.main.util.Log;
 public class ReloadSlashCommandConsole extends ConsoleCommand {
 
     public ReloadSlashCommandConsole() {
-        super("reload-slash-command", "\n\t- <>: Reload bot slash command");
+        super("reload-slash-command", "Reload bot slash command");
     }
 
     @Override

@@ -9,7 +9,7 @@ import alpha.main.util.StringUtils;
 public class ShowConfigConsole extends ConsoleCommand {
 
     public ShowConfigConsole() {
-        super("show-config", "\n\t- <> Show bot configures");
+        super("show-config", "Show bot configures");
     }
 
     @Override

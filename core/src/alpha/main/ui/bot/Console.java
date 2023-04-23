@@ -4,11 +4,9 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
-import java.util.LinkedList;
 
 import alpha.main.AlphaChan;
-import alpha.main.event.Signal;
-import alpha.main.util.StringUtils;
+import alpha.main.handler.CommandHandler.ConsoleCommandHandler;
 
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
@@ -20,44 +18,26 @@ import javafx.scene.paint.Color;
 import javafx.scene.paint.CycleMethod;
 import javafx.scene.paint.LinearGradient;
 import javafx.scene.paint.Stop;
-import javafx.scene.text.Text;
-import javafx.scene.text.TextFlow;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.event.EventHandler;
 import javafx.scene.Node;
 import javafx.scene.Scene;
-import javafx.scene.control.ScrollPane;
-import javafx.scene.control.TextField;
-import javafx.scene.control.ScrollPane.ScrollBarPolicy;
 import javafx.scene.effect.BlendMode;
-import javafx.scene.input.KeyCode;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 
 public class Console extends Application {
 
-    private static TextFlow output = new TextFlow();
-    private static TextField input = new TextField();
-    private static InputCache inputCache = new InputCache();
-    private static ScrollPane outputPane = new ScrollPane(output);
-
-    public static Signal<String> onInputAccepted = new Signal<String>();
+    private static AutoCompleteTextField input = new AutoCompleteTextField();
+    private static ConsoleOutputPane output = new ConsoleOutputPane();
 
     public synchronized static void append(Color color, String content) {
-        Text text = new Text();
-        text.setStyle("-fx-fill: " + StringUtils.toHexString(color) + ";-fx-font-weight:bold;");
-        text.setText(content);
-        output.getChildren().addAll(text);
-
-        if (output.getChildren().size() > 10000) {
-            output.getChildren().remove(0);
-        }
-        outputPane.setVvalue(outputPane.getVmax());
+        output.append(color, content);
     }
 
     public synchronized static void appendLine(Color color, String content) {
-        append(color, content + "\n");
+        output.append(color, content + "\n");
     }
 
     @Override
@@ -87,40 +67,18 @@ public class Console extends Application {
 
             System.setOut(printStream);
 
-            stage.setOpacity(0);
-
-            output.setLineSpacing(0);
-
+            input.textProperty()
+                    .addListener((observable, oldValue, newValue) -> ConsoleCommandHandler.onAutoComplete(input));
             input.setPrefHeight(15);
-
-            input.setOnKeyPressed((key) -> {
-                if (key.getCode() == KeyCode.UP) {
-                    String text = inputCache.getLast();
-                    input.setText(text);
-                    input.positionCaret(text.length());
-                }
-
-                else if (key.getCode() == KeyCode.DOWN) {
-                    String text = inputCache.getNext();
-                    input.setText(text);
-                    input.positionCaret(text.length());
-                }
-            });
-
-            input.setOnAction((action) -> {
-                String text = input.getText();
-                input.setText("");
-                inputCache.add(text);
-                onInputAccepted.emit(text);
+            input.onInputAccepted.connect((text) -> {
                 appendLine(Color.web("#B5E4F4"), text);
+                ConsoleCommandHandler.onCommand(text);
             });
 
             BorderPane root = new BorderPane();
 
-            root.setCenter(outputPane);
+            root.setCenter(output);
             root.setBottom(input);
-
-            outputPane.setHbarPolicy(ScrollBarPolicy.NEVER);
 
             Scene scene = new Scene(root, 300, 250);
 
@@ -131,9 +89,9 @@ public class Console extends Application {
             Background background = new Background(new BackgroundFill(gradient, null, null));
 
             output.setBackground(Background.EMPTY);
-            outputPane.setBackground(Background.EMPTY);
-            outputPane.widthProperty().addListener((l) -> {
-                Node vp = outputPane.lookup(".viewport");
+            output.setBackground(Background.EMPTY);
+            output.widthProperty().addListener((l) -> {
+                Node vp = output.lookup(".viewport");
                 vp.setStyle("-fx-background-color:transparent;");
             });
 
@@ -162,44 +120,10 @@ public class Console extends Application {
 
             Platform.setImplicitExit(false);
 
-            stage.setOpacity(1);
             stage.show();
 
         } catch (Exception e) {
             e.printStackTrace();
-        }
-    }
-
-    private static class InputCache {
-
-        private LinkedList<String> cache = new LinkedList<>();
-        private long cacheLimit = 100;
-        private int index = 0;
-
-        public synchronized String getNext() {
-            if (cache.size() == 0)
-                return "";
-
-            if (index > cache.size() - 1)
-                index = 0;
-
-            return cache.get(index++);
-        }
-
-        public synchronized String getLast() {
-            if (cache.size() == 0)
-                return "";
-
-            if (index < 0)
-                index = cache.size() - 1;
-
-            return cache.get(index--);
-        }
-
-        public synchronized void add(String content) {
-            cache.add(content);
-            if (cache.size() > cacheLimit)
-                cache.remove(0);
         }
     }
 }

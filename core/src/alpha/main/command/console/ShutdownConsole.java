@@ -7,7 +7,7 @@ import alpha.main.command.ConsoleCommand;
 public class ShutdownConsole extends ConsoleCommand {
 
     public ShutdownConsole() {
-        super("shutdown", "\n\t- Shutdown the bot");
+        super("shutdown", "Shutdown the bot");
     }
 
     @Override

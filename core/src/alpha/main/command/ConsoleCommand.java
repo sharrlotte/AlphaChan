@@ -2,8 +2,10 @@ package alpha.main.command;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import alpha.main.command.ConsoleCommandOptionData.OptionType;
+import alpha.main.ui.bot.AutoCompleteTextField;
 
 public abstract class ConsoleCommand {
 
@@ -62,6 +64,20 @@ public abstract class ConsoleCommand {
 
     public void runCommand(ConsoleCommandEvent event) {
         onCommand(event);
+    }
+
+    public void runAutoComplete(ConsoleAutoCompleteEvent event) {
+        if (event.getFocusString() != null && !event.getFocusString().isEmpty()) {
+            for (ConsoleCommandOptionData option : options) {
+                if (option.getName().equals(event.getFocusString())) {
+                    onAutoComplete(event);
+                    return;
+                }
+            }
+        }
+        event.replyChoices(event.getFocusString(),
+                options.stream().map((v) -> new AutoCompleteTextField.Choice(v.getName(), v.getName() + "="))
+                        .collect(Collectors.toList()));
     }
 
     public void onAutoComplete(ConsoleAutoCompleteEvent event) {

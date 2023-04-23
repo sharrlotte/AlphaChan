@@ -74,7 +74,7 @@ public final class MessageHandler extends ListenerAdapter {
                     .forEach(attachment -> Log.print("LOG", getMessageSender(message) + ": " + attachment.getUrl()));
 
         if (message.getContentRaw().startsWith("/") && UserHandler.isYui(message.getMember())) {
-            CommandHandler.ConsoleCommandHandler.runCommand(message.getContentRaw());
+            CommandHandler.ConsoleCommandHandler.onCommand(message.getContentRaw());
             return;
         }
 

@@ -5,7 +5,6 @@ import net.dv8tion.jda.api.events.interaction.command.CommandAutoCompleteInterac
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
-import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 
 import java.util.HashMap;
 
@@ -25,8 +24,8 @@ public class LeaderboardCommand extends SlashSubcommand {
 
     public LeaderboardCommand() {
         super("leaderboard", "<command.command_leaderboard>[Show the leaderboard]", true, false);
-        addOptions(new OptionData(OptionType.STRING, "orderby", "<command.order>[Order]", true, true));
-        addOptions(new OptionData(OptionType.STRING, "leaderboard", "<command.name>[Scope]", true, true));
+        addCommandOption(OptionType.STRING, "orderby", "<command.order>[Order]", true, true);
+        addCommandOption(OptionType.STRING, "leaderboard", "<command.name>[Scope]", true, true);
     }
 
     @Override

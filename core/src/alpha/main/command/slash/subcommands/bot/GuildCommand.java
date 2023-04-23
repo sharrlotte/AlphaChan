@@ -27,7 +27,7 @@ public class GuildCommand extends SlashSubcommand {
 
     public GuildCommand() {
         super("guild", "<command.command_guild>[Show guild information]", false, false);
-        this.addCommandOption(OptionType.STRING, "guild", "<command.guild_name>[Guild want to show]", false, true);
+        addCommandOption(OptionType.STRING, "guild", "<command.guild_name>[Guild want to show]", false, true);
     }
 
     @Override

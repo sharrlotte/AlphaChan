@@ -10,8 +10,9 @@ public class ConsoleCommandEvent {
     private final String name;
     private final HashMap<String, String> optionMap;
 
-    private static final Pattern COMMAND_NAME_PATTERN = Pattern.compile("([\\w\\-]+)");
-    private static final Pattern COMMAND_OPTION_PATTERN = Pattern.compile("(\\w+)=\\[([\\w\s{},\\-]+)\\]");
+    public static final Pattern COMMAND_NAME_PATTERN = Pattern.compile("/([\\w\\-]+)");
+    public static final Pattern COMMAND_OPTION_PATTERN = Pattern
+            .compile("(\\w+)=(([\\w\\-_]+)|\\{([\\w\s,\\-_]+)\\}|\\\"([\\w\s,\\-_]+)\\\")");
 
     private ConsoleCommandEvent(String name, HashMap<String, String> optionMap) {
         this.name = name;
@@ -29,7 +30,7 @@ public class ConsoleCommandEvent {
         String name = nameMatcher.find() ? nameMatcher.group(1) : null;
 
         if (name == null)
-            return null;
+            new ConsoleCommandEvent(null, null);
 
         Matcher optionMatcher = COMMAND_OPTION_PATTERN.matcher(command);
         HashMap<String, String> options = new HashMap<>();
@@ -50,11 +51,19 @@ public class ConsoleCommandEvent {
     }
 
     public String getOption(String option) {
-        return optionMap.get(option);
+        String value = optionMap.get(option);
+        return value;
+    }
+
+    public String getOptionAsString(String option) {
+        String value = optionMap.get(option);
+        value = value.startsWith("\"") ? value.substring(1, value.length()) : value;
+        value = value.endsWith("\"") ? value.substring(0, value.length() - 1) : value;
+        return value;
     }
 
     @SuppressWarnings("unchecked")
-    public <T> T getOption(String option, Class<T> clazz) {
+    public <T> T getOptionAs(String option, Class<T> clazz) {
         if (optionMap.containsKey(option))
             try {
                 return (T) optionMap.get(option);
@@ -70,8 +79,11 @@ public class ConsoleCommandEvent {
     public <T> void getOptionAsList(String option, Class<T> clazz, List<T> result) {
         if (optionMap.containsKey(option)) {
             try {
-                for (String value : optionMap.get(option).split(",")) {
-                    result.add((T) value);
+                String value = optionMap.get(option);
+                value = value.startsWith("{") ? value.substring(1, value.length()) : value;
+                value = value.endsWith("}") ? value.substring(0, value.length() - 1) : value;
+                for (String v : value.split(",")) {
+                    result.add((T) v);
                 }
 
             } catch (Exception e) {

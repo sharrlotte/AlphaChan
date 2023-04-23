@@ -52,7 +52,6 @@ public class AlphaChan {
                     GatewayIntent.GUILD_VOICE_STATES, //
                     GatewayIntent.GUILD_MODERATION, //
                     GatewayIntent.GUILD_INVITES)
-
                     .enableCache(CacheFlag.VOICE_STATE).setMemberCachePolicy(MemberCachePolicy.ALL).build();
 
             jda.awaitReady();
@@ -92,10 +91,10 @@ public class AlphaChan {
                 try {
                     Thread.sleep(2000);
                 } catch (InterruptedException unused) {
-
+                } finally {
+                    Platform.exit();
+                    System.exit(0);
                 }
-                Platform.exit();
-                System.exit(0);
             }).start();
         }
     }
