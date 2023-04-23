@@ -1,4 +1,4 @@
-package alpha.main.data;
+package alpha.main.common;
 
 public enum Bool {
 

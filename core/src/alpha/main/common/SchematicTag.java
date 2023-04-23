@@ -1,4 +1,4 @@
-package alpha.main.data.mindustry;
+package alpha.main.common;
 
 import java.util.ArrayList;
 import java.util.Arrays;

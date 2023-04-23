@@ -11,6 +11,7 @@ import alpha.main.data.user.GuildCache;
 import alpha.main.handler.GuildHandler;
 import alpha.main.handler.MessageHandler;
 import alpha.main.ui.discord.PageTable;
+import alpha.main.util.StringUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
@@ -22,8 +23,6 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.components.buttons.ButtonStyle;
 
 public class GuildCommand extends SlashSubcommand {
-
-    private final int MAX_DISPLAY = 7;
 
     public GuildCommand() {
         super("guild", "<command.command_guild>[Show guild information]", false, false);
@@ -43,13 +42,13 @@ public class GuildCommand extends SlashSubcommand {
             for (int i = 0; i < guilds.size(); i++) {
                 Guild guild = guilds.get(i);
                 Member owner = guild.getOwner();
-                field.append("<command.guild_name>[Guild name]: " + guild.getName() + "\n");
+                field.append("<command.display_guild_name>[Guild name]: " + guild.getName() + "\n");
                 if (owner != null)
                     field.append("<command.guild_owner>[Guild owner]: " + owner.getEffectiveName() + "\n");
-                field.append("<command.guild_total_member>[Members]: " + guild.getMemberCount());
+                field.append("<command.guild_total_member>[Members]: " + guild.getMemberCount() + "\n\n");
 
-                if (i % MAX_DISPLAY == MAX_DISPLAY - 1) {
-                    builder.addField("<command.guild>[Guild]", field.toString(), false);
+                if (field.length() > 800) {
+                    builder.addField("<command.guild>[Guild]", StringUtils.backtick(field.toString()), false);
                     table.addPage(builder);
                     builder.clear();
                     field = new StringBuilder();

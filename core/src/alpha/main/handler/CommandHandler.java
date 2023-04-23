@@ -228,9 +228,9 @@ public class CommandHandler {
             String estimate = StringUtils.findBestMatch(command, consoleCommands.keySet());
 
             if (estimate == null) {
-                Log.info("COMMAND NOT FOUND", "[/" + command + "] doesn't exists, use [/help] to get all command");
+                Log.info("COMMAND NOT FOUND", "[" + command + "] doesn't exists, use [/help] to get all command");
             } else {
-                Log.info("COMMAND NOT FOUND", "[/" + command + "] doesn't exists, do you mean [/" + estimate + "]");
+                Log.info("COMMAND NOT FOUND", "[" + command + "] doesn't exists, do you mean [/" + estimate + "]");
             }
         }
 
